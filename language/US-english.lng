@@ -1,0 +1,19 @@
+<?php
+$lang = array (
+'admin_login_greeting'		=> "Welcome to Rash admin panel! Please log in now.",
+'home_greeting'				=> "<p>Hello! Enjoy our collection of quotes and if you feel the pleasure, you can add some of your own.</p>"
+	."<p>Depending on if you like or dislike a quote, there are links that are + and - signs that you can click to promote or demote a quote."
+	."If you think a quote has slipped by our moderators and isn't appropriate for this website, you can always click the [X] link near it.</p>"
+	."<p>Note: The quote is not removed from the database, it just puts a flag up for the admins to check it to verify that it is alright, it may or may not be removed. </p>"
+	."<p>Queries? Remarks? <a href=\"mailto:rawrnix@rawrnix.com\">Email!</a></p>",
+'add_outputmsg_top'			=> "The quote you have submitted is: ",
+'add_outputmsg_bottom'		=> "If this is not the quote you have entered, please contact the administrator and explain your problem.",
+'tracking_check_1'			=> "Quote has been modified, and data of your action has been recorded in the database.<br />",
+'tracking_check_2'			=> "Quote has been modified, your IP has been logged, and data of your action has been recorded in the database.<br />",
+'tracking_check_3'			=> "You have already voted on this quote, please try again later.<br />",
+'flag_previously_flagged'	=> "This quote has been flagged and rechecked by a moderator already.",
+'flag_currently_flagged'	=> "This quote is currently pending deletion.",
+'flag_quote_flagged'		=> "You have marked this quote for deletion.",
+'login_error'				=> "Error logging in, please try again."
+);
+?>

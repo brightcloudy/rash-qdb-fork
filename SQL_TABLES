@@ -1,0 +1,53 @@
+mysql> describe rash_news;
++-------+---------+------+-----+---------+----------------+
+| Field | Type    | Null | Key | Default | Extra          |
++-------+---------+------+-----+---------+----------------+
+| id    | int(11) |      | PRI | NULL    | auto_increment |
+| news  | text    |      |     |         |                |
+| date  | int(10) |      |     | 0       |                |
++-------+---------+------+-----+---------+----------------+
+3 rows in set (0.01 sec)
+
+mysql> describe rash_queue;
++-------+---------+------+-----+---------+----------------+
+| Field | Type    | Null | Key | Default | Extra          |
++-------+---------+------+-----+---------+----------------+
+| id    | int(11) |      | PRI | NULL    | auto_increment |
+| quote | text    |      |     |         |                |
++-------+---------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> describe rash_users;
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| user     | varchar(20)  |      |     |         |       |
+| password | varchar(255) |      |     |         |       |
+| level    | int(1)       |      |     | 0       |       |
+| salt     | text         | YES  |     | NULL    |       |
++----------+--------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> describe rash_quotes;
++--------+---------+------+-----+---------+----------------+
+| Field  | Type    | Null | Key | Default | Extra          |
++--------+---------+------+-----+---------+----------------+
+| id     | int(11) |      | PRI | NULL    | auto_increment |
+| quote  | text    |      |     |         |                |
+| rating | int(7)  |      |     | 0       |                |
+| flag   | int(1)  |      |     | 0       |                |
+| date   | int(10) |      |     | 0       |                |
++--------+---------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> describe rash_tracking;
++----------+-------------+------+-----+---------+----------------+
+| Field    | Type        | Null | Key | Default | Extra          |
++----------+-------------+------+-----+---------+----------------+
+| id       | int(11)     |      | PRI | NULL    | auto_increment |
+| ip       | varchar(15) |      |     |         |                |
+| quote_id | text        |      |     |         |                |
+| vote     | text        |      |     |         |                |
+| flag     | text        |      |     |         |                |
++----------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)

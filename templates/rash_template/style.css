@@ -1,0 +1,72 @@
+/* ORGANIZE THE CSS SOMETIME YOU SHIT */
+
+div.quote_quote{
+	padding-bottom: 5pt;	
+}
+div.quote_whole{
+	padding-top: 10pt;
+}
+div#home_greeting{
+	float:left;
+	width:67%;
+	width: 45%;
+	margin-right:15px;
+	position: relative;
+	z-index: 1;
+}
+div#home_news_whole{
+	float: left;
+}
+div#site_admin_nav{
+	position: relative;
+	margin-top: 90pt;
+	clear: both;
+	margin-top: -.1pt
+}
+html>body div#site_admin_nav{ /* for firefox, disabled in opera and ie */
+	margin-top: 0pt;
+}
+div#site_nav{
+	position: relative;
+	z-index: 0;
+}
+div#site_image{
+	border: 0pt;
+}
+a, a:visited, a:hover, a:visited:hover{
+	color: #FF0000;
+}
+div.home_news_date{
+	font-weight: bold;
+}
+div#site_all{
+	margin-left: 50pt;
+	margin-right: 100pt;
+}
+a#site_nav_admin{
+	color: #ffffff;
+}
+a#site_nav_logout{
+	color: #000000;
+}
+div#site_admin_nav{
+	position: relative;
+}
+a#site_admin_flag, a#site_admin_queue{
+	color: #336699;
+}
+div#add_outputmsg_quote{
+	padding-top: 10pt;
+	font-family: monospace;
+	padding-bottom: 10pt;
+}
+.admin_queue_alt1{
+	background-color: #ffffff;
+}
+.admin_queue_alt2{
+	background-color: #f0f0f0;
+}
+div#quote_origin-name, div#search_title, div#add_title, div#admin_queue_title, div#admin_flag_title, div#admin_change-pw_title, div#admin_users_title, div#admin_add-user_title{
+	font-size: 23.6pt;
+	font-weight: bold;
+}
