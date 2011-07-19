@@ -315,9 +315,11 @@ function quote_queue($method)
        No<input type="radio" name="q<?=$row['id']?>" value="n<?=$row['id']?>">
       </td>
       <td>
+        <div class="quote_quote">
 <?
 		echo nl2br("       ".$row['quote']); // displays quote with appropriate line breaks
 ?>
+        </div>
 
       </td>
 	  <td>
@@ -396,9 +398,11 @@ while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
 	Delete<input type="radio" name="q<?=$row['id']?>" value="d<?=$row['id']?>">
 </td>
 <td>
+<div class="quote_quote">
 <?
 	echo nl2br($row['quote']);
 ?>
+</div>
 </td>
 <td>
 	<input type="radio" name="q<?=$row['id']?>" value="u<?=$row['id']?>">Unflag

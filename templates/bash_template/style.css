@@ -34,7 +34,25 @@ div.quote_whole{
 div.quote_whole:nth-child(odd) {
 	background-color:#f0f0f0;
 }
-
+.quote_plus {
+  border: 1px solid green;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+}
+.quote_plus:hover {
+  background-color:lightgreen;
+}
+ 
+.quote_minus {
+  border: 1px solid red;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+}
+.quote_minus:hover {
+  background-color:pink;
+}
 /* searchpage */
 input#search_submit-button{
 	background-color: #c08000;

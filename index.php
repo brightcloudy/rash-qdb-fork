@@ -45,11 +45,11 @@ switch($page[0])
 		echo "  </div>\n";
 		break;
 	case 'bottom':
-		$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE rating < 0 ORDER BY rating ASC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE rating < 0 ORDER BY rating ASC LIMIT 50";
 		quote_generation($query, "Bottom", -1); // contgen.php
 		break;
 	case 'browse':
-		$query = "SELECT id, quote, rating, flag FROM rash_quotes ORDER BY id ASC ";
+		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes ORDER BY id ASC ";
 		quote_generation($query, "Browse", $page[1], $quote_limit, $page_limit); // contgen.php
 		break;
 	case 'change_pw':
@@ -64,7 +64,7 @@ switch($page[0])
 			flag_queue($page[1]);
 		break;
 	case 'latest':
-		$query = "SELECT id, quote, rating, flag FROM rash_quotes ORDER BY id DESC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes ORDER BY id DESC LIMIT 50";
 		quote_generation($query, "Latest", -1); // contgen.php
 		break;
 	case 'logout':
@@ -79,11 +79,11 @@ switch($page[0])
 			quote_queue($page[1]);
 		break;
 	case 'random':
-		$query = "SELECT id, quote, rating, flag FROM rash_quotes ORDER BY rand() LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes ORDER BY rand() LIMIT 50";
 		quote_generation($query, "Random", -1); // contgen.php
 		break;
 	case 'random2':
-		$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE rating > 1 ORDER BY rand() LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE rating > 1 ORDER BY rand() LIMIT 50";
 		quote_generation($query, "Random2", -1); // contgen.php
 		break;
     case 'rss':

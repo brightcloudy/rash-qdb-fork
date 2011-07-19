@@ -203,8 +203,10 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 	// if a date is requested in the query (ie. SELECT * FROM or SELECT quote, date, flag, ect. FROM)
 	// it will present the date, but the date isn't always wanted, so it is only echoed if it's
 	// initialized by dumping the query results into an array
-		if(isset($row['date']))
-			echo "     <span class=\"quote_date\">" . $row['date'] . "</span>\n";
+		if(isset($row['date'])) {
+			date_default_timezone_set('America/New_York');
+			echo "     <span class=\"quote_date\">" . date("F j, Y", $row['date']) . "</span>\n";
+		}
 ?>
     </div>
     <div class="quote_quote">
