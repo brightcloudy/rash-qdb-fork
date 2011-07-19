@@ -35,7 +35,7 @@ div.quote_whole:nth-child(odd) {
 	background-color:#f0f0f0;
 }
 .quote_plus {
-  border: 1px solid green;
+  color: green;
   display: inline-block;
   min-width: 1.25em;
   text-align:center;
@@ -45,7 +45,7 @@ div.quote_whole:nth-child(odd) {
 }
  
 .quote_minus {
-  border: 1px solid red;
+  color: red;
   display: inline-block;
   min-width: 1.25em;
   text-align:center;
