@@ -377,8 +377,8 @@ $x = 0;
 while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
 ?>
 <tr>
-<td>
-	Delete<input type="radio" name="q<?=$row['id']?>" value="d<?=$row['id']?>">
+<td class="quote_delete">
+	<label>Delete<input type="radio" name="q<?=$row['id']?>" value="d<?=$row['id']?>"></label>
 </td>
 <td>
 <div class="quote_quote">
@@ -387,8 +387,8 @@ while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
 ?>
 </div>
 </td>
-<td>
-	<input type="radio" name="q<?=$row['id']?>" value="u<?=$row['id']?>">Unflag
+<td class="quote_unflag">
+	<label><input type="radio" name="q<?=$row['id']?>" value="u<?=$row['id']?>">Unflag</label>
 </td>
 </tr>
 <?
