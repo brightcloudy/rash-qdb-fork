@@ -294,8 +294,8 @@ function quote_queue($method)
 	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // will itinerate through each entry in rash_queue
 ?>
      <tr>
-      <td>
-       No<input type="radio" name="q<?=$row['id']?>" value="n<?=$row['id']?>">
+      <td class="quote_no">
+       <label>No<input type="radio" name="q<?=$row['id']?>" value="n<?=$row['id']?>"></label>
       </td>
       <td>
         <div class="quote_quote">
@@ -305,8 +305,8 @@ function quote_queue($method)
         </div>
 
       </td>
-	  <td>
-       <input type="radio" name="q<?=$row['id']?>" value="y<?=$row['id']?>" style="text-align: right">Yes
+	  <td class="quote_yes">
+       <label><input type="radio" name="q<?=$row['id']?>" value="y<?=$row['id']?>" style="text-align: right">Yes</label>
 	  </td>
      </tr>
     </div>

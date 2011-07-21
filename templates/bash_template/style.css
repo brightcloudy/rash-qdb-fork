@@ -107,6 +107,18 @@ html>body div#site_admin_nav{ /* hack for firefox, disabled in opera and ie */
 .admin_queue tr {
 	background-color: #f0f0f0;
 }
+.admin_queue .quote_no label,
+.admin_queue .quote_yes label {
+  padding: 1em;
+}
+.admin_queue .quote_no label:hover {
+  background-color:pink;
+}
+.admin_queue .quote_yes label:hover {
+  background-color:lightgreen;
+}
+
+
 input#admin_login_username-box{
 	background-color: #f0f0f0;
 }
