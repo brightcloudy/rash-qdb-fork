@@ -66,7 +66,8 @@ elseif($_SERVER['QUERY_STRING'] == md5('create_tables')){
 	$res =& $db->query("CREATE TABLE rash_users (
 							user varchar(20) NOT NULL,
 							`password` varchar(255) NOT NULL,
-							level int(1) NOT NULL); ");
+							level int(1) NOT NULL,
+							salt text); ");
 	if (DB::isError($res)) {
 	    die($res->getMessage());
 	}
