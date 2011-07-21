@@ -1,16 +1,20 @@
 <?php
-//require_once '/usr/local/lib/php/PEAR.php';
-//if(file_exists('settings.php')){
-//	include('settings.php');
-//}
-require 'settings.php';
-if(file_exists('settings.php')){
-	require('connect.php');
+
+$def_template = './templates/bash_template/bash_template.php';
+
+if (file_exists($def_template)) {
+    require $def_template;
+} else {
+    function printheader($txt) {}
+    function printfooter() {}
 }
-//require('./templates/rash_template/rash_template.php');
 
+if (file_exists('settings.php')){
+    die("settings.php already exists.");
+}
 
-//printheader("Install");
+printheader();
+
 If($_SERVER['QUERY_STRING'] == md5('create_file')){
 	$fp = fopen("settings.php","w");
 	$string = "<?php \n"
@@ -32,12 +36,14 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 				."//\n"
 //				."\$language	= '".$_POST['language']."';\n"
 				."?>";
-	fwrite($fp, $string, strlen($string)); 
+	if (fwrite($fp, $string, strlen($string)) === FALSE) {
+	    die("Sorry, cannot write settings.php");
+	}
 	header("Location: install.php?".md5('create_tables'));
 }
 elseif($_SERVER['QUERY_STRING'] == md5('create_tables')){
 	$res =& $db->query("CREATE TABLE rash_quotes (
-							id int(11) NOT NULL auto_increment primary key, 
+							id int(11) NOT NULL auto_increment primary key,
 							quote text NOT NULL,
 							rating int(7) NOT NULL,
 							flag int(1) NOT NULL,
@@ -79,24 +85,29 @@ elseif($_SERVER['QUERY_STRING'] == md5('create_tables')){
 	if (DB::isError($res)) {
 	    die($res->getMessage());
 	}
-	echo "Table rash_news has been created successfully!<br />";	
+	echo "Table rash_news has been created successfully!<br />";
+	echo 'Everything should now be OK.';
 }
 elseif(!file_exists('settings.php')){
 ?>
- <form action="?<?=md5('create_file')?>" method="post">
-  Template File Path: <input type="text" name="template" value="./templates/rash_template/rash_template.php" style="width: 215pt"><br />
-  DB Type:	<input type="text" name="phptype" value="mysql"><br />
-  DB Hostname:	<input type="text" name="hostspec" value="localhost"><br />
-  DB Database:	<input type="text" name="database" value="rash">(which database to use)<br />
-  DB Username:	<input type="text" name="username" value="username"><br />
-  DB Password:	<input type="password" name="password" value="password"><br /><br />
+<h2>Install</h2>
+<pre><form action="?<?=md5('create_file')?>" method="post">
+  Template File Path: <input type="text" name="template" value="<?php echo $def_template; ?>" style="width: 215pt">
+  DB Type:	      <input type="text" name="phptype" value="mysql">
+  DB Hostname:	      <input type="text" name="hostspec" value="localhost">
+  DB Database:	      <input type="text" name="database" value="rash">(which database to use)
+  DB Username:	      <input type="text" name="username" value="username">
+  DB Password:	      <input type="password" name="password" value="password">
 
 <!--  Language: <select name="language">
    <option value="US-English">US-English
   </select><br />-->
   <input type="submit" value="Submit">
  </form>
+</pre>
 <?php
-//printfooter();
 }
+
+printfooter();
+
 ?>
