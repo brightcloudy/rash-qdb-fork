@@ -161,6 +161,7 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 {
 	require('settings.php');
 	require('connect.php');
+	require("language/{$language}.lng");
 	if($page != -1){
 ?>
   <div id="quote_all">
@@ -195,10 +196,10 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
    <div class="quote_whole">
     <div class="quote_option-bar">
      <a href="?<?=$row['id']?>" class="quote_number">#<?=$row['id']?></a>
-     <a href="?vote<?=$GET_SEPARATOR_HTML.$row['id'].$GET_SEPARATOR_HTML."plus"?>" class="quote_plus">+</a>
+     <a href="?vote<?=$GET_SEPARATOR_HTML.$row['id'].$GET_SEPARATOR_HTML."plus"?>" class="quote_plus" title="<?=$lang['upvote']?>">+</a>
      <span class="quote_rating">(<?=$row['rating']?>)</span>
-     <a href="?vote<?=$GET_SEPARATOR_HTML.$row['id'].$GET_SEPARATOR_HTML."minus"?>" class="quote_minus">-</a>
-     <a href="?flag<?=$GET_SEPARATOR_HTML.$row['id']?>" class="quote_flag">[X]</a>
+     <a href="?vote<?=$GET_SEPARATOR_HTML.$row['id'].$GET_SEPARATOR_HTML."minus"?>" class="quote_minus" title="<?=$lang['downvote']?>">-</a>
+     <a href="?flag<?=$GET_SEPARATOR_HTML.$row['id']?>" class="quote_flag" title="<?=$lang['flagquote']?>">[X]</a>
 <?
 	// if a date is requested in the query (ie. SELECT * FROM or SELECT quote, date, flag, ect. FROM)
 	// it will present the date, but the date isn't always wanted, so it is only echoed if it's

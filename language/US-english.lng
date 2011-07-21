@@ -14,6 +14,9 @@ $lang = array (
 'flag_previously_flagged'	=> "This quote has been flagged and rechecked by a moderator already.",
 'flag_currently_flagged'	=> "This quote is currently pending deletion.",
 'flag_quote_flagged'		=> "You have marked this quote for deletion.",
-'login_error'				=> "Error logging in, please try again."
+'login_error'				=> "Error logging in, please try again.",
+'upvote'  => "Upvote quote",
+'downvote' => "Downvote quote",
+'flagquote' => "Flag quote for admin attention"
 );
 ?>
