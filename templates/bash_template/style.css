@@ -101,10 +101,10 @@ div#site_admin_nav_lower_infobar{
 html>body div#site_admin_nav{ /* hack for firefox, disabled in opera and ie */
 	margin-top: 0pt;
 }
-.admin_queue_alt1{
+.admin_queue tr:nth-child(odd) {
 	background-color: #ffffff;
 }
-.admin_queue_alt2{
+.admin_queue tr {
 	background-color: #f0f0f0;
 }
 input#admin_login_username-box{

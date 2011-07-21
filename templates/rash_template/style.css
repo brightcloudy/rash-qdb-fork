@@ -60,10 +60,10 @@ div#add_outputmsg_quote{
 	font-family: monospace;
 	padding-bottom: 10pt;
 }
-.admin_queue_alt1{
+.admin_queue tr:nth-child(odd) {
 	background-color: #ffffff;
 }
-.admin_queue_alt2{
+.admin_queue tr {
 	background-color: #f0f0f0;
 }
 div#quote_origin-name, div#search_title, div#add_title, div#admin_queue_title, div#admin_flag_title, div#admin_change-pw_title, div#admin_users_title, div#admin_add-user_title{

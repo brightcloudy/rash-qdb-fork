@@ -227,23 +227,6 @@ function login($method)
 
 
 
-// alternate_colors($x)
-// Used to determine the alternate colors for the quote queue function, it serves to make the
-// output easier to read by the addition of alternating colors each itineration of the output loop.
-// it works by taking a variable $x and incrementing each time the loop in quote_queue() itinerates,
-// then it takes that variable and uses the modulus operator with 2, if the number's remainder is 
-// 0, then it is even, if the remainder is 1, it is odd. even numebrs get alt1 color, odds get alt2 color
-//
-
-function alternate_colors($x)
-{
-	if(!($x%2)){ 
-		echo "class=\"admin_queue_alt1\"";
-	}
-	elseif(($x%2) == 1){
-		echo "class=\"admin_queue_alt2\"";
-	}
-}
 
 // quote_queue($method)
 // This function displays the queue of quotes in the table rash_queue, input from users is sent
@@ -305,12 +288,12 @@ function quote_queue($method)
 	}
 ?>
   <form action="?queue<?=$GET_SEPARATOR_HTML?>judgement" method="post">
-   <table width="100%" cellspacing="0">
+   <table width="100%" cellspacing="0" class="admin_queue">
 <?
 	$x = 0;
 	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // will itinerate through each entry in rash_queue
 ?>
-     <tr <?alternate_colors($x);?>>
+     <tr>
       <td>
        No<input type="radio" name="q<?=$row['id']?>" value="n<?=$row['id']?>">
       </td>
@@ -388,12 +371,12 @@ function flag_queue($method)
 $res =& $db->query("SELECT * FROM rash_quotes WHERE flag = 1 ORDER BY id ASC");
 ?>
 <form action="?flag_queue<?=$GET_SEPARATOR_HTML?>judgement" method="post">
-<table width="100%">
+<table width="100%" class="admin_queue">
 <?
 $x = 0;
 while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
 ?>
-<tr <?alternate_colors($x)?>>
+<tr>
 <td>
 	Delete<input type="radio" name="q<?=$row['id']?>" value="d<?=$row['id']?>">
 </td>
