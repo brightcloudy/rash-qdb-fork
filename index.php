@@ -1,6 +1,9 @@
 <?
 session_start();
 require_once 'DB.php';
+if (!file_exists('settings.php')) {
+    die('settings.php does not exist. Run <a href="install.php">the install script</a> first.');
+}
 require('settings.php');
 require('connect.php');
 require($template);
