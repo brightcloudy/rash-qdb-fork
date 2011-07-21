@@ -30,7 +30,7 @@ function home_generation()
 	while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
 ?>
     <div class="home_news_date">
-     <?=$row['date']."\n"?>
+<?= date('Ymd', $row['date']) ."\n"?>
     </div>
     <div class="home_news_news">
      <?=$row['news']?>
