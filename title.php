@@ -34,20 +34,12 @@ function title($title)
 			return 'Rash Quote Management System';
 			break;
 		case true:
-			if(is_int($_SERVER['QUERY_STRING']) || $_SERVER['QUERY_STRING'] != false)
-			{
-				if(verify_int($_SERVER['QUERY_STRING']))
-				{
-					return 'Quote #'.$title;
-				}
-				else{
-					return 'Rash Quote Management System';
-				}
-			}
-			else{
-				return 'Rash Quote Management System';
-			}
-			break;
+		    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
+			return 'Quote #'.$title;
+		    } else {
+			return 'Rash Quote Management System';
+		    }
+		    break;
 	}
 }
 ?>

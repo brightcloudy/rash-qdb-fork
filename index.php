@@ -13,7 +13,6 @@ require('user_funcs.php');
 require('qmod.php');
 require('qfind.php');
 require('ip_tracking.php');
-require('verify_int.php');
 require('rss.php');
 
 
@@ -107,23 +106,13 @@ switch($page[0])
 		vote($page[1], $page[2]);
 		break;
 	default:
-		if(is_int($_SERVER['QUERY_STRING']) || $_SERVER['QUERY_STRING'] != false)
-		{
-			if(verify_int($_SERVER['QUERY_STRING']))
-			{
-				$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE id ='${_SERVER['QUERY_STRING']}' ";
-				quote_generation($query, "#${_SERVER['QUERY_STRING']}", -1); // contgen.php
-			}
-			else
-			{
-				home_generation(); // contgen.php
-			}
-		}
-		else
-		{
-			home_generation(); // contgen.php
-		}
-		
+	    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
+		$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE id ='${_SERVER['QUERY_STRING']}' ";
+		quote_generation($query, "#${_SERVER['QUERY_STRING']}", -1); // contgen.php
+	    } else {
+		home_generation(); // contgen.php
+	    }
+
 }
 if(!($page[0] == 'rss'))
     printfooter();	// templates/x_template/x_template.php
