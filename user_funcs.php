@@ -26,14 +26,15 @@ function add_quote($method)
       <?=$add_outputmsg_top."\n"?>
      </div>
      <div id="add_outputmsg_quote">
-      <?=nl2br(htmlspecialchars($_POST["rash_quote"]))."\n"?>
+    <?=nl2br(htmlspecialchars(trim($_POST["rash_quote"])))."\n"?>
      </div>
      <div id="add_outputmsg_bottom">
       <?=$lang['add_outputmsg_bottom']."\n"?>
      </div>
     </div> 
 <?
-		$res =& $db->query("INSERT INTO rash_queue (quote) VALUES('".addslashes(htmlspecialchars($_POST["rash_quote"]))."');");
+    $quotxt = addslashes(htmlspecialchars(trim($_POST["rash_quote"])));
+		$res =& $db->query("INSERT INTO rash_queue (quote) VALUES('".$quotxt."');");
 		if(DB::isError($res)){
 			die($res->getMessage());
 		}
