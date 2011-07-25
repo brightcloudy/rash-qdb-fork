@@ -6,10 +6,9 @@ function add_news($method)
 	require('connect.php');
 	require('str_rand.php');
 	date_default_timezone_set('America/New_York');
-	$today = mktime(date('G'),date('i'),date('s'),date('m'),date('d'),date('Y'));	// this timestamp is inserted to rash_quotes
 	if($method == 'submit')
 	{
-		$db->query("INSERT INTO rash_news (news,date) VALUES('${_POST['news']}', '".$today."');");
+	    $db->query("INSERT INTO rash_news (news,date) VALUES('${_POST['news']}', '".mktime()."');");
 	}
 ?>
   <div id="admin_add-news_all">
@@ -252,7 +251,6 @@ function quote_queue($method)
 		}
 		$x = 0;
 		date_default_timezone_set('America/New_York');
-		$today = mktime(date('G'),date('i'),date('s'),date('m'),date('d'),date('Y'));	// this timestamp is inserted to rash_quotes
 		while($judgement_array[$x]){	// itinerates through $judgement_array, stops when it gets to the end of the quote list
 			if(substr($judgement_array[$x], 0, 1) == 'y'){	// checks to see if the first letter of
 															// the entry of a quote in the array is y
@@ -264,7 +262,7 @@ function quote_queue($method)
 					die($res->getMessage());
 				}
 				$row = $quote->fetchRow(DB_FETCHMODE_ASSOC);	// fetches the quote from the database
-				$db->query("INSERT INTO `rash_quotes` (quote, rating, flag, date) VALUES ('".addslashes($row['quote'])."', 0, 0, '$today');");
+				$db->query("INSERT INTO `rash_quotes` (quote, rating, flag, date) VALUES ('".addslashes($row['quote'])."', 0, 0, '".mktime()."');");
 				echo "Quote ".substr($judgement_array[$x], 1)." added to quote database! <br />";
 															// inserts the quote into rash_quotes and gives a confirmation message
 			}
@@ -346,8 +344,6 @@ function flag_queue($method)
 		}
 
 		$x = 0;
-		date_default_timezone_set('America/New_York');
-		$today = mktime(date('G'),date('i'),date('s'),date('m'),date('d'),date('Y'));
 		while($judgement_array[$x]){
 			if(substr($judgement_array[$x], 0, 1) == 'u'){
 				// mysql_query("UPDATE rash_quotes SET `check` =2 WHERE id =".substr($judgement_array[$x], 1).";");
