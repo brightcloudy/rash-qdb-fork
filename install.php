@@ -40,6 +40,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  '$password' => "'".$_POST['password']."'",
 		  '$rss_url' => "'".$_POST['rss_url']."'",
 		  '$rss_title' => "'".$_POST['rss_title']."'",
+		  '$rss_desc' => "'".$_POST['rss_desc']."'",
 		  '$language' => "'US-english'",
 		  '$quote_limit' => '10',
 		  '$page_limit' => '5');
@@ -110,6 +111,7 @@ else {
 
   RSS URL:            <input type="text" name="rss_url" value="<?php echo 'http://'.$_SERVER['SERVER_NAME'];?>">
   RSS Title:          <input type="text" name="rss_title" value="Rash QDB">
+  RSS Description:    <input type="text" name="rss_desc" value="Quote Database for the IRC channel">
 
   <input type="submit" value="Submit">
  </form>

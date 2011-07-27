@@ -42,4 +42,6 @@ $rss_url    = 'http://qdb.rawrnix.com';		//omit trailing slash or face eternal h
 												// your rss feed is at yoursite.com/rash/?rss
 $rss_title  = '#nethack QDB';	// title of your rss feed 
 
+$rss_desc = 'Quote Database for the IRC channel #NetHack'; // description of the rss feed
+
 ?>
