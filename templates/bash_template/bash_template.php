@@ -12,7 +12,7 @@ ob_start();
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
- <title>QMS: <?=title($title)?></title>
+ <title>nhqdb: <?=title($title)?></title>
  <meta name="robots" content="noarchive,nofollow" />
  <link rel="alternative" type="text/xml" title="RSS" href="?rss" />
  <style type="text/css" media="all">
@@ -37,10 +37,10 @@ ob_start();
   <div id="site_nav">
    <div id="site_nav_upper">
     <div id="site_nav_upper_qms-long">
-     Quote Management System
+     #nethack QDB
     </div>
     <div id="site_nav_upper_qms">
-     QMS
+     nhqdb
     </div>&nbsp;
 <?
 

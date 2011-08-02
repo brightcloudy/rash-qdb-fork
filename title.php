@@ -31,13 +31,13 @@ function title($title)
 			return 'Top Quotes';
 			break;
 		case false:
-			return 'Rash Quote Management System';
+			return '#nethack QDB';
 			break;
 		case true:
 		    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
 			return 'Quote #'.$title;
 		    } else {
-			return 'Rash Quote Management System';
+			return '#nethack QDB';
 		    }
 		    break;
 	}

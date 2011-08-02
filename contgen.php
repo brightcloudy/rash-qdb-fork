@@ -14,6 +14,7 @@ function home_generation()
 	require('settings.php');
 	require('connect.php');
 	require("language/{$language}.lng");
+	date_default_timezone_set('America/New_York');
 	$res =& $db->query("SELECT * FROM rash_news");
 	if(DB::isError($res)){
 		die($res->getMessage());
