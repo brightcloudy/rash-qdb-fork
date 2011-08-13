@@ -5,7 +5,7 @@ function write_settings($fname, $data)
     $fp = fopen($fname,"w");
     $str = "<?php \n";
     foreach ($data as $key=>$val) {
-	$str .= $key.' = '.$val.";\n";
+	$str .= '$CONFIG[\''.$key.'\'] = '.$val.";\n";
     }
     if (fwrite($fp, $str, strlen($str)) === FALSE) {
 	return FALSE;
@@ -16,38 +16,42 @@ function write_settings($fname, $data)
 $def_template = './templates/bash_template/bash_template.php';
 
 if (file_exists($def_template)) {
+    /*require('language/US-english.lng');*/
     require $def_template;
 } else {
-    function printheader($txt) {}
+    function printheader($txt, $topleft='', $topright='') {}
     function printfooter() {}
 }
 
-printheader();
+printheader('Install Rash Quote Management System');
 
 If($_SERVER['QUERY_STRING'] == md5('create_file')){
     if (file_exists('settings.php')){
 	die("settings.php already exists.");
     }
-    $data = array('$template' => "'".$_POST['template']."'",
-		  '$GET_SEPARATOR' => "ini_get('arg_separator.output')",
-		  '$GET_SEPARATOR_HTML' => 'htmlspecialchars($GET_SEPARATOR, ENT_QUOTES)',
-		  '$phptype' => "'".$_POST['phptype']."'",
-		  '$hostspec' => "'".$_POST['hostspec']."'",
-		  '$port' => "''",
-		  '$socket' => "''",
-		  '$database' => "'".$_POST['database']."'",
-		  '$username' => "'".$_POST['username']."'",
-		  '$password' => "'".$_POST['password']."'",
-		  '$rss_url' => "'".$_POST['rss_url']."'",
-		  '$rss_title' => "'".$_POST['rss_title']."'",
-		  '$rss_desc' => "'".$_POST['rss_desc']."'",
-		  '$language' => "'US-english'",
-		  '$quote_limit' => '10',
-		  '$page_limit' => '5');
+    $data = array('template' => "'".$_POST['template']."'",
+		  'phptype' => "'".$_POST['phptype']."'",
+		  'hostspec' => "'".$_POST['hostspec']."'",
+		  'port' => "''",
+		  'socket' => "''",
+		  'database' => "'".$_POST['database']."'",
+		  'username' => "'".$_POST['username']."'",
+		  'password' => "'".$_POST['password']."'",
+		  'site_short_title' => "'".$_POST['site_short_title']."'",
+		  'site_long_title' => "'".$_POST['site_long_title']."'",
+		  'rss_url' => "'".$_POST['rss_url']."'",
+		  'rss_title' => "'".$_POST['rss_title']."'",
+		  'rss_desc' => "'".$_POST['rss_desc']."'",
+		  'language' => "'US-english'",
+		  'quote_limit' => '10',
+		  'page_limit' => '5',
+		  'GET_SEPARATOR' => "ini_get('arg_separator.output')",
+		  'GET_SEPARATOR_HTML' => 'htmlspecialchars($GET_SEPARATOR, ENT_QUOTES)');
     if (!write_settings('settings.php', $data)) {
 	die("Sorry, cannot write settings.php");
     }
     header("Location: install.php?".md5('create_tables'));
+    exit;
 }
 elseif($_SERVER['QUERY_STRING'] == md5('create_tables')){
     if (!file_exists('settings.php')){
@@ -60,42 +64,64 @@ elseif($_SERVER['QUERY_STRING'] == md5('create_tables')){
     function mk_db_table($tablename,$fields)
     {
 	include 'settings.php';
-	include 'connect.php';
+
+	$dsn = array(
+		     'phptype'  => $CONFIG['phptype'],
+		     'username' => $CONFIG['username'],
+		     'password' => $CONFIG['password'],
+		     'hostspec' => $CONFIG['hostspec'],
+		     'port'     => $CONFIG['port'],
+		     'socket'   => $CONFIG['socket'],
+		     'database' => $CONFIG['database'],
+		     );
+	$db =& DB::connect($dsn);
+	if (DB::isError($db)) {
+	    print $db->getMessage();
+	    return 1;
+	}
+
 	print 'Create table '.$tablename.': ';
 	$sql = 'CREATE TABLE '.$tablename.' ('.$fields.');';
 	$res =& $db->query($sql);
 	if (DB::isError($res)) {
-	    die($res->getMessage());
+	    print $res->getMessage();
+	    return 1;
+	} else {
+	    print "OK<br />";
+	    return 0;
 	}
-	echo "OK<br />";
     }
 
-    mk_db_table('rash_quotes', "id int(11) NOT NULL auto_increment primary key,
+    $error = mk_db_table('rash_quotes', "id int(11) NOT NULL auto_increment primary key,
 							quote text NOT NULL,
 							rating int(7) NOT NULL,
 							flag int(1) NOT NULL,
 							date int(10) NOT NULL");
 
-    mk_db_table('rash_queue', "id int(11) NOT NULL auto_increment primary key,
+    $error |= mk_db_table('rash_queue', "id int(11) NOT NULL auto_increment primary key,
 							quote text NOT NULL");
 
 
-    mk_db_table('rash_tracking', "id int(11) NOT NULL auto_increment primary key,
+    $error |= mk_db_table('rash_tracking', "id int(11) NOT NULL auto_increment primary key,
 							ip varchar(15) NOT NULL,
 							quote_id text NOT NULL,
 							vote text NOT NULL,
 							flag text NOT NULL");
 
-    mk_db_table('rash_users', "user varchar(20) NOT NULL,
+    $error |= mk_db_table('rash_users', "user varchar(20) NOT NULL,
 							`password` varchar(255) NOT NULL,
 							level int(1) NOT NULL,
 							salt text");
 
-    mk_db_table('rash_news', "id int(11) NOT NULL auto_increment primary key,
+    $error |= mk_db_table('rash_news', "id int(11) NOT NULL auto_increment primary key,
 							news text NOT NULL,
 							date int(10) NOT NULL");
 
-    echo 'Everything should now be OK.';
+    if ($error) {
+	print 'There were some errors...';
+    } else {
+	print 'Everything should now be OK.';
+    }
 }
 else {
     if(!file_exists('settings.php')){
@@ -108,6 +134,9 @@ else {
   DB Database:	      <input type="text" name="database" value="rash">(which database to use)
   DB Username:	      <input type="text" name="username" value="username">
   DB Password:	      <input type="password" name="password" value="password">
+
+  Site Short Title:   <input type="text" name="site_short_title" value="QMS">
+  Site Long Title:    <input type="text" name="site_long_title" value="Quote Management System">
 
   RSS URL:            <input type="text" name="rss_url" value="<?php echo 'http://'.$_SERVER['SERVER_NAME'];?>">
   RSS Title:          <input type="text" name="rss_title" value="Rash QDB">
