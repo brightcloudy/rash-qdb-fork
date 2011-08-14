@@ -15,6 +15,14 @@ require("language/{$CONFIG['language']}.lng");
 
 require($CONFIG['template']);
 
+function urlargs($ar1, $ar2 = null, $ar3 = null)
+{
+    global $CONFIG;
+    if ($ar2 === null) return $ar1;
+    if ($ar3 === null) return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2));
+    return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2, $ar3));
+}
+
 
 function rash_rss()
 {
@@ -311,13 +319,13 @@ function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 		$page_limit -= 2;
 	}while($page_limit > 1);
 	echo "   <div class=\"quote_pagenums\">\n";
-	echo "    <a href=\"?".strtolower($origin).$CONFIG['GET_SEPARATOR_HTML']."1\">".$lang['page_first']."</a>&nbsp;&nbsp;\n";
+	echo "    <a href=\"?".urlargs(strtolower($origin),'1')."\">".$lang['page_first']."</a>&nbsp;&nbsp;\n";
 	// this line is responsible for the -10 link in browse (by default), and the weird part in the middle
 	// is a conditional that checks to see if the current page - 10 is going to be 0 or negative, if it is,
 	// the -10 link defaults to page 1, if it turns out it's > 0, it links to the current page - 10 pages
 	//
-	echo "    <a href=\"?".strtolower($origin).$CONFIG['GET_SEPARATOR_HTML']
-		.((($page_default-10) > 1) ? ($page_default-10) : (1))
+	echo "    <a href=\"?".urlargs(strtolower($origin),
+					     ((($page_default-10) > 1) ? ($page_default-10) : (1)))
 		."\">-10</a>&nbsp;&nbsp; \n";
 
 	if(($page_default - $page_base) > 1)
@@ -328,7 +336,7 @@ function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 
 	do{	// echo the page numbers before the current page, but only $page_limit many
 		if($x > 0) // keeps page numbers from going to zero or below
-			echo "    <a href=\"?".strtolower($origin).$CONFIG['GET_SEPARATOR_HTML'].$x."\">${x}</a> \n";
+		    echo "    <a href=\"?".urlargs(strtolower($origin),$x)."\">${x}</a> \n";
 		$x++;
 	}while($x < $page_default);
 
@@ -339,7 +347,7 @@ function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 
 	do{	// echo the page numbers after the current page, but only $page_limit many
 		if($x <= $pagenum) // keeps page numbers from going higher than ones that have quotes
-			echo "    <a href=\"?".strtolower($origin).$CONFIG['GET_SEPARATOR_HTML'].$x."\">${x}</a> \n";
+		    echo "    <a href=\"?".urlargs(strtolower($origin),$x)."\">${x}</a> \n";
 		$x++;
 	}while($x < ($page_default + $page_base + 1));
 
@@ -353,11 +361,11 @@ function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 	// if it turns out that's true, then it links to the current page + 10, if current page + 10 is higher
 	// than the highest possible page, then it just links to the highest possible page
 	//
-	echo "    &nbsp;&nbsp;<a href=\"?".strtolower($origin).$CONFIG['GET_SEPARATOR_HTML']
-		.((($page_default+10) < $pagenum) ? ($page_default+10) : ($pagenum))
+	echo "    &nbsp;&nbsp;<a href=\"?".urlargs(strtolower($origin),
+						   ((($page_default+10) < $pagenum) ? ($page_default+10) : ($pagenum)))
 		."\">+10</a>&nbsp;&nbsp;\n";
 
-	echo "    &nbsp;&nbsp;<a href=\"?".strtolower($origin).$CONFIG['GET_SEPARATOR_HTML'].$pagenum."\">".$lang['page_first']."</a>\n";
+	echo "    &nbsp;&nbsp;<a href=\"?".urlargs(strtolower($origin),$pagenum)."\">".$lang['page_first']."</a>\n";
 	echo "   </div>\n";
 }
 
@@ -407,10 +415,10 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
    <div class="quote_whole">
     <div class="quote_option-bar">
      <a href="?<?=$row['id']?>" class="quote_number">#<?=$row['id']?></a>
-     <a href="?vote<?=$CONFIG['GET_SEPARATOR_HTML'].$row['id'].$CONFIG['GET_SEPARATOR_HTML']."plus"?>" class="quote_plus" title="<?=$lang['upvote']?>">+</a>
+     <a href="?<?=urlargs('vote',$row['id'],'plus')?>" class="quote_plus" title="<?=$lang['upvote']?>">+</a>
      <span class="quote_rating">(<?=$row['rating']?>)</span>
-     <a href="?vote<?=$CONFIG['GET_SEPARATOR_HTML'].$row['id'].$CONFIG['GET_SEPARATOR_HTML']."minus"?>" class="quote_minus" title="<?=$lang['downvote']?>">-</a>
-     <a href="?flag<?=$CONFIG['GET_SEPARATOR_HTML'].$row['id']?>" class="quote_flag" title="<?=$lang['flagquote']?>">[X]</a>
+     <a href="?<?=urlargs('vote',$row['id'],'minus')?>" class="quote_minus" title="<?=$lang['downvote']?>">-</a>
+     <a href="?<?=urlargs('flag',$row['id'])?>" class="quote_flag" title="<?=$lang['flagquote']?>">[X]</a>
 <?
 	// if a date is requested in the query (ie. SELECT * FROM or SELECT quote, date, flag, ect. FROM)
 	// it will present the date, but the date isn't always wanted, so it is only echoed if it's
@@ -449,7 +457,7 @@ function add_news($method)
    <div id="admin_add-news_title">
     Add News
    </div>
-   <form method="post" action="?add_news<?=$CONFIG['GET_SEPARATOR_HTML']?>submit">
+   <form method="post" action="?<?=urlargs('add_news','submit')?>">
 	<textarea cols="80" rows="5" name="news" id="add_news_news"></textarea><br />
 	<input type="submit" value="Add News" id="add_news" />
    </form>
@@ -471,7 +479,7 @@ function add_user($method)
    <div id="admin_add-user_title">
     Add User
    </div>
-   <form method="post" action="?add_user<?=$CONFIG['GET_SEPARATOR_HTML']?>update">
+   <form method="post" action="?<?=urlargs('add_user','update')?>">
     Username: <input type="text" name="username" id="admin_add-user_username" /><br />
 	RANDOM Salt: <input type="text" name="salt" value="<?=str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')?>" id="admin_add-user_salt" /><br />
 	Default Password: <input type="text" name="password" /><br />
@@ -508,7 +516,7 @@ function change_pw($method, $who)
   <div id="admin_change-pw_title">
    Change Password
   </div>
-  <form action="?change_pw<?=$CONFIG['GET_SEPARATOR_HTML']?>update<?=$CONFIG['GET_SEPARATOR_HTML']?><?=$_SESSION['user']?>" method="post">
+  <form action="?<?=urlargs('change_pw','update',$_SESSION['user'])?>" method="post">
    Old Password: <input type="password" name="old_password"><br />
    New Password: <input type="password" name="new_password"><br />
    Verify: <input type="password" name="verify_password"><br />
@@ -543,7 +551,7 @@ function edit_users($method, $who)
 		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 ?>
   <span style="font-style: underline">Editing user <?=$who?></span>
-  <form action="?users<?=$CONFIG['GET_SEPARATOR_HTML']?>update<?=$CONFIG['GET_SEPARATOR_HTML']?><?=$who?>" method="post">
+  <form action="?<?=urlargs('users','update',$who)?>" method="post">
    New Username: <input type="text" value="<?=$row['user']?>" name="user"><br />
    New Password: <input type="text" name="password"> (insert as cleartext, the program will encrypt it or leave it blank for no pw change)<br />
    New Level: <select name="level">
@@ -559,7 +567,7 @@ function edit_users($method, $who)
   <div id="admin_users_title">
    Users
   </div>
-  <form action="?users<?=$CONFIG['GET_SEPARATOR_HTML']?>delete" method="post">
+  <form action="?<?=urlargs('users','delete')?>" method="post">
    <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
     <tr>
      <td>
@@ -582,13 +590,13 @@ function edit_users($method, $who)
 ?>
     <tr>
      <td>
-      <a href="?users<?=$CONFIG['GET_SEPARATOR_HTML']?>edit<?=$CONFIG['GET_SEPARATOR_HTML']?><?=$row['user']?>"><?=$row['user']?></a>
+      <a href="?<?=urlargs('users','edit',$row['user'])?>"><?=$row['user']?></a>
      </td>
      <td>
-      <a href="?users<?=$CONFIG['GET_SEPARATOR_HTML']?>edit<?=$CONFIG['GET_SEPARATOR_HTML']?><?=$row['user']?>"><?=$row['password']?></a>
+      <a href="?<?=urlargs('users','edit',$row['user'])?>"><?=$row['password']?></a>
      </td>
      <td>
-      <a href="?users<?=$CONFIG['GET_SEPARATOR_HTML']?>edit<?=$CONFIG['GET_SEPARATOR_HTML']?><?=$row['user']?>"><?=$row['level']?></a>
+      <a href="?<?=urlargs('users','edit',$row['user'])?>"><?=$row['level']?></a>
      </td>
      <td>
       <input type="checkbox" name="d<?=$row['user']?>" value="<?=$row['user']?>" />
@@ -608,14 +616,14 @@ function login($method)
 {
     global $CONFIG, $db, $lang;
 	if(!$method){
-?>
-   <?=$lang['admin_login_greeting']?>
-   <form action="?admin<?=$CONFIG['GET_SEPARATOR_HTML']?>login" method="post">
+
+   print $lang['admin_login_greeting'];
+   print '<form action="?'.urlargs('admin','login').'" method="post">
     Username: <input type="text" name="rash_username" size="8" id="admin_login_username-box" /><br />
     Password: <input type="password" name="rash_password" size="8" id="admin_login_password-box" /><br />
     <input type="submit" value="Log In" id="admin_login_submit-button" />
-   </form>
-<?
+   </form>';
+
 	}
 	elseif($method == 'login'){
 		$res =& $db->query("SELECT salt FROM rash_users WHERE user='".strtolower($_POST['rash_username'])."'");
@@ -710,7 +718,7 @@ function quote_queue($method)
 		die($res->getMessage());
 	}
 ?>
-  <form action="?queue<?=$CONFIG['GET_SEPARATOR_HTML']?>judgement" method="post">
+  <form action="?<?=urlargs('queue','judgement')?>" method="post">
    <table width="100%" cellspacing="0" class="admin_queue">
 <?
 	$x = 0;
@@ -789,7 +797,7 @@ function flag_queue($method)
 //$result = mysql_query("SELECT * FROM rash_quotes WHERE `check` =0 order by id asc");
 $res =& $db->query("SELECT * FROM rash_quotes WHERE flag = 1 ORDER BY id ASC");
 ?>
-<form action="?flag_queue<?=$CONFIG['GET_SEPARATOR_HTML']?>judgement" method="post">
+<form action="?<?=urlargs('flag_queue','judgement')?>" method="post">
 <table width="100%" class="admin_queue">
 <?
 $x = 0;
@@ -845,7 +853,7 @@ function search($method)
 	print '<div id="search_title">'.$lang['search_title'].'</div>';
     }
 
-    print '<form method="post" action="?search'.$CONFIG['GET_SEPARATOR_HTML'].'fetch">';
+    print '<form method="post" action="?'.urlargs('search','fetch').'">';
     if ($method == 'fetch') { print '<input type="submit" name="submit" id="search_submit-button">&nbsp;'; }
     print '<input type="text" name="search" size="28" id="search_query-box">&nbsp;';
     if ($method != 'fetch') { print '<input type="submit" name="submit" id="search_submit-button">&nbsp;<br />'; }
@@ -905,7 +913,7 @@ function add_quote($method)
 	}
     }
 
-    print '<form action="?add'.$CONFIG['GET_SEPARATOR_HTML'].'submit" method="post">
+    print '<form action="?'.urlargs('add','submit').'" method="post">
      <textarea cols="80" rows="5" name="rash_quote" id="add_quote"></textarea><br />
      <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
      <input type="reset" value="'.$lang['add_reset_btn'].'" id="add_reset" />
