@@ -929,8 +929,7 @@ $page[2] = 0;
 $page = explode($CONFIG['GET_SEPARATOR'], $_SERVER['QUERY_STRING']);
 
 if(!($page[0] == 'rss'))
-    printheader($page[0], $CONFIG['site_short_title'], $CONFIG['site_long_title']); // templates/x_template/x_template.php
-
+    printheader(title($page[0]), $CONFIG['site_short_title'], $CONFIG['site_long_title']); // templates/x_template/x_template.php
 
 $dsn = array(
 	     'phptype'  => $CONFIG['phptype'],
