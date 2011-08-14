@@ -430,6 +430,7 @@ function add_news($method)
 	date_default_timezone_set('America/New_York');
 	if($method == 'submit')
 	{
+	    $_POST['news'] = nl2br($_POST['news']);
 	    $db->query("INSERT INTO rash_news (news,date) VALUES('${_POST['news']}', '".mktime()."');");
 	}
 ?>
