@@ -894,7 +894,7 @@ function add_quote($method)
 	print '<div id="add_outputmsg">';
 
 	print '<div id="add_outputmsg_top">'.$lang['add_outputmsg_top'].'</div>';
-	print '<div id="add_outputmsg_quote">'.$quotxt.'</div>';
+	print '<div id="add_outputmsg_quote">'.nl2br($quotxt).'</div>';
 	print '<div id="add_outputmsg_bottom">'.$lang['add_outputmsg_bottom'].'</div>';
 
 	print '</div>';
