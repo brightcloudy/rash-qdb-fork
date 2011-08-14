@@ -235,7 +235,7 @@ function home_generation()
 {
     global $db, $lang;
 
-    $res =& $db->query("SELECT * FROM rash_news");
+    $res =& $db->query("SELECT * FROM rash_news ORDER BY date desc LIMIT 5");
     if(DB::isError($res)){
 	die($res->getMessage());
     }
