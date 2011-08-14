@@ -3,7 +3,7 @@
 function write_settings($fname, $data)
 {
     $fp = fopen($fname,"w");
-    $str = "<?php \n";
+    $str = "<?php\n";
     foreach ($data as $key=>$val) {
 	$str .= '$CONFIG[\''.$key.'\'] = '.$val.";\n";
     }
@@ -12,6 +12,34 @@ function write_settings($fname, $data)
     }
     return TRUE;
 }
+
+function db_query($sql) {
+    include 'settings.php';
+    require_once 'DB.php';
+    $dsn = array(
+		 'phptype'  => $CONFIG['phptype'],
+		 'username' => $CONFIG['username'],
+		 'password' => $CONFIG['password'],
+		 'hostspec' => $CONFIG['hostspec'],
+		 'port'     => $CONFIG['port'],
+		 'socket'   => $CONFIG['socket'],
+		 'database' => $CONFIG['database'],
+		 );
+    $db =& DB::connect($dsn);
+    if (DB::isError($db)) {
+	print $db->getMessage();
+	return 1;
+    }
+    $res =& $db->query($sql);
+    if (DB::isError($res)) {
+	print $res->getMessage();
+	return 1;
+    } else {
+	print "OK<br />";
+	return 0;
+    }
+}
+
 
 $def_template = './templates/bash_template/bash_template.php';
 
@@ -50,46 +78,26 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
     if (!write_settings('settings.php', $data)) {
 	die("Sorry, cannot write settings.php");
     }
-    header("Location: install.php?".md5('create_tables'));
-    exit;
-}
-elseif($_SERVER['QUERY_STRING'] == md5('create_tables')){
+
     if (!file_exists('settings.php')){
 	die("settings.php does not exist.");
     }
 
     print '<h2>Creating database tables...</h2>';
 
-
     function mk_db_table($tablename,$fields)
     {
-	include 'settings.php';
-
-	$dsn = array(
-		     'phptype'  => $CONFIG['phptype'],
-		     'username' => $CONFIG['username'],
-		     'password' => $CONFIG['password'],
-		     'hostspec' => $CONFIG['hostspec'],
-		     'port'     => $CONFIG['port'],
-		     'socket'   => $CONFIG['socket'],
-		     'database' => $CONFIG['database'],
-		     );
-	$db =& DB::connect($dsn);
-	if (DB::isError($db)) {
-	    print $db->getMessage();
-	    return 1;
-	}
-
 	print 'Create table '.$tablename.': ';
-	$sql = 'CREATE TABLE '.$tablename.' ('.$fields.');';
-	$res =& $db->query($sql);
-	if (DB::isError($res)) {
-	    print $res->getMessage();
-	    return 1;
-	} else {
-	    print "OK<br />";
-	    return 0;
-	}
+	return db_query('CREATE TABLE '.$tablename.' ('.$fields.');');
+    }
+
+    function mk_user($username, $password)
+    {
+	print 'Creating user '.$username.': ';
+	$salt = 'abcdefghijk';
+	$level = 1;
+	$str = "INSERT INTO rash_users (user, password, level, salt) VALUES('$username', '".crypt($password, "\$1\$".substr($salt, 0, 8)."\$")."', '$level', '\$1\$".$salt."\$');";
+	return db_query($str);
     }
 
     $error = mk_db_table('rash_quotes', "id int(11) NOT NULL auto_increment primary key,
@@ -117,6 +125,8 @@ elseif($_SERVER['QUERY_STRING'] == md5('create_tables')){
 							news text NOT NULL,
 							date int(10) NOT NULL");
 
+    $error |= mk_user($_POST['adminuser'], $_POST['adminpass']);
+
     if ($error) {
 	print 'There were some errors...';
     } else {
@@ -134,6 +144,9 @@ else {
   DB Database:	      <input type="text" name="database" value="rash">(which database to use)
   DB Username:	      <input type="text" name="username" value="username">
   DB Password:	      <input type="password" name="password" value="password">
+
+  Admin Username:     <input type="text" name="adminuser" value="admin">
+  Admin Password:     <input type="password" name="adminpass" value="password">
 
   Site Short Title:   <input type="text" name="site_short_title" value="QMS">
   Site Long Title:    <input type="text" name="site_long_title" value="Quote Management System">
