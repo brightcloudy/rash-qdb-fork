@@ -234,35 +234,23 @@ function ip_track($where, $quote_num)
 function home_generation()
 {
     global $db, $lang;
-	$res =& $db->query("SELECT * FROM rash_news");
-	if(DB::isError($res)){
-		die($res->getMessage());
-	}
+
+    $res =& $db->query("SELECT * FROM rash_news");
+    if(DB::isError($res)){
+	die($res->getMessage());
+    }
+
+    $news = '';
+
+    while ($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	$news .= '<div class="home_news_date">'.date('Ymd', $row['date']).'</div>';
+	$news .= '<div class="home_news_news">'.$row['news'].'</div>';
+    }
+
 ?>
   <div id="home_all">
-   <div id="home_news">
-<?
-	//
-	// please note that in the code that news on left and home generation on
-	// the right, that's because of how floats work with css, but in
-	// presentation it is reversed!
-	//
-	while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
-?>
-    <div class="home_news_date">
-<?= date('Ymd', $row['date']) ."\n"?>
-    </div>
-    <div class="home_news_news">
-     <?=$row['news']?>
-    </div>
-<?
-	}
-?>
-   </div>
-
-   <div id="home_greeting">
-    <?=$lang['home_greeting']."\n"// language/x.lng?>
-   </div>
+   <div id="home_news"><?=$news?></div>
+   <div id="home_greeting"><?=$lang['home_greeting']?></div>
   </div>
 <?
 }
