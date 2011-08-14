@@ -15,14 +15,6 @@ require("language/{$CONFIG['language']}.lng");
 
 require($CONFIG['template']);
 
-function urlargs($ar1, $ar2 = null, $ar3 = null)
-{
-    global $CONFIG;
-    if ($ar2 === null) return $ar1;
-    if ($ar3 === null) return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2));
-    return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2, $ar3));
-}
-
 
 function rash_rss()
 {
