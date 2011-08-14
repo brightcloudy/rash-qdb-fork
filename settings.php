@@ -24,4 +24,4 @@ $CONFIG['page_limit'] = 5;	// how many page numbers to show
 
 // No need to change these
 $CONFIG['GET_SEPARATOR'] = ini_get('arg_separator.output');
-$CONFIG['GET_SEPARATOR_HTML'] = htmlspecialchars($GET_SEPARATOR, ENT_QUOTES);
+$CONFIG['GET_SEPARATOR_HTML'] = htmlspecialchars($CONFIG['GET_SEPARATOR'], ENT_QUOTES);

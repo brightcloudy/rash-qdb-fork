@@ -46,7 +46,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'quote_limit' => '10',
 		  'page_limit' => '5',
 		  'GET_SEPARATOR' => "ini_get('arg_separator.output')",
-		  'GET_SEPARATOR_HTML' => 'htmlspecialchars($GET_SEPARATOR, ENT_QUOTES)');
+		  'GET_SEPARATOR_HTML' => 'htmlspecialchars($CONFIG[\'GET_SEPARATOR\'], ENT_QUOTES)');
     if (!write_settings('settings.php', $data)) {
 	die("Sorry, cannot write settings.php");
     }
