@@ -695,7 +695,7 @@ function quote_queue($method)
 															// the quote is deleted from rash_queue regardless if it is
 															// submitted into rash_quotes or not, since there's no reason
 															// for it to be there if it is checked as no or as yes
-			echo "Quote ".substr($judgement_array[$x], 1)." deleted from temporary datbase!<br />";
+			echo "Quote ".substr($judgement_array[$x], 1)." deleted from temporary database!<br />";
 			$x++;	// increments x so the judgement_array goes to the next item
 		}
 	}
