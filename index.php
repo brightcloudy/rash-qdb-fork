@@ -446,6 +446,24 @@ function add_news($method)
 <?
 }
 
+function user_level_select($selected=3, $id='admin_add-user_level')
+{
+    $lvls = array('1' => 'superuser',
+		  '2' => 'administrator',
+		  '3' => 'moderator');
+
+    $str = '<select name="level" size="1" id="'.$id.'">';
+
+    foreach ($lvls as $key => $val) {
+	$str .= '<option value="'.$key.'"';
+	if ($key == $selected) $str .= ' selected';
+	$str .= '>'.$key.' - '.$val.'</option>';
+    }
+
+    $str .= '</select>';
+    return $str;
+}
+
 function add_user($method)
 {
     global $CONFIG, $db;
@@ -464,11 +482,7 @@ function add_user($method)
     Username: <input type="text" name="username" id="admin_add-user_username" /><br />
 	RANDOM Salt: <input type="text" name="salt" value="<?=str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')?>" id="admin_add-user_salt" /><br />
 	Default Password: <input type="text" name="password" /><br />
-	Level: <select name="level" size="1" id="admin_add-user_level">
-      <option>1 - superuser
-	  <option>2 - administrator
-	  <option selected>3 - moderator
-	 </select><br />
+       Level: <?=user_level_select()?><br />
 	 <input type="submit" value="Submit" id="admin_add-user_submit" />
    </form>
   </div>
@@ -535,11 +549,7 @@ function edit_users($method, $who)
   <form action="?<?=urlargs('users','update',$who)?>" method="post">
    New Username: <input type="text" value="<?=$row['user']?>" name="user"><br />
    New Password: <input type="text" name="password"> (insert as cleartext, the program will encrypt it or leave it blank for no pw change)<br />
-   New Level: <select name="level">
-    <option value="1" <?if($row['level']==1){echo "selected=selected";}?>>1
-    <option value="2" <?if($row['level']==2){echo "selected=selected";}?>>2
-    <option value="3" <?if($row['level']==3){echo "selected=selected";}?>>3
-   </select>
+      New Level: <?=user_level_select($row['level'])?>
    <input type="submit">
   </form>
 <?
