@@ -983,7 +983,9 @@ $dsn = array(
 	     );
 $db =& DB::connect($dsn);
 if (DB::isError($db)) {
-    die($db->getMessage());
+    print $db->getMessage();
+    if (!($page[0] == 'rss')) printfooter();
+    exit;
 }
 
 

@@ -115,8 +115,11 @@ function printfooter()
     <div id="site_admin_nav_lower_infobar">
      <span id="site_admin_nav_lower_infobar_pending">
 <?
-
-		$numrows = $db->getOne('select count(id) from rash_queue');
+	  if (DB::isError($db)) {
+	      $numrows = 0;
+	  } else {
+	      $numrows = $db->getOne('select count(id) from rash_queue');
+	  }
 		echo $lang['pending_quotes'].": $numrows;\n";
 
 ?>
@@ -124,7 +127,11 @@ function printfooter()
      <span id="site_admin_nav_lower_infobar_approved">
 <?
 
-	$numrows = $db->getOne('SELECT COUNT(id) FROM rash_quotes');
+	   if (DB::isError($db)) {
+	       $numrows = 0;
+	   } else {
+	       $numrows = $db->getOne('SELECT COUNT(id) FROM rash_quotes');
+	   }
 	echo $lang['approved_quotes'].": $numrows\n";
 
 ?>
