@@ -54,4 +54,10 @@ $lang = array (
 'random2_title' => "Random, with rating &gt; 1",
 'top_title' => "Top",
 'bottom_title' => "Bottom",
+'editquote' => "Edit quote",
+'editquote_title' => "Edit Quote",
+'editquote_outputmsg_top' => "",
+'editquote_outputmsg_bottom' => "",
+'edit_quote_btn' => "Submit",
+'edit_reset_btn' => "Reset"
 );

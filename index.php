@@ -349,6 +349,16 @@ function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 	echo "   </div>\n";
 }
 
+
+function edit_quote_button($quoteid)
+{
+    global $lang;
+    if ($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2)) {
+	return '<a href="?'.urlargs('edit','edit',$quoteid).'" class="quote_edit" title="'.$lang['editquote'].'">[E]</a>';
+    }
+    return '';
+}
+
 /************************************************************************
 ************************************************************************/
 
@@ -399,6 +409,7 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
      <span class="quote_rating">(<?=$row['rating']?>)</span>
      <a href="?<?=urlargs('vote',$row['id'],'minus')?>" class="quote_minus" title="<?=$lang['downvote']?>">-</a>
      <a href="?<?=urlargs('flag',$row['id'])?>" class="quote_flag" title="<?=$lang['flagquote']?>">[X]</a>
+     <?=edit_quote_button($row['id'])?>
 <?
 	// if a date is requested in the query (ie. SELECT * FROM or SELECT quote, date, flag, ect. FROM)
 	// it will present the date, but the date isn't always wanted, so it is only echoed if it's
@@ -869,6 +880,45 @@ function search($method)
 
 }
 
+function edit_quote($method, $quoteid)
+{
+    global $CONFIG, $db, $lang;
+
+    if (!($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))) return;
+
+    print '<div id="editquote_all">';
+
+    print '<div id="editquote_title">'.$lang['editquote_title'].'</div>';
+
+    if ($method == 'submit') {
+
+	$quotxt = addslashes(htmlspecialchars(trim($_POST["rash_quote"])));
+
+	print '<div id="editquote_outputmsg">';
+
+	print '<div id="editquote_outputmsg_top">'.$lang['editquote_outputmsg_top'].'</div>';
+	print '<div id="editquote_outputmsg_quote">'.nl2br($quotxt).'</div>';
+	print '<div id="editquote_outputmsg_bottom">'.$lang['editquote_outputmsg_bottom'].'</div>';
+
+	print '</div>';
+
+	$res =& $db->query("UPDATE rash_quotes SET quote='".$quotxt."' WHERE id=".$quoteid.";");
+	if(DB::isError($res)){
+	    die($res->getMessage());
+	}
+    } else {
+	$quotxt = $db->getOne("SELECT quote FROM rash_quotes WHERE id=".$quoteid);
+    }
+
+    print '<form action="?'.urlargs('edit','submit', $quoteid).'" method="post">
+     <textarea cols="80" rows="5" name="rash_quote" id="edit_quote">'.$quotxt.'</textarea><br />
+     <input type="submit" value="'.$lang['edit_quote_btn'].'" id="edit_submit" />
+     <input type="reset" value="'.$lang['edit_reset_btn'].'" id="edit_reset" />
+    </form>';
+
+    print '</div>';
+}
+
 
 // add_quote()
 // This function serves as the page catering to ?add, it can receive input
@@ -1012,6 +1062,10 @@ switch($page[0])
 		$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE rating > 0 ORDER BY rating DESC LIMIT 50";
 		quote_generation($query, $lang['top_title'], -1);
 		break;
+	case 'edit':
+	    if ($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))
+		edit_quote($page[1], $page[2]);
+	    break;
 	case 'users':
 		if($_SESSION['logged_in'])
 			edit_users($page[1], $page[2]);
