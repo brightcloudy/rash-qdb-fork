@@ -21,6 +21,9 @@ $CONFIG['language'] = 'US-english';
 // Misc configs
 $CONFIG['quote_limit'] = 10;	// how many quotes ?browse displays at once
 $CONFIG['page_limit'] = 5;	// how many page numbers to show
+$CONFIG['timezone'] = 'America/New_York';
+$CONFIG['news_time_format'] = 'Y-m-d';
+$CONFIG['quote_time_format'] = 'F j, Y';
 
 // No need to change these
 $CONFIG['GET_SEPARATOR'] = ini_get('arg_separator.output');

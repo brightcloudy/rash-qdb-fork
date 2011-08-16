@@ -1,15 +1,29 @@
 <?php
 
-include 'settings.php';
 
 
 function urlargs($ar1, $ar2 = null, $ar3 = null)
 {
-    global $CONFIG;
+    include 'settings.php';
     if ($ar2 === null) return $ar1;
     if ($ar3 === null) return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2));
     return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2, $ar3));
 }
+
+
+function write_settings($fname, $data)
+{
+    $fp = fopen($fname,"w");
+    $str = "<?php\n";
+    foreach ($data as $key=>$val) {
+	$str .= '$CONFIG[\''.$key.'\'] = '.$val.";\n";
+    }
+    if (fwrite($fp, $str, strlen($str)) === FALSE) {
+	return FALSE;
+    }
+    return TRUE;
+}
+
 
 
 /**
@@ -41,7 +55,7 @@ function str_rand($length = 8, $seeds = 'abcdefghijklmnopqrstuvwxyz0123456789')
 
 function title($title)
 {
-    global $CONFIG;
+    include 'settings.php';
 	switch($title)
 	{
 		case 'add':

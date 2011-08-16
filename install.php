@@ -1,17 +1,6 @@
 <?php
 
-function write_settings($fname, $data)
-{
-    $fp = fopen($fname,"w");
-    $str = "<?php\n";
-    foreach ($data as $key=>$val) {
-	$str .= '$CONFIG[\''.$key.'\'] = '.$val.";\n";
-    }
-    if (fwrite($fp, $str, strlen($str)) === FALSE) {
-	return FALSE;
-    }
-    return TRUE;
-}
+include 'util_funcs.php';
 
 function db_query($sql) {
     include 'settings.php';
@@ -27,12 +16,12 @@ function db_query($sql) {
 		 );
     $db =& DB::connect($dsn);
     if (DB::isError($db)) {
-	print $db->getMessage();
+	print $db->getMessage().'<br />';
 	return 1;
     }
     $res =& $db->query($sql);
     if (DB::isError($res)) {
-	print $res->getMessage();
+	print $res->getMessage().'<br />';
 	return 1;
     } else {
 	print "OK<br />";
@@ -74,8 +63,11 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
 		  'language' => "'US-english'",
-		  'quote_limit' => '10',
-		  'page_limit' => '5',
+		  'quote_limit' => $_POST['quote_limit'],
+		  'page_limit' => $_POST['page_limit'],
+		  'timezone' => "'".$_POST['timezone']."'",
+		  'news_time_format' => "'".$_POST['news_time_format']."'",
+		  'quote_time_format' => "'".$_POST['quote_time_format']."'",
 		  'GET_SEPARATOR' => "ini_get('arg_separator.output')",
 		  'GET_SEPARATOR_HTML' => 'htmlspecialchars($CONFIG[\'GET_SEPARATOR\'], ENT_QUOTES)');
     if (!write_settings('settings.php', $data)) {
@@ -97,7 +89,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
     function mk_user($username, $password)
     {
 	print 'Creating user '.$username.': ';
-	$salt = 'abcdefghijk';
+	$salt = str_rand();
 	$level = 1;
 	$str = "INSERT INTO rash_users (user, password, level, salt) VALUES('$username', '".crypt($password, "\$1\$".substr($salt, 0, 8)."\$")."', '$level', '\$1\$".$salt."\$');";
 	return db_query($str);
@@ -135,6 +127,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
     } else {
 	print 'Everything should now be OK.';
     }
+    print '<p><a href="./">QDB main page</a>';
 }
 else {
     if(!file_exists('settings.php')){
@@ -157,6 +150,13 @@ else {
   RSS URL:            <input type="text" name="rss_url" value="<?php echo 'http://'.$_SERVER['SERVER_NAME'];?>">
   RSS Title:          <input type="text" name="rss_title" value="Rash QDB">
   RSS Description:    <input type="text" name="rss_desc" value="Quote Database for the IRC channel">
+
+  Quote limit:        <input type="text" name="quote_limit" value="10"> (number of quotes shown per page when browsing)
+  Page limit:         <input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
+
+  Timezone:           <input type="text" name="timezone" value="America/New_York">
+  News time format:   <input type="text" name="news_time_format" value="Y-m-d">
+  Quote time format:  <input type="text" name="quote_time_format" value="F j, Y">
 
   <input type="submit" value="Submit">
  </form>

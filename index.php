@@ -233,7 +233,7 @@ function ip_track($where, $quote_num)
 //
 function home_generation()
 {
-    global $db, $lang, $TEMPLATE;
+    global $db, $lang, $TEMPLATE, $CONFIG;
 
     $res =& $db->query("SELECT * FROM rash_news ORDER BY date desc LIMIT 5");
     if(DB::isError($res)){
@@ -243,7 +243,7 @@ function home_generation()
     $news = '';
 
     while ($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
-	$news .= $TEMPLATE->news_item($row['news'], date('Ymd', $row['date']));
+	$news .= $TEMPLATE->news_item($row['news'], date($CONFIG['news_time_format'], $row['date']));
     }
 
     print $TEMPLATE->main_page($news);
@@ -395,7 +395,7 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 	print '<div id="quote_origin-name">'.$origin.'</div>';
     }
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
-	print $TEMPLATE->quote_iter($row['id'], $row['rating'], nl2br($row['quote']), $row['date']);
+	print $TEMPLATE->quote_iter($row['id'], $row['rating'], nl2br($row['quote']), date($CONFIG['quote_time_format'], $row['date']));
     }
     if($page != -1){
 	print '<div class="quote_pagenums">';
@@ -409,7 +409,6 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 function add_news($method)
 {
     global $CONFIG, $TEMPLATE, $db;
-	date_default_timezone_set('America/New_York');
 	if($method == 'submit')
 	{
 	    $_POST['news'] = nl2br($_POST['news']);
@@ -578,7 +577,6 @@ function quote_queue($method)
 			}
 		}
 		$x = 0;
-		date_default_timezone_set('America/New_York');
 		while($judgement_array[$x]){	// itinerates through $judgement_array, stops when it gets to the end of the quote list
 			if(substr($judgement_array[$x], 0, 1) == 'y'){	// checks to see if the first letter of
 															// the entry of a quote in the array is y
@@ -752,6 +750,8 @@ function add_quote($method)
 $page[1] = 0;
 $page[2] = 0;
 $page = explode($CONFIG['GET_SEPARATOR'], $_SERVER['QUERY_STRING']);
+
+date_default_timezone_set($CONFIG['timezone']);
 
 if(!($page[0] == 'rss'))
     $TEMPLATE->printheader(title($page[0]), $CONFIG['site_short_title'], $CONFIG['site_long_title']); // templates/x_template/x_template.php

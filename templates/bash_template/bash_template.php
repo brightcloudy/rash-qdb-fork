@@ -473,8 +473,7 @@ function quote_iter($quoteid, $rating, $quotetxt, $date=null)
      '.edit_quote_button($quoteid);
 
     if (isset($date)) {
-	date_default_timezone_set('America/New_York');
-	$str .= "     <span class=\"quote_date\">" . date("F j, Y", $date) . "</span>\n";
+	$str .= "     <span class=\"quote_date\">" . $date . "</span>\n";
     }
 
     $str .= '
