@@ -702,11 +702,11 @@ function edit_quote($method, $quoteid)
 
     if ($method == 'submit') {
 
-	$quotxt = addslashes(htmlspecialchars(trim($_POST["rash_quote"])));
+	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
 
 	$innerhtml = $TEMPLATE->edit_quote_outputmsg(nl2br($quotxt));
 
-	$res =& $db->query("UPDATE rash_quotes SET quote='".$quotxt."' WHERE id=".$quoteid.";");
+	$res =& $db->query("UPDATE rash_quotes SET quote=".$db->quote($quotxt)." WHERE id=".$quoteid.";");
 	if(DB::isError($res)){
 	    die($res->getMessage());
 	}
@@ -734,11 +734,11 @@ function add_quote($method)
 	// run it through addslashes() and htmlspecialchars()
 	// and then insert it into rash_submit mysql table
 
-	$quotxt = addslashes(htmlspecialchars(trim($_POST["rash_quote"])));
+	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
 
 	$innerhtml = $TEMPLATE->add_quote_outputmsg(nl2br($quotxt));
 
-	$res =& $db->query("INSERT INTO rash_queue (quote) VALUES('".$quotxt."');");
+	$res =& $db->query("INSERT INTO rash_queue (quote) VALUES(".$db->quote($quotxt).");");
 	if(DB::isError($res)){
 	    die($res->getMessage());
 	}
