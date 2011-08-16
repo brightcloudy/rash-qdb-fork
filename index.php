@@ -98,10 +98,10 @@ function flag($quote_num)
 //
 function vote($quote_num, $method)
 {
-    global $db;
+    global $db, $TEMPLATE;
 	$tracking_verdict = user_quote_status('vote', $quote_num);
 	if($tracking_verdict == 3){
-		printfooter();
+		$TEMPLATE->printfooter();
 		exit();
 	}
 	if($tracking_verdict == 1 || 2){
@@ -233,7 +233,7 @@ function ip_track($where, $quote_num)
 //
 function home_generation()
 {
-    global $db, $lang;
+    global $db, $lang, $TEMPLATE;
 
     $res =& $db->query("SELECT * FROM rash_news ORDER BY date desc LIMIT 5");
     if(DB::isError($res)){
@@ -243,16 +243,10 @@ function home_generation()
     $news = '';
 
     while ($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
-	$news .= '<div class="home_news_date">'.date('Ymd', $row['date']).'</div>';
-	$news .= '<div class="home_news_news">'.$row['news'].'</div>';
+	$news .= $TEMPLATE->news_item($row['news'], date('Ymd', $row['date']));
     }
 
-?>
-  <div id="home_all">
-   <div id="home_news"><?=$news?></div>
-   <div id="home_greeting"><?=$lang['home_greeting']?></div>
-  </div>
-<?
+    print $TEMPLATE->main_page($news);
 }
 
 /************************************************************************
@@ -345,16 +339,16 @@ function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 						   ((($page_default+10) < $pagenum) ? ($page_default+10) : ($pagenum)))
 		."\">+10</a>&nbsp;&nbsp;\n";
 
-	echo "    &nbsp;&nbsp;<a href=\"?".urlargs(strtolower($origin),$pagenum)."\">".$lang['page_first']."</a>\n";
+	echo "    &nbsp;&nbsp;<a href=\"?".urlargs(strtolower($origin),$pagenum)."\">".$lang['page_last']."</a>\n";
 	echo "   </div>\n";
 }
 
 
 function edit_quote_button($quoteid)
 {
-    global $lang;
+    global $TEMPLATE;
     if ($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2)) {
-	return '<a href="?'.urlargs('edit','edit',$quoteid).'" class="quote_edit" title="'.$lang['editquote'].'">[E]</a>';
+	return $TEMPLATE->edit_quote_button($quoteid);
     }
     return '';
 }
@@ -376,85 +370,53 @@ function edit_quote_button($quoteid)
 //
 function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_limit = 10)
 {
-    global $CONFIG, $db, $lang;
+    global $CONFIG, $TEMPLATE, $db, $lang;
     if ($page != -1) {
-	print '<div id="quote_all">';
 	if(!$page)
 	    $page = 1;
 
+	print '<div class="quote_pagenums">';
 	page_numbers($origin, $quote_limit, $page, $page_limit);
+	print '</div>';
 
-	}
-	$up_lim = ($quote_limit * $page);
-	$low_lim = $up_lim - $quote_limit;
-	if($page != -1){
-		$query .= "LIMIT $low_lim,$quote_limit";
-	}
+    }
+    $up_lim = ($quote_limit * $page);
+    $low_lim = $up_lim - $quote_limit;
+    if($page != -1){
+	$query .= "LIMIT $low_lim,$quote_limit";
+    }
 
-	$res =& $db->query($query);
-	if (DB::isError($res)) {
-		die($res->getMessage());
-	}
+    $res =& $db->query($query);
+    if (DB::isError($res)) {
+	die($res->getMessage());
+    }
 
-	if (isset($origin)) {
-	    print '<div id="quote_origin-name">'.$origin.'</div>';
-
-	}
-	while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
-?>
-   <div class="quote_whole">
-    <div class="quote_option-bar">
-     <a href="?<?=$row['id']?>" class="quote_number">#<?=$row['id']?></a>
-     <a href="?<?=urlargs('vote',$row['id'],'plus')?>" class="quote_plus" title="<?=$lang['upvote']?>">+</a>
-     <span class="quote_rating">(<?=$row['rating']?>)</span>
-     <a href="?<?=urlargs('vote',$row['id'],'minus')?>" class="quote_minus" title="<?=$lang['downvote']?>">-</a>
-     <a href="?<?=urlargs('flag',$row['id'])?>" class="quote_flag" title="<?=$lang['flagquote']?>">[X]</a>
-     <?=edit_quote_button($row['id'])?>
-<?
-	// if a date is requested in the query (ie. SELECT * FROM or SELECT quote, date, flag, ect. FROM)
-	// it will present the date, but the date isn't always wanted, so it is only echoed if it's
-	// initialized by dumping the query results into an array
-		if(isset($row['date'])) {
-			date_default_timezone_set('America/New_York');
-			echo "     <span class=\"quote_date\">" . date("F j, Y", $row['date']) . "</span>\n";
-		}
-?>
-    </div>
-    <div class="quote_quote">
-     <?=nl2br($row['quote'])."\n"?>
-    </div>
-   </div>
-<?
-	}
-	if($page != -1){
-	    print '<div class="quote_pagenums">';
-	    page_numbers($origin, $quote_limit, $page, $page);
-	    print '</div>';
-	}
+    if (isset($origin)) {
+	print '<div id="quote_origin-name">'.$origin.'</div>';
+    }
+    while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
+	print $TEMPLATE->quote_iter($row['id'], $row['rating'], nl2br($row['quote']), $row['date']);
+    }
+    if($page != -1){
+	print '<div class="quote_pagenums">';
+	page_numbers($origin, $quote_limit, $page, $page);
+	print '</div>';
+    }
 }
 
 
 
 function add_news($method)
 {
-    global $CONFIG, $db;
+    global $CONFIG, $TEMPLATE, $db;
 	date_default_timezone_set('America/New_York');
 	if($method == 'submit')
 	{
 	    $_POST['news'] = nl2br($_POST['news']);
 	    $db->query("INSERT INTO rash_news (news,date) VALUES('${_POST['news']}', '".mktime()."');");
 	}
-?>
-  <div id="admin_add-news_all">
-   <div id="admin_add-news_title">
-    Add News
-   </div>
-   <form method="post" action="?<?=urlargs('add_news','submit')?>">
-	<textarea cols="80" rows="5" name="news" id="add_news_news"></textarea><br />
-	<input type="submit" value="Add News" id="add_news" />
-   </form>
-  </div>
-<?
+
+	print $TEMPLATE->add_news_page();
 }
 
 function user_level_select($selected=3, $id='admin_add-user_level')
@@ -477,33 +439,21 @@ function user_level_select($selected=3, $id='admin_add-user_level')
 
 function add_user($method)
 {
-    global $CONFIG, $db;
-	if($method == 'update'){
+    global $CONFIG, $TEMPLATE, $db;
+    if ($method == 'update') {
 		$db->query("INSERT INTO rash_users (user, password, level, salt) VALUES('${_POST['username']}', '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', '${_POST['level']}', '\$1\$".$_POST['salt']."\$');");
 		if (DB::isError($res)) {
 		    die($res-> getMessage());
 		}
-	}
-?>
-  <div id="admin_add-user_all">
-   <div id="admin_add-user_title">
-    Add User
-   </div>
-   <form method="post" action="?<?=urlargs('add_user','update')?>">
-    Username: <input type="text" name="username" id="admin_add-user_username" /><br />
-	RANDOM Salt: <input type="text" name="salt" value="<?=str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')?>" id="admin_add-user_salt" /><br />
-	Default Password: <input type="text" name="password" /><br />
-       Level: <?=user_level_select()?><br />
-	 <input type="submit" value="Submit" id="admin_add-user_submit" />
-   </form>
-  </div>
-<?
+    }
+
+    print $TEMPLATE->add_user_page();
 }
 
 function change_pw($method, $who)
 {
-    global $CONFIG, $db;
-	if($method == 'update'){
+    global $CONFIG, $TEMPLATE, $db;
+    if ($method == 'update') {
 		// created to keep errors at a minimum
 		$row['salt'] = 0;
 
@@ -517,23 +467,14 @@ function change_pw($method, $who)
 				echo "Password updated!";
 			}
 		}
-	}
-?>
-  <div id="admin_change-pw_title">
-   Change Password
-  </div>
-  <form action="?<?=urlargs('change_pw','update',$_SESSION['user'])?>" method="post">
-   Old Password: <input type="password" name="old_password"><br />
-   New Password: <input type="password" name="new_password"><br />
-   Verify: <input type="password" name="verify_password"><br />
-   <input type="submit">
-  </form>
-<?
+    }
+
+    print $TEMPLATE->change_password_page();
 }
 
 function edit_users($method, $who)
 {
-    global $CONFIG, $db;
+    global $CONFIG, $TEMPLATE, $db;
 	if($method == 'delete'){	// delete a user from rash_users
 		if($_POST['verify']){
 			$res =& $db->query("SELECT * FROM rash_users");
@@ -555,77 +496,29 @@ function edit_users($method, $who)
 								// can change username, password, or user level
 		$res =& $db->query("SELECT * FROM rash_users WHERE user='$who'");
 		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
-?>
-  <span style="font-style: underline">Editing user <?=$who?></span>
-  <form action="?<?=urlargs('users','update',$who)?>" method="post">
-   New Username: <input type="text" value="<?=$row['user']?>" name="user"><br />
-   New Password: <input type="text" name="password"> (insert as cleartext, the program will encrypt it or leave it blank for no pw change)<br />
-      New Level: <?=user_level_select($row['level'])?>
-   <input type="submit">
-  </form>
-<?
+
+		print $TEMPLATE->edit_user_page_form($who, $row['user'], $row['level']);
 	}
-?>
-  <div id="admin_users_title">
-   Users
-  </div>
-  <form action="?<?=urlargs('users','delete')?>" method="post">
-   <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
-    <tr>
-     <td>
-      &nbsp;Username&nbsp;
-     </td>
-     <td>
-      &nbsp;PW_Hash&nbsp;
-     </td>
-     <td>
-      &nbsp;Level&nbsp;
-     </td>
-     <td>
-      &nbsp;Delete&nbsp;
-     </td>
-    </tr>
-<?
+
+	$innerhtml = '';
+
 	$res =& $db->query("SELECT * FROM rash_users");
 	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
 	{
-?>
-    <tr>
-     <td>
-      <a href="?<?=urlargs('users','edit',$row['user'])?>"><?=$row['user']?></a>
-     </td>
-     <td>
-      <a href="?<?=urlargs('users','edit',$row['user'])?>"><?=$row['password']?></a>
-     </td>
-     <td>
-      <a href="?<?=urlargs('users','edit',$row['user'])?>"><?=$row['level']?></a>
-     </td>
-     <td>
-      <input type="checkbox" name="d<?=$row['user']?>" value="<?=$row['user']?>" />
-    </tr>
-<?
+	    $innerhtml .= $TEMPLATE->edit_user_page_table_row($row['user'], $row['password'], $row['level']);
+
 	}
-?>
-  </table>
-  <input type="submit" value="Submit" />&nbsp;I'm sure: <input type="checkbox" name="verify" value="1" />
- </form>
-<?
+
+	print $TEMPLATE->edit_user_page_table($innerhtml);
 }
 
 // login($method)
 //
 function login($method)
 {
-    global $CONFIG, $db, $lang;
+    global $CONFIG, $TEMPLATE, $db, $lang;
 	if(!$method){
-
-   print $lang['admin_login_greeting'];
-   print '<form action="?'.urlargs('admin','login').'" method="post">
-    Username: <input type="text" name="rash_username" size="8" id="admin_login_username-box" /><br />
-    Password: <input type="password" name="rash_password" size="8" id="admin_login_password-box" /><br />
-    <input type="submit" value="Log In" id="admin_login_submit-button" />
-   </form>';
-
+	    print $TEMPLATE->login_page();
 	}
 	elseif($method == 'login'){
 		$res =& $db->query("SELECT salt FROM rash_users WHERE user='".strtolower($_POST['rash_username'])."'");
@@ -671,7 +564,7 @@ function login($method)
 
 function quote_queue($method)
 {
-    global $CONFIG, $db;
+    global $CONFIG, $TEMPLATE, $db;
 	if($method == 'judgement'){ // $method is a variable that is passed to the function to tell it how to act
 								// setting it to judgement tells the program to take moderator radio button input
 								// and either let the quotes into rash_quotes or purge them
@@ -709,50 +602,22 @@ function quote_queue($method)
 			$x++;	// increments x so the judgement_array goes to the next item
 		}
 	}
-?>
-  <div id="admin_queue_title">
-   Queue
-  </div>
-<?
+
 	$res =& $db->query("SELECT * FROM rash_queue order by id asc");
 					// query to grab all of the queued quotes to display
 	if (DB::isError($res)){
 		die($res->getMessage());
 	}
-?>
-  <form action="?<?=urlargs('queue','judgement')?>" method="post">
-   <table width="100%" cellspacing="0" class="admin_queue">
-<?
+
+	$innerhtml = '';
 	$x = 0;
 	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // will itinerate through each entry in rash_queue
-?>
-     <tr>
-      <td class="quote_no">
-       <label>No<input type="radio" name="q<?=$row['id']?>" value="n<?=$row['id']?>"></label>
-      </td>
-      <td>
-        <div class="quote_quote">
-<?
-		echo nl2br("       ".$row['quote']); // displays quote with appropriate line breaks
-?>
-        </div>
-
-      </td>
-	  <td class="quote_yes">
-       <label><input type="radio" name="q<?=$row['id']?>" value="y<?=$row['id']?>" style="text-align: right">Yes</label>
-	  </td>
-     </tr>
-    </div>
-
-<?
-		$x++;
+	    $innerhtml .= $TEMPLATE->quote_queue_page_iter($row['id'], nl2br($row['quote']));
+	    $x++;
 	}
-?>
-   </table>
-   <input type="submit" value="Submit Query" />
-   <input type="reset" value="Reset" />
-  </form>
-<?
+
+	print $TEMPLATE->quote_queue_page($innerhtml);
+
 }
 // End quote_queue()
 
@@ -763,7 +628,7 @@ function quote_queue($method)
 
 function flag_queue($method)
 {
-    global $CONFIG, $db;
+    global $CONFIG, $TEMPLATE, $db;
 	if($method == 'judgement'){
 		// $result = mysql_query("SELECT * FROM rash_quotes WHERE `check` =0");
 		$res =& $db->query("SELECT * FROM rash_quotes WHERE flag = 1");
@@ -791,44 +656,18 @@ function flag_queue($method)
 			$x++;
 		}
 	}
-?>
-<div id="admin_flag_title">
- Flags
-</div>
-<?
-//$result = mysql_query("SELECT * FROM rash_quotes WHERE `check` =0 order by id asc");
-$res =& $db->query("SELECT * FROM rash_quotes WHERE flag = 1 ORDER BY id ASC");
-?>
-<form action="?<?=urlargs('flag_queue','judgement')?>" method="post">
-<table width="100%" class="admin_queue">
-<?
-$x = 0;
-while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
-?>
-<tr>
-<td class="quote_delete">
-	<label>Delete<input type="radio" name="q<?=$row['id']?>" value="d<?=$row['id']?>"></label>
-</td>
-<td>
-<div class="quote_quote">
-<?
-	echo nl2br($row['quote']);
-?>
-</div>
-</td>
-<td class="quote_unflag">
-	<label><input type="radio" name="q<?=$row['id']?>" value="u<?=$row['id']?>">Unflag</label>
-</td>
-</tr>
-<?
-	$x++;
-}
-?>
-</table>
-<input type="submit" value="Submit Query" />
-<input type="reset" value="Reset" />
-</form>
-<?
+
+	$res =& $db->query("SELECT * FROM rash_quotes WHERE flag = 1 ORDER BY id ASC");
+
+	$innerhtml = '';
+
+	$x = 0;
+	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	    $innerhtml .= $TEMPLATE->flag_queue_page_iter($row['id'], nl2br($row['quote']));
+	    $x++;
+	}
+
+	print $TEMPLATE->flag_queue_page($innerhtml);
 }
 
 
@@ -839,7 +678,7 @@ while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
 
 function search($method)
 {
-    global $CONFIG, $lang;
+    global $CONFIG, $TEMPLATE, $lang;
     if ($method == 'fetch') {
 	if($_POST['sortby'] == 'rating')
 	    $how = 'desc';
@@ -849,58 +688,23 @@ function search($method)
 	quote_generation($query, $lang['search_results_title'], -1);
     }
 
-    print '<div class="search_all">';
-
-    if($method != 'fetch') {
-	print '<div id="search_title">'.$lang['search_title'].'</div>';
-    }
-
-    print '<form method="post" action="?'.urlargs('search','fetch').'">';
-    if ($method == 'fetch') { print '<input type="submit" name="submit" id="search_submit-button">&nbsp;'; }
-    print '<input type="text" name="search" size="28" id="search_query-box">&nbsp;';
-    if ($method != 'fetch') { print '<input type="submit" name="submit" id="search_submit-button">&nbsp;<br />'; }
-    print $lang['search_sort'].': <select name="sortby" size="1" id="search_sortby-dropdown">';
-    print '<option selected>'.$lang['search_opt_rating'];
-    print '<option>'.$lang['search_opt_id'];
-    print '</select>';
-
-    print '&nbsp;';
-
-    print $lang['search_howmany'].': <select name="number" size="1" id="search_limit-dropdown">
-     <option selected>10
-     <option>25
-     <option>50
-     <option>75
-     <option>100
-    </select>';
-
-    print '</form>';
-
-    print '</div>';
+    print $TEMPLATE->search_quotes_page(($method == 'fetch'));
 
 }
 
 function edit_quote($method, $quoteid)
 {
-    global $CONFIG, $db, $lang;
+    global $CONFIG, $TEMPLATE, $db, $lang;
 
     if (!($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))) return;
 
-    print '<div id="editquote_all">';
-
-    print '<div id="editquote_title">'.$lang['editquote_title'].'</div>';
+    $innerhtml = '';
 
     if ($method == 'submit') {
 
 	$quotxt = addslashes(htmlspecialchars(trim($_POST["rash_quote"])));
 
-	print '<div id="editquote_outputmsg">';
-
-	print '<div id="editquote_outputmsg_top">'.$lang['editquote_outputmsg_top'].'</div>';
-	print '<div id="editquote_outputmsg_quote">'.nl2br($quotxt).'</div>';
-	print '<div id="editquote_outputmsg_bottom">'.$lang['editquote_outputmsg_bottom'].'</div>';
-
-	print '</div>';
+	$innerhtml = $TEMPLATE->edit_quote_outputmsg(nl2br($quotxt));
 
 	$res =& $db->query("UPDATE rash_quotes SET quote='".$quotxt."' WHERE id=".$quoteid.";");
 	if(DB::isError($res)){
@@ -910,13 +714,7 @@ function edit_quote($method, $quoteid)
 	$quotxt = $db->getOne("SELECT quote FROM rash_quotes WHERE id=".$quoteid);
     }
 
-    print '<form action="?'.urlargs('edit','submit', $quoteid).'" method="post">
-     <textarea cols="80" rows="5" name="rash_quote" id="edit_quote">'.$quotxt.'</textarea><br />
-     <input type="submit" value="'.$lang['edit_quote_btn'].'" id="edit_submit" />
-     <input type="reset" value="'.$lang['edit_reset_btn'].'" id="edit_reset" />
-    </form>';
-
-    print '</div>';
+    print $TEMPLATE->edit_quote_page($quoteid, $quotxt, $innerhtml);
 }
 
 
@@ -927,11 +725,9 @@ function edit_quote($method, $quoteid)
 
 function add_quote($method)
 {
-    global $CONFIG, $db, $lang;
+    global $CONFIG, $TEMPLATE, $db, $lang;
 
-    print '<div id="add_all">';
-
-    print '<div id="add_title">'.$lang['add_title'].'</div>';
+    $innerhtml = '';
 
     if ($method == 'submit') {
 	// take $_POST['quote'] and echo it to the screen, then
@@ -940,13 +736,7 @@ function add_quote($method)
 
 	$quotxt = addslashes(htmlspecialchars(trim($_POST["rash_quote"])));
 
-	print '<div id="add_outputmsg">';
-
-	print '<div id="add_outputmsg_top">'.$lang['add_outputmsg_top'].'</div>';
-	print '<div id="add_outputmsg_quote">'.nl2br($quotxt).'</div>';
-	print '<div id="add_outputmsg_bottom">'.$lang['add_outputmsg_bottom'].'</div>';
-
-	print '</div>';
+	$innerhtml = $TEMPLATE->add_quote_outputmsg(nl2br($quotxt));
 
 	$res =& $db->query("INSERT INTO rash_queue (quote) VALUES('".$quotxt."');");
 	if(DB::isError($res)){
@@ -954,13 +744,7 @@ function add_quote($method)
 	}
     }
 
-    print '<form action="?'.urlargs('add','submit').'" method="post">
-     <textarea cols="80" rows="5" name="rash_quote" id="add_quote"></textarea><br />
-     <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
-     <input type="reset" value="'.$lang['add_reset_btn'].'" id="add_reset" />
-    </form>';
-
-    print '</div>';
+    print $TEMPLATE->add_quote_page($innerhtml);
 }
 
 
@@ -970,7 +754,7 @@ $page[2] = 0;
 $page = explode($CONFIG['GET_SEPARATOR'], $_SERVER['QUERY_STRING']);
 
 if(!($page[0] == 'rss'))
-    printheader(title($page[0]), $CONFIG['site_short_title'], $CONFIG['site_long_title']); // templates/x_template/x_template.php
+    $TEMPLATE->printheader(title($page[0]), $CONFIG['site_short_title'], $CONFIG['site_long_title']); // templates/x_template/x_template.php
 
 $dsn = array(
 	     'phptype'  => $CONFIG['phptype'],
@@ -984,7 +768,7 @@ $dsn = array(
 $db =& DB::connect($dsn);
 if (DB::isError($db)) {
     print $db->getMessage();
-    if (!($page[0] == 'rss')) printfooter();
+    if (!($page[0] == 'rss')) $TEMPLATE->printfooter();
     exit;
 }
 
@@ -1008,9 +792,7 @@ switch($page[0])
 		}
 		break;
 	case 'admin':
-		echo "  <div id=\"admin_all\">\n";
 		login($page[1]);
-		echo "  </div>\n";
 		break;
 	case 'bottom':
 		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE rating < 0 ORDER BY rating ASC LIMIT 50";
@@ -1085,6 +867,6 @@ switch($page[0])
 
 }
 if(!($page[0] == 'rss'))
-    printfooter();	// templates/x_template/x_template.php
+    $TEMPLATE->printfooter();	// templates/x_template/x_template.php
 
 $db->disconnect();
