@@ -47,11 +47,14 @@ if (file_exists($def_template)) {
     /*require('language/US-english.lng');*/
     require $def_template;
 } else {
-    function printheader($txt, $topleft='', $topright='') {}
-    function printfooter() {}
+    class BaseTemplate {
+	function printheader($txt, $topleft='', $topright='') {}
+	function printfooter() {}
+    }
+    $TEMPLATE = new BaseTemplate();
 }
 
-printheader('Install Rash Quote Management System');
+$TEMPLATE->printheader('Install Rash Quote Management System');
 
 If($_SERVER['QUERY_STRING'] == md5('create_file')){
     if (file_exists('settings.php')){
@@ -163,6 +166,6 @@ else {
 	die("settings.php already exists.");
     }
 }
-printfooter();
+$TEMPLATE->printfooter();
 
 ?>
