@@ -22,8 +22,8 @@ function get_db_stats()
 
     if (DB::isError($db)) { return null; }
 
-    $ret['pending_quotes'] = $db->getOne('select count(id) from rash_queue');
-    $ret['approved_quotes'] = $db->getOne('SELECT COUNT(id) FROM rash_quotes');
+    $ret['pending_quotes'] = $db->getOne('select count(id) from '.db_tablename('queue'));
+    $ret['approved_quotes'] = $db->getOne('SELECT COUNT(id) FROM '.db_tablename('quotes'));
 
     return $ret;
 }
@@ -32,7 +32,7 @@ function get_db_stats()
 function rash_rss()
 {
     global $db, $CONFIG;
-    $query = "SELECT id, quote, rating, flag FROM rash_quotes ORDER BY id DESC LIMIT 15";
+    $query = "SELECT id, quote, rating, flag FROM ".db_tablename('quotes')." ORDER BY id DESC LIMIT 15";
 
     $res =& $db->query($query);
     print "<?xml version=\"1.0\" ?>\n";
@@ -91,7 +91,7 @@ function flag($quote_num)
 	$tracking_verdict = user_quote_status('flag', $quote_num);
 	if($tracking_verdict == 1 || 2){
 	    global $db;
-	    $res =& $db->query("SELECT flag FROM rash_quotes WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
+	    $res =& $db->query("SELECT flag FROM ".db_tablename('quotes')." WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
 		$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
 		if($row[0] == 2){
 			echo $lang['flag_previously_flagged'];
@@ -101,13 +101,13 @@ function flag($quote_num)
 		}
 		else{
 			echo $lang['flag_quote_flagged'];
-			$db->query("UPDATE rash_quotes SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
+			$db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
 		}
 	}
 }
 
 // function vote($quote_num, $method)
-// This function increments or decrements the rating of the quote in rash_quotes.
+// This function increments or decrements the rating of the quote in quotes.
 //
 function vote($quote_num, $method)
 {
@@ -119,9 +119,9 @@ function vote($quote_num, $method)
 	}
 	if($tracking_verdict == 1 || 2){
 		if($method == "plus")
-		    $db->query("UPDATE rash_quotes SET rating = rating+1 WHERE id = ".$db->quote((int)$quote_num));
+		    $db->query("UPDATE ".db_tablename('quotes')." SET rating = rating+1 WHERE id = ".$db->quote((int)$quote_num));
 		elseif($method == "minus")
-		    $db->query("UPDATE rash_quotes SET rating = rating-1 WHERE id = ".$db->quote((int)$quote_num));
+		    $db->query("UPDATE ".db_tablename('quotes')." SET rating = rating-1 WHERE id = ".$db->quote((int)$quote_num));
 	}
 }
 
@@ -139,14 +139,14 @@ function ip_track($where, $quote_num)
 	}
 
 
-	$res =& $db->query("SELECT ip FROM rash_tracking WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+	$res =& $db->query("SELECT ip FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 	if (DB::isError($res)) {
 		die($res->getMessage());
 	}
 
 	if($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // if ip is in database
 		$res->free();
-		$res =& $db->query("SELECT quote_id FROM rash_tracking WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+		$res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 		if (DB::isError($res)) {
 			die($res->getMessage());
 		}
@@ -154,7 +154,7 @@ function ip_track($where, $quote_num)
 		$quote_array = explode(",", $quote_array[0]);
 		$quote_place = array_search($quote_num, $quote_array);
 		if(in_array($quote_num, $quote_array)){
-		    $res2 =& $db->query("SELECT $where FROM rash_tracking WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+		    $res2 =& $db->query("SELECT $where FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
 				die($res->getMessage());
 			}
@@ -163,7 +163,7 @@ function ip_track($where, $quote_num)
 			if(!$where_result[$quote_place]){
 				$where_result[$quote_place] = 1;
 				$where_result = implode(",", $where_result);
-				$db->query("UPDATE rash_tracking SET ".$db->quote($where)."=".$db->quote($where_result)." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+				$db->query("UPDATE ".db_tablename('tracking')." SET ".$db->quote($where)."=".$db->quote($where_result)." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 				if (DB::isError($res)) {
 					die($res->getMessage());
 				}
@@ -183,39 +183,39 @@ function ip_track($where, $quote_num)
 			// Oh how I miss thee mysql :(
 
 			// Update the quote_id
-		    $res =& $db->query("SELECT quote_id FROM rash_tracking WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+		    $res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
 				die($res->getMessage());
 			}
 			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
 			$row[] = $quote_num;
-			$db->query("UPDATE rash_tracking SET quote_id = ".$db->quote(implode(",", $row))." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+			$db->query("UPDATE ".db_tablename('tracking')." SET quote_id = ".$db->quote(implode(",", $row))." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
 				die($res->getMessage());
 			}
 			$res->free();
 
 			// Update $where
-			$res =& $db->query("SELECT ".$db->quote($where)." FROM rash_tracking WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+			$res =& $db->query("SELECT ".$db->quote($where)." FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
 				die($res->getMessage());
 			}
 			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
 			$row[] = '1';
-			$db->query("UPDATE rash_tracking SET ".$db->quote($where)." = ".$db->quote(implode(",", $row)));
+			$db->query("UPDATE ".db_tablename('tracking')." SET ".$db->quote($where)." = ".$db->quote(implode(",", $row)));
 			if (DB::isError($res)) {
 				die($res->getMessage());
 			}
 			$res->free();
 
 			// Update $where2
-			$res =& $db->query("SELECT ".$db->quote($where2)." FROM rash_tracking WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+			$res =& $db->query("SELECT ".$db->quote($where2)." FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
 				die($res->getMessage());
 			}
 			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
 			$row[] = '0';
-			$db->query("UPDATE rash_tracking SET ".$db->quote($where2)." = ".$db->quote(implode(",", $row)));
+			$db->query("UPDATE ".db_tablename('tracking')." SET ".$db->quote($where2)." = ".$db->quote(implode(",", $row)));
 			if (DB::isError($res)) {
 				die($res->getMessage());
 			}
@@ -225,7 +225,7 @@ function ip_track($where, $quote_num)
 		}
 	}
 	else{ // if ip isn't in database, add it and appropriate quote action
-	    $res = $db->query("INSERT INTO rash_tracking (ip, quote_id, ".$db->quote($where).", ".$db->quote($where2).") VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", 1, 0);");
+	    $res = $db->query("INSERT INTO ".db_tablename('tracking')." (ip, quote_id, ".$db->quote($where).", ".$db->quote($where2).") VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", 1, 0);");
 		if (DB::isError($res)) {
 			die($res->getMessage());
 		}
@@ -248,7 +248,7 @@ function home_generation()
 {
     global $db, $lang, $TEMPLATE, $CONFIG;
 
-    $res =& $db->query("SELECT * FROM rash_news ORDER BY date desc LIMIT 5");
+    $res =& $db->query("SELECT * FROM ".db_tablename('news')." ORDER BY date desc LIMIT 5");
     if(DB::isError($res)){
 	die($res->getMessage());
     }
@@ -273,7 +273,7 @@ function home_generation()
 function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 {
     global $CONFIG, $db, $lang;
-	$numrows = $db->getOne("SELECT COUNT(id) FROM rash_quotes");
+    $numrows = $db->getOne("SELECT COUNT(id) FROM ".db_tablename('quotes'));
     $testrows = $numrows;
 
 	$pagenum = 0;
@@ -371,7 +371,7 @@ function edit_quote_button($quoteid)
 
 // quote_generation()
 //
-// This is the rugged function that pulls quotes out of the rash_quotes table
+// This is the rugged function that pulls quotes out of the quotes table
 // on the database and presents them to the viewer.
 //
 // The $query variable is usually gotten from index.php (anyplace can call this
@@ -425,7 +425,7 @@ function add_news($method)
 	if($method == 'submit')
 	{
 	    $news = nl2br($_POST['news']);
-	    $db->query("INSERT INTO rash_news (news,date) VALUES(".$db->quote($news).", '".mktime()."');");
+	    $db->query("INSERT INTO ".db_tablename('news')." (news,date) VALUES(".$db->quote($news).", '".mktime()."');");
 	}
 
 	print $TEMPLATE->add_news_page();
@@ -453,7 +453,7 @@ function add_user($method)
 {
     global $CONFIG, $TEMPLATE, $db;
     if ($method == 'update') {
-	$db->query("INSERT INTO rash_users (user, password, level, salt) VALUES(".$db->quote($_POST['username']).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
+	$db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($_POST['username']).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
 		if (DB::isError($res)) {
 		    die($res-> getMessage());
 		}
@@ -469,13 +469,13 @@ function change_pw($method, $who)
 		// created to keep errors at a minimum
 		$row['salt'] = 0;
 
-		$res =& $db->query("SELECT `password`, salt FROM rash_users WHERE user=".$db->quote($who));
+		$res =& $db->query("SELECT `password`, salt FROM ".db_tablename('users')." WHERE user=".$db->quote($who));
 		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 		$salt = "\$1\$".str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')."\$";
 
 		if((md5($_POST['old_password']) == $row['password']) || (crypt($_POST['old_password'], $row['salt']) == $row['password'])){
 			if($_POST['verify_password'] == $_POST['new_password']){
-				$db->query("UPDATE rash_users SET `password`='".crypt($_POST['new_password'], $salt)."', salt='$salt' WHERE user='$who'");
+				$db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['new_password'], $salt)."', salt='$salt' WHERE user='$who'");
 				echo "Password updated!";
 			}
 		}
@@ -487,26 +487,26 @@ function change_pw($method, $who)
 function edit_users($method, $who)
 {
     global $CONFIG, $TEMPLATE, $db;
-	if($method == 'delete'){	// delete a user from rash_users
+	if($method == 'delete'){	// delete a user from users
 		if($_POST['verify']){
-			$res =& $db->query("SELECT * FROM rash_users");
+		    $res =& $db->query("SELECT * FROM ".db_tablename('users'));
 			while($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
 			{
 				if(isset($_POST['d'.$row['user']])){
-					$db->query("DELETE FROM rash_users WHERE user='{$_POST['d'.$row['user']]}'");
+					$db->query("DELETE FROM ".db_tablename('users')." WHERE user='{$_POST['d'.$row['user']]}'");
 					echo $row['user']." has been removed from the userlist!<br />\n";
 				}
 			}
 		}
 	}
 	if($method == 'update'){	// parse the info from $method == 'edit' into the database
-	    $db->query("UPDATE rash_users SET user=".$db->quote(strtolower($_POST['user'])).", level=".$db->quote((int)$_POST['level'])." WHERE user=".$db->quote($who));
+	    $db->query("UPDATE ".db_tablename('users')." SET user=".$db->quote(strtolower($_POST['user'])).", level=".$db->quote((int)$_POST['level'])." WHERE user=".$db->quote($who));
 		if($_POST['password'])
-		    $db->query("UPDATE rash_users SET `password`='".md5($_POST['password'])."' WHERE user=".$db->quote($who));
+		    $db->query("UPDATE ".db_tablename('users')." SET `password`='".md5($_POST['password'])."' WHERE user=".$db->quote($who));
 	}
 	if($method == 'edit'){		// take input from a superuser about how to change all users
 								// can change username, password, or user level
-	    $res =& $db->query("SELECT * FROM rash_users WHERE user=".$db->quote($who));
+	    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE user=".$db->quote($who));
 		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
 		print $TEMPLATE->edit_user_page_form($who, $row['user'], $row['level']);
@@ -514,7 +514,7 @@ function edit_users($method, $who)
 
 	$innerhtml = '';
 
-	$res =& $db->query("SELECT * FROM rash_users");
+	$res =& $db->query("SELECT * FROM ".db_tablename('users'));
 	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
 	{
 	    $innerhtml .= $TEMPLATE->edit_user_page_table_row($row['user'], $row['password'], $row['level']);
@@ -533,19 +533,19 @@ function login($method)
 	    print $TEMPLATE->login_page();
 	}
 	elseif($method == 'login'){
-	    $res =& $db->query("SELECT salt FROM rash_users WHERE user=".$db->quote(strtolower($_POST['rash_username'])));
+	    $res =& $db->query("SELECT salt FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username'])));
 		$salt = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
 		// if there is no presence of a salt, it is probably md5 since old rash used plain md5
 		if(!$salt['salt']){
-		    $res =& $db->query("SELECT user, password, level FROM rash_users WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".md5($_POST['rash_password'])."'");
+		    $res =& $db->query("SELECT user, password, level FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".md5($_POST['rash_password'])."'");
 			$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 			echo $row['user'];
 
 		}
 		// if there is presense of a salt, it is probably new rash passwords, so it is salted md5
 		else{
-		    $res =& $db->query("SELECT user, password, level FROM rash_users WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".crypt($_POST['rash_password'], $salt['salt'])."'");
+		    $res =& $db->query("SELECT user, password, level FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".crypt($_POST['rash_password'], $salt['salt'])."'");
 			$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 		}
 
@@ -569,8 +569,8 @@ function login($method)
 
 
 // quote_queue($method)
-// This function displays the queue of quotes in the table rash_queue, input from users is sent
-// to rash_queue and an administrator has the privileges to send that quote into the main quote
+// This function displays the queue of quotes in the table queue, input from users is sent
+// to queue and an administrator has the privileges to send that quote into the main quote
 // database to be viewed by the public, or purge it from the system.
 //
 
@@ -579,8 +579,8 @@ function quote_queue($method)
     global $CONFIG, $TEMPLATE, $db;
 	if($method == 'judgement'){ // $method is a variable that is passed to the function to tell it how to act
 								// setting it to judgement tells the program to take moderator radio button input
-								// and either let the quotes into rash_quotes or purge them
-		$res =& $db->query("SELECT * FROM rash_queue");
+								// and either let the quotes into quotes or purge them
+	    $res =& $db->query("SELECT * FROM ".db_tablename('queue'));
 		$x = 0;
 		while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
 			if($_POST['q'.$row['id']]){ // sets up an array that can be looped through containing the ids of all the
@@ -594,27 +594,27 @@ function quote_queue($method)
 			if(substr($judgement_array[$x], 0, 1) == 'y'){	// checks to see if the first letter of
 															// the entry of a quote in the array is y
 															// a 'y' in there signifies it should be inserted
-															// into rash_quotes
-			    $quote =& $db->query("SELECT quote FROM rash_queue WHERE id =".$db->quote((int)substr($judgement_array[$x], 1))." LIMIT 1");
-										// query to grab the quote in question straight from rash_queue
+															// into quotes
+			    $quote =& $db->query("SELECT quote FROM ".db_tablename('queue')." WHERE id =".$db->quote((int)substr($judgement_array[$x], 1))." LIMIT 1");
+										// query to grab the quote in question straight from queue
 				if (DB::isError($res)) {
 					die($res->getMessage());
 				}
 				$row = $quote->fetchRow(DB_FETCHMODE_ASSOC);	// fetches the quote from the database
-				$db->query("INSERT INTO `rash_quotes` (quote, rating, flag, date) VALUES (".$db->quote($row['quote']).", 0, 0, '".mktime()."');");
+				$db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, date) VALUES (".$db->quote($row['quote']).", 0, 0, '".mktime()."');");
 				echo "Quote ".substr($judgement_array[$x], 1)." added to quote database! <br />";
-															// inserts the quote into rash_quotes and gives a confirmation message
+															// inserts the quote into quotes and gives a confirmation message
 			}
-			$db->query("DELETE FROM rash_queue WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)).";");
-															// the quote is deleted from rash_queue regardless if it is
-															// submitted into rash_quotes or not, since there's no reason
+			$db->query("DELETE FROM ".db_tablename('queue')." WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)).";");
+															// the quote is deleted from queue regardless if it is
+															// submitted into quotes or not, since there's no reason
 															// for it to be there if it is checked as no or as yes
 			echo "Quote ".substr($judgement_array[$x], 1)." deleted from temporary database!<br />";
 			$x++;	// increments x so the judgement_array goes to the next item
 		}
 	}
 
-	$res =& $db->query("SELECT * FROM rash_queue order by id asc");
+	$res =& $db->query("SELECT * FROM ".db_tablename('queue')." order by id asc");
 					// query to grab all of the queued quotes to display
 	if (DB::isError($res)){
 		die($res->getMessage());
@@ -644,15 +644,15 @@ function flag_queue($method)
 
 	    if ($_POST['do_all'] == 'on') {
 		if (isset($_POST['unflag_all'])) {
-		    $db->query("UPDATE rash_quotes SET flag=2 WHERE flag=1");
+		    $db->query("UPDATE ".db_tablename('quotes')." SET flag=2 WHERE flag=1");
 		    print 'Unflagged all.<br />';
 		} else if (isset($_POST['delete_all'])) {
-		    $db->query("DELETE FROM rash_quotes WHERE flag=1");
+		    $db->query("DELETE FROM ".db_tablename('quotes')." WHERE flag=1");
 		    print 'Deleted all.<br />';
 		}
 	    }
 
-		$res =& $db->query("SELECT * FROM rash_quotes WHERE flag = 1");
+		$res =& $db->query("SELECT * FROM ".db_tablename('quotes')." WHERE flag = 1");
 
 		$x = 0;
 		while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
@@ -665,18 +665,18 @@ function flag_queue($method)
 		$x = 0;
 		while($judgement_array[$x]){
 			if(substr($judgement_array[$x], 0, 1) == 'u'){
-			    $db->query("UPDATE rash_quotes SET flag = 2 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
+			    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 2 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
 				echo "Quote ".substr($judgement_array[$x], 1)." has been unflagged! <br />";
 			}
 			if(substr($judgement_array[$x], 0, 1) == 'd'){
-			    $db->query("DELETE FROM rash_quotes WHERE id=".$db->quote((int)substr($judgement_array[$x], 1)));
+			    $db->query("DELETE FROM ".db_tablename('quotes')." WHERE id=".$db->quote((int)substr($judgement_array[$x], 1)));
 				echo "Quote ".substr($judgement_array[$x], 1)." deleted from database!<br />";
 			}
 			$x++;
 		}
 	}
 
-	$res =& $db->query("SELECT * FROM rash_quotes WHERE flag = 1 ORDER BY id ASC");
+	$res =& $db->query("SELECT * FROM ".db_tablename('quotes')." WHERE flag = 1 ORDER BY id ASC");
 
 	$innerhtml = '';
 
@@ -714,7 +714,7 @@ function search($method)
 
 	$search = '%'.$search.'%';
 
-	$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
+	$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
 
 	quote_generation($query, $lang['search_results_title'], -1);
     }
@@ -736,12 +736,12 @@ function edit_quote($method, $quoteid)
 
 	$innerhtml = $TEMPLATE->edit_quote_outputmsg(mangle_quote_text($quotxt));
 
-	$res =& $db->query("UPDATE rash_quotes SET quote=".$db->quote($quotxt)." WHERE id=".$db->quote($quoteid));
+	$res =& $db->query("UPDATE ".db_tablename('quotes')." SET quote=".$db->quote($quotxt)." WHERE id=".$db->quote($quoteid));
 	if(DB::isError($res)){
 	    die($res->getMessage());
 	}
     } else {
-	$quotxt = $db->getOne("SELECT quote FROM rash_quotes WHERE id=".$db->quote($quoteid));
+	$quotxt = $db->getOne("SELECT quote FROM ".db_tablename('quotes')." WHERE id=".$db->quote($quoteid));
     }
 
     print $TEMPLATE->edit_quote_page($quoteid, $quotxt, $innerhtml);
@@ -750,7 +750,7 @@ function edit_quote($method, $quoteid)
 
 // add_quote()
 // This function serves as the page catering to ?add, it can receive input
-// from an HTML form that will be inserted into rash_queue for viewing when
+// from an HTML form that will be inserted into queue for viewing when
 // logged in as an administrator.
 
 function add_quote($method)
@@ -765,7 +765,7 @@ function add_quote($method)
 
 	$innerhtml = $TEMPLATE->add_quote_outputmsg(mangle_quote_text($quotxt));
 
-	$res =& $db->query("INSERT INTO rash_queue (quote) VALUES(".$db->quote($quotxt).")");
+	$res =& $db->query("INSERT INTO ".db_tablename('queue')." (quote) VALUES(".$db->quote($quotxt).")");
 	if(DB::isError($res)){
 	    die($res->getMessage());
 	}
@@ -824,11 +824,11 @@ switch($page[0])
 		login($page[1]);
 		break;
 	case 'bottom':
-		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE rating < 0 ORDER BY rating ASC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE rating < 0 ORDER BY rating ASC LIMIT 50";
 		quote_generation($query, $lang['bottom_title'], -1);
 		break;
 	case 'browse':
-		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes ORDER BY id ASC ";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." ORDER BY id ASC ";
 		quote_generation($query, $lang['browse_title'], $page[1], $CONFIG['quote_limit'], $CONFIG['page_limit']);
 		break;
 	case 'change_pw':
@@ -843,7 +843,7 @@ switch($page[0])
 			flag_queue($page[1]);
 		break;
 	case 'latest':
-		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes ORDER BY id DESC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." ORDER BY id DESC LIMIT 50";
 		quote_generation($query, $lang['latest_title'], -1);
 		break;
 	case 'logout':
@@ -858,11 +858,11 @@ switch($page[0])
 			quote_queue($page[1]);
 		break;
 	case 'random':
-		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes ORDER BY rand() LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." ORDER BY rand() LIMIT 50";
 		quote_generation($query, $lang['random_title'], -1);
 		break;
 	case 'random2':
-		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE rating > 1 ORDER BY rand() LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE rating > 1 ORDER BY rand() LIMIT 50";
 		quote_generation($query, $lang['random2_title'], -1);
 		break;
 	case 'rss':
@@ -872,7 +872,7 @@ switch($page[0])
 		search($page[1]);
 		break;
 	case 'top':
-		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE rating > 0 ORDER BY rating DESC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE rating > 0 ORDER BY rating DESC LIMIT 50";
 		quote_generation($query, $lang['top_title'], -1);
 		break;
 	case 'edit':
@@ -888,7 +888,7 @@ switch($page[0])
 		break;
 	default:
 	    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
-		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE id =".$db->quote((int)$_SERVER['QUERY_STRING']);
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE id =".$db->quote((int)$_SERVER['QUERY_STRING']);
 		quote_generation($query, "#${_SERVER['QUERY_STRING']}", -1);
 	    } else {
 		home_generation();

@@ -57,6 +57,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'database' => "'".$_POST['database']."'",
 		  'username' => "'".$_POST['username']."'",
 		  'password' => "'".$_POST['password']."'",
+		  'db_table_prefix' => "'".$_POST['db_table_prefix']."'",
 		  'site_short_title' => "'".$_POST['site_short_title']."'",
 		  'site_long_title' => "'".$_POST['site_long_title']."'",
 		  'rss_url' => "'".$_POST['rss_url']."'",
@@ -91,32 +92,32 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 	print 'Creating user '.$username.': ';
 	$salt = str_rand();
 	$level = 1;
-	$str = "INSERT INTO rash_users (user, password, level, salt) VALUES('$username', '".crypt($password, "\$1\$".substr($salt, 0, 8)."\$")."', '$level', '\$1\$".$salt."\$');";
+	$str = "INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES('$username', '".crypt($password, "\$1\$".substr($salt, 0, 8)."\$")."', '$level', '\$1\$".$salt."\$');";
 	return db_query($str);
     }
 
-    $error = mk_db_table('rash_quotes', "id int(11) NOT NULL auto_increment primary key,
+    $error = mk_db_table(db_tablename('quotes'), "id int(11) NOT NULL auto_increment primary key,
 							quote text NOT NULL,
 							rating int(7) NOT NULL,
 							flag int(1) NOT NULL,
 							date int(10) NOT NULL");
 
-    $error |= mk_db_table('rash_queue', "id int(11) NOT NULL auto_increment primary key,
+    $error |= mk_db_table(db_tablename('queue'), "id int(11) NOT NULL auto_increment primary key,
 							quote text NOT NULL");
 
 
-    $error |= mk_db_table('rash_tracking', "id int(11) NOT NULL auto_increment primary key,
+    $error |= mk_db_table(db_tablename('tracking'), "id int(11) NOT NULL auto_increment primary key,
 							ip varchar(15) NOT NULL,
 							quote_id text NOT NULL,
 							vote text NOT NULL,
 							flag text NOT NULL");
 
-    $error |= mk_db_table('rash_users', "user varchar(20) NOT NULL,
+    $error |= mk_db_table(db_tablename('users'), "user varchar(20) NOT NULL,
 							`password` varchar(255) NOT NULL,
 							level int(1) NOT NULL,
 							salt text");
 
-    $error |= mk_db_table('rash_news', "id int(11) NOT NULL auto_increment primary key,
+    $error |= mk_db_table(db_tablename('news'), "id int(11) NOT NULL auto_increment primary key,
 							news text NOT NULL,
 							date int(10) NOT NULL");
 
@@ -140,6 +141,8 @@ else {
   DB Database:	      <input type="text" name="database" value="rash">(which database to use)
   DB Username:	      <input type="text" name="username" value="username">
   DB Password:	      <input type="password" name="password" value="password">
+
+  DB table prefix:    <input type="text" name="db_table_prefix" value="rash">
 
   Admin Username:     <input type="text" name="adminuser" value="admin">
   Admin Password:     <input type="password" name="adminpass" value="password">

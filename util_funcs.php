@@ -8,6 +8,12 @@ function mangle_quote_text($txt)
     return $txt;
 }
 
+function db_tablename($name)
+{
+    include 'settings.php';
+    return $CONFIG['db_table_prefix'].'_'.$name;
+}
+
 function urlargs($ar1, $ar2 = null, $ar3 = null)
 {
     include 'settings.php';

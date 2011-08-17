@@ -9,6 +9,7 @@ $CONFIG['socket'] = '';
 $CONFIG['database'] = 'rashdb';
 $CONFIG['username'] = 'root';
 $CONFIG['password'] = '';
+$CONFIG['db_table_prefix'] = 'rash';
 
 // Site info
 $CONFIG['site_short_title'] = 'nhqdb';
