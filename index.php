@@ -32,7 +32,7 @@ function rash_rss()
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
 	print "<item>\n";
 	print "<title>".$CONFIG['rss_url']."/?".$row['id']."</title>\n";
-	print "<description>".nl2br($row['quote'])."</description>\n";
+	print "<description>".mangle_quote_text($row['quote'])."</description>\n";
 	print "<link>".$CONFIG['rss_url']."/?".$row['id']."</link>\n";
 	print "</item>\n\n";
     }
@@ -395,7 +395,7 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 	print '<div id="quote_origin-name">'.$origin.'</div>';
     }
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
-	print $TEMPLATE->quote_iter($row['id'], $row['rating'], nl2br($row['quote']), date($CONFIG['quote_time_format'], $row['date']));
+	print $TEMPLATE->quote_iter($row['id'], $row['rating'], mangle_quote_text($row['quote']), date($CONFIG['quote_time_format'], $row['date']));
     }
     if($page != -1){
 	print '<div class="quote_pagenums">';
@@ -411,8 +411,8 @@ function add_news($method)
     global $CONFIG, $TEMPLATE, $db;
 	if($method == 'submit')
 	{
-	    $_POST['news'] = nl2br($_POST['news']);
-	    $db->query("INSERT INTO rash_news (news,date) VALUES('${_POST['news']}', '".mktime()."');");
+	    $news = nl2br($_POST['news']);
+	    $db->query("INSERT INTO rash_news (news,date) VALUES(".$db->quote($news).", '".mktime()."');");
 	}
 
 	print $TEMPLATE->add_news_page();
@@ -588,7 +588,7 @@ function quote_queue($method)
 					die($res->getMessage());
 				}
 				$row = $quote->fetchRow(DB_FETCHMODE_ASSOC);	// fetches the quote from the database
-				$db->query("INSERT INTO `rash_quotes` (quote, rating, flag, date) VALUES ('".addslashes($row['quote'])."', 0, 0, '".mktime()."');");
+				$db->query("INSERT INTO `rash_quotes` (quote, rating, flag, date) VALUES (".$db->quote($row['quote']).", 0, 0, '".mktime()."');");
 				echo "Quote ".substr($judgement_array[$x], 1)." added to quote database! <br />";
 															// inserts the quote into rash_quotes and gives a confirmation message
 			}
@@ -609,8 +609,8 @@ function quote_queue($method)
 
 	$innerhtml = '';
 	$x = 0;
-	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // will itinerate through each entry in rash_queue
-	    $innerhtml .= $TEMPLATE->quote_queue_page_iter($row['id'], nl2br($row['quote']));
+	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	    $innerhtml .= $TEMPLATE->quote_queue_page_iter($row['id'], mangle_quote_text($row['quote']));
 	    $x++;
 	}
 
@@ -661,7 +661,7 @@ function flag_queue($method)
 
 	$x = 0;
 	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
-	    $innerhtml .= $TEMPLATE->flag_queue_page_iter($row['id'], nl2br($row['quote']));
+	    $innerhtml .= $TEMPLATE->flag_queue_page_iter($row['id'], mangle_quote_text($row['quote']));
 	    $x++;
 	}
 
@@ -702,7 +702,7 @@ function edit_quote($method, $quoteid)
 
 	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
 
-	$innerhtml = $TEMPLATE->edit_quote_outputmsg(nl2br($quotxt));
+	$innerhtml = $TEMPLATE->edit_quote_outputmsg(mangle_quote_text($quotxt));
 
 	$res =& $db->query("UPDATE rash_quotes SET quote=".$db->quote($quotxt)." WHERE id=".$quoteid.";");
 	if(DB::isError($res)){
@@ -728,13 +728,10 @@ function add_quote($method)
     $innerhtml = '';
 
     if ($method == 'submit') {
-	// take $_POST['quote'] and echo it to the screen, then
-	// run it through addslashes() and htmlspecialchars()
-	// and then insert it into rash_submit mysql table
 
 	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
 
-	$innerhtml = $TEMPLATE->add_quote_outputmsg(nl2br($quotxt));
+	$innerhtml = $TEMPLATE->add_quote_outputmsg(mangle_quote_text($quotxt));
 
 	$res =& $db->query("INSERT INTO rash_queue (quote) VALUES(".$db->quote($quotxt).");");
 	if(DB::isError($res)){
