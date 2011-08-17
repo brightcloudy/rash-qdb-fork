@@ -714,7 +714,7 @@ function search($method)
 
 	$search = '%'.$search.'%';
 
-	$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
+	$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
 
 	quote_generation($query, $lang['search_results_title'], -1);
     }
@@ -872,7 +872,7 @@ switch($page[0])
 		search($page[1]);
 		break;
 	case 'top':
-		$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE rating > 0 ORDER BY rating DESC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM rash_quotes WHERE rating > 0 ORDER BY rating DESC LIMIT 50";
 		quote_generation($query, $lang['top_title'], -1);
 		break;
 	case 'edit':
