@@ -16,6 +16,19 @@ require("language/{$CONFIG['language']}.lng");
 require($CONFIG['template']);
 
 
+function get_db_stats()
+{
+    global $db;
+
+    if (DB::isError($db)) { return null; }
+
+    $ret['pending_quotes'] = $db->getOne('select count(id) from rash_queue');
+    $ret['approved_quotes'] = $db->getOne('SELECT COUNT(id) FROM rash_quotes');
+
+    return $ret;
+}
+
+
 function rash_rss()
 {
     global $db, $CONFIG;
@@ -864,6 +877,6 @@ switch($page[0])
 
 }
 if(!($page[0] == 'rss'))
-    $TEMPLATE->printfooter();	// templates/x_template/x_template.php
+    $TEMPLATE->printfooter(get_db_stats());	// templates/x_template/x_template.php
 
 $db->disconnect();

@@ -70,9 +70,9 @@ ob_start();
 // printfooter()
 // Bottom of the document!
 //
-function printfooter()
+function printfooter($dbstats=null)
 {
-    global $db, $lang;
+    global $lang;
 ?>
   <div id="site_admin_nav">
    <div id="site_admin_nav_upper">
@@ -114,25 +114,12 @@ function printfooter()
     <div id="site_admin_nav_lower_infobar">
      <span id="site_admin_nav_lower_infobar_pending">
 <?
-	  if (DB::isError($db)) {
-	      $numrows = 0;
-	  } else {
-	      $numrows = $db->getOne('select count(id) from rash_queue');
-	  }
-		echo $lang['pending_quotes'].": $numrows;\n";
-
+	  echo $lang['pending_quotes'].": ".$dbstats['pending_quotes'].";\n";
 ?>
      </span>
      <span id="site_admin_nav_lower_infobar_approved">
 <?
-
-	   if (DB::isError($db)) {
-	       $numrows = 0;
-	   } else {
-	       $numrows = $db->getOne('SELECT COUNT(id) FROM rash_quotes');
-	   }
-	echo $lang['approved_quotes'].": $numrows\n";
-
+	  echo $lang['approved_quotes'].": ".$dbstats['approved_quotes']."\n";
 ?>
      </span>
     </div>
