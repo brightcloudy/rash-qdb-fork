@@ -695,12 +695,21 @@ function search($method)
 	    $how = 'desc';
 	else
 	    $how = 'asc';
-	$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE quote LIKE '%{$_POST['search']}%' ORDER BY {$_POST['sortby']} $how LIMIT {$_POST['number']}";
+
+	$search = $_POST['search'];
+
+	if (preg_match('/^#[0-9]+$/', trim($search))) {
+	    $exactmatch = ' or id='.substr(trim($search), 1);
+	} else {
+	    $exactmatch = '';
+	}
+
+	$query = "SELECT id, quote, rating, flag FROM rash_quotes WHERE (quote LIKE '%".$search."%'".$exactmatch.") ORDER BY {$_POST['sortby']} $how LIMIT {$_POST['number']}";
+
 	quote_generation($query, $lang['search_results_title'], -1);
     }
 
     print $TEMPLATE->search_quotes_page(($method == 'fetch'));
-
 }
 
 function edit_quote($method, $quoteid)
