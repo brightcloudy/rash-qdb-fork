@@ -283,6 +283,10 @@ function flag_queue_page($inner_html)
     $str .= '</table>
 <input type="submit" value="Submit Query" />
 <input type="reset" value="Reset" />
+&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" value="Unflag All" name="unflag_all">
+<input type="submit" value="Delete All" name="delete_all">
+Are you sure?:<input type="checkbox" name="do_all">
 </form>';
 
     return $str;

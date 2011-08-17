@@ -641,6 +641,17 @@ function flag_queue($method)
 {
     global $CONFIG, $TEMPLATE, $db;
 	if($method == 'judgement'){
+
+	    if ($_POST['do_all'] == 'on') {
+		if (isset($_POST['unflag_all'])) {
+		    $db->query("UPDATE rash_quotes SET flag=2 WHERE flag=1");
+		    print 'Unflagged all.<br />';
+		} else if (isset($_POST['delete_all'])) {
+		    $db->query("DELETE FROM rash_quotes WHERE flag=1");
+		    print 'Deleted all.<br />';
+		}
+	    }
+
 		$res =& $db->query("SELECT * FROM rash_quotes WHERE flag = 1");
 
 		$x = 0;
