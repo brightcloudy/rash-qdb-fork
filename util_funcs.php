@@ -3,7 +3,7 @@
 /* Change urls to clickable links, and change newlines to br-tags. */
 function mangle_quote_text($txt)
 {
-    $txt = preg_replace('/((http|ftp):\/\/([\w\d\-]+)(\.[\w\d\-]+){1,})([\/\?\w\d\.=&+%~_\-]+)?/', '<A href="\\1\\5">\\1\\5</A>', $txt);
+    $txt = preg_replace('/((http|ftp):\/\/([\w\d\-]+)(\.[\w\d\-]+){1,})([\/\?\w\d\.=&+%~_\-]+(#[\w\d_]+)?)?/', '<A href="\\1\\5">\\1\\5</A>', $txt);
     $txt = nl2br($txt);
     return $txt;
 }
