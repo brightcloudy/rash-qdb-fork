@@ -463,7 +463,7 @@ function quote_queue_page($innerhtml)
 function quote_iter($quoteid, $rating, $quotetxt, $date=null)
 {
     global $lang;
-    $str = '   <div class="quote_whole">
+    $str = '<p><div class="quote_whole">
     <div class="quote_option-bar">
      <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>
      <a href="?'.urlargs('vote',$quoteid,'plus').'" class="quote_plus" title="'.$lang['upvote'].'">+</a>
