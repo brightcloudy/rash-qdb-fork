@@ -42,11 +42,13 @@ abstract class BaseTemplate {
     {
 	global $lang;
 	if ($admin) { $menudata = $this->adminmenu; } else { $menudata = $this->mainmenu; }
-	$arr = array();
-	foreach ($menudata as $m) {
-	    $arr[] = '<a href="'.$m['url'].'" id="'.$m['id'].'">'.$lang[$m['txt']].'</a>';
+	if ($menudata) {
+	    $arr = array();
+	    foreach ($menudata as $m) {
+		$arr[] = '<a href="'.$m['url'].'" id="'.$m['id'].'">'.$lang[$m['txt']].'</a>';
+	    }
+	    $str = join(' | ', $arr);
 	}
-	$str = join(' | ', $arr);
 	return '<div id="site_nav_lower"><div id="site_nav_lower_linkbar">'.$str.'</div></div>';
     }
 

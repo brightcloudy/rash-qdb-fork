@@ -41,7 +41,7 @@ if (isset($_SESSION['logged_in'])) {
     }
     $adminmenu[] = array('url' => '?change_pw', 'id' => 'site_admin_nav_change-password', 'txt' => 'menu_changepass');
     $adminmenu[] = array('url' => '?logout', 'id' => 'site_admin_nav_logout', 'txt' => 'menu_logout');
-}
+} else $adminmenu = null;
 
 $TEMPLATE->set_menu(0, $mainmenu);
 $TEMPLATE->set_menu(1, $adminmenu);
