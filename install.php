@@ -32,15 +32,15 @@ function db_query($sql) {
 
 $def_template = './templates/bash_template/bash_template.php';
 
+require 'basetemplate.php';
+
 if (file_exists($def_template)) {
     /*require('language/US-english.lng');*/
     require $def_template;
 } else {
-    class BaseTemplate {
-	function printheader($txt, $topleft='', $topright='') {}
-	function printfooter() {}
+    class TempTemplate extends BaseTemplate  {
     }
-    $TEMPLATE = new BaseTemplate();
+    $TEMPLATE = new TempTemplate();
 }
 
 $TEMPLATE->printheader('Install Rash Quote Management System');
