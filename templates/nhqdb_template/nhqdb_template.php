@@ -29,6 +29,27 @@ ob_start();
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 
+
+  userAgentLowerCase = navigator.userAgent.toLowerCase();
+
+  function resizeTextarea(t) {
+    if ( !t.initialRows ) t.initialRows = t.rows;
+    a = t.value.split('\n');
+    b=0;
+    for (x=0; x < a.length; x++) {
+      if (a[x].length >= t.cols) b+= Math.floor(a[x].length / t.cols);
+    }
+    b += a.length;
+    if (userAgentLowerCase.indexOf('opera') != -1) b += 2;
+    if (b > t.rows || b < t.rows)
+	t.rows = (b < t.initialRows ? t.initialRows : ((b < 50) ? b : 50));
+  }
+
+  function setFocus(id) {
+      var e = document.getElementById(id);
+      if (e) e.focus();
+  }
+
 </script>
 </head>
 <body>
@@ -170,10 +191,12 @@ function add_quote_page($added_quote_html='')
     $str .= $added_quote_html;
 
     $str .= '<form action="?'.urlargs('add','submit').'" method="post">
-     <textarea cols="80" rows="5" name="rash_quote" id="add_quote"></textarea><br />
+     <textarea cols="80" rows="5" name="rash_quote" id="add_quote" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)"></textarea><br />
      <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
      <input type="reset" value="'.$lang['add_reset_btn'].'" id="add_reset" />
     </form>';
+
+    $str .= '<script type="text/javascript">setFocus("add_quote");</script>';
 
     $str .= '</div>';
     return $str;
@@ -237,6 +260,8 @@ function search_quotes_page($fetched)
     $str .= '<option selected>'.$lang['search_opt_rating'];
     $str .= '<option>'.$lang['search_opt_id'];
     $str .= '</select>';
+
+    $str .= '<script type="text/javascript">setFocus("search_query-box");</script>';
 
     $str .= '&nbsp;';
 
