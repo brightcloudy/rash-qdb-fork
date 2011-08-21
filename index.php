@@ -1,4 +1,8 @@
 <?php
+/*
+error_reporting(E_ALL);
+ini_set('display_errors','On');
+*/
 
 if (!file_exists('settings.php')) {
     header("Location: install.php");
@@ -13,6 +17,7 @@ require('settings.php');
 require('util_funcs.php');
 require("language/{$CONFIG['language']}.lng");
 
+require('basetemplate.php');
 require($CONFIG['template']);
 
 
@@ -60,19 +65,19 @@ function rash_rss()
 //
 function user_quote_status($where, $quote_num)
 {
-    global $lang;
+    global $TEMPLATE, $lang;
 	$tracking_verdict = ip_track($where, $quote_num);
 	if($where != 'flag'){
 		switch($tracking_verdict){
 			case 1:
-				echo $lang['tracking_check_1'];
-				break;
+			    $TEMPLATE->add_message($lang['tracking_check_1']);
+			    break;
 			case 2:
-				echo $lang['tracking_check_2'];
-				break;
+			    $TEMPLATE->add_message($lang['tracking_check_2']);
+			    break;
 			case 3:
-				echo $lang['tracking_check_3'];
-				break;
+			    $TEMPLATE->add_message($lang['tracking_check_3']);
+			    break;
 		}
 	}
 	return $tracking_verdict;
@@ -87,21 +92,21 @@ function user_quote_status($where, $quote_num)
 //
 function flag($quote_num)
 {
-    global $lang, $db;
+    global $TEMPLATE, $lang, $db;
 	$tracking_verdict = user_quote_status('flag', $quote_num);
 	if($tracking_verdict == 1 || 2){
 	    global $db;
 	    $res =& $db->query("SELECT flag FROM ".db_tablename('quotes')." WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
 		$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
 		if($row[0] == 2){
-			echo $lang['flag_previously_flagged'];
+		    $TEMPLATE->add_message($lang['flag_previously_flagged']);
 		}
 		elseif($row[0] == 1){
-			echo $lang['flag_currently_flagged'];
+		    $TEMPLATE->add_message($lang['flag_currently_flagged']);
 		}
 		else{
-			echo $lang['flag_quote_flagged'];
-			$db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
+		    $TEMPLATE->add_message($lang['flag_quote_flagged']);
+		    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
 		}
 	}
 }
@@ -478,7 +483,7 @@ function change_pw($method, $who)
 		if((md5($_POST['old_password']) == $row['password']) || (crypt($_POST['old_password'], $row['salt']) == $row['password'])){
 			if($_POST['verify_password'] == $_POST['new_password']){
 				$db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['new_password'], $salt)."', salt='$salt' WHERE user='$who'");
-				echo "Password updated!";
+				$TEMPLATE->add_message('Password updated!');
 			}
 		}
     }
@@ -496,7 +501,7 @@ function edit_users($method, $who)
 			{
 				if(isset($_POST['d'.$row['user']])){
 					$db->query("DELETE FROM ".db_tablename('users')." WHERE user='{$_POST['d'.$row['user']]}'");
-					echo $row['user']." has been removed from the userlist!<br />\n";
+					$TEMPLATE->add_message($row['user'].' has been removed from the userlist!');
 				}
 			}
 		}
@@ -542,8 +547,6 @@ function login($method)
 		if(!$salt['salt']){
 		    $res =& $db->query("SELECT user, password, level FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".md5($_POST['rash_password'])."'");
 			$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
-			echo $row['user'];
-
 		}
 		// if there is presense of a salt, it is probably new rash passwords, so it is salted md5
 		else{
@@ -553,7 +556,7 @@ function login($method)
 
 		// if there is no row returned for the user, the password is expected to be false because of the AND conditional in the query
 		if(!$row['user']){
-			echo $lang['login_error'];
+		    $TEMPLATE->add_message($lang['login_error']);
 		}
 		else{
 			$_SESSION['user'] = $row['user'];		// site-wide accessible username
@@ -604,14 +607,14 @@ function quote_queue($method)
 				}
 				$row = $quote->fetchRow(DB_FETCHMODE_ASSOC);	// fetches the quote from the database
 				$db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, date) VALUES (".$db->quote($row['quote']).", 0, 0, '".mktime()."');");
-				echo "Quote ".substr($judgement_array[$x], 1)." added to quote database! <br />";
+				$TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' added to quote database!');
 															// inserts the quote into quotes and gives a confirmation message
 			}
 			$db->query("DELETE FROM ".db_tablename('queue')." WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)).";");
 															// the quote is deleted from queue regardless if it is
 															// submitted into quotes or not, since there's no reason
 															// for it to be there if it is checked as no or as yes
-			echo "Quote ".substr($judgement_array[$x], 1)." deleted from temporary database!<br />";
+			$TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' deleted from temporary database!');
 			$x++;	// increments x so the judgement_array goes to the next item
 		}
 	}
@@ -647,10 +650,10 @@ function flag_queue($method)
 	    if ($_POST['do_all'] == 'on') {
 		if (isset($_POST['unflag_all'])) {
 		    $db->query("UPDATE ".db_tablename('quotes')." SET flag=2 WHERE flag=1");
-		    print 'Unflagged all.<br />';
+		    $TEMPLATE->add_message('Unflagged all.');
 		} else if (isset($_POST['delete_all'])) {
 		    $db->query("DELETE FROM ".db_tablename('quotes')." WHERE flag=1");
-		    print 'Deleted all.<br />';
+		    $TEMPLATE->add_message('Deleted all.');
 		}
 	    }
 
@@ -668,11 +671,11 @@ function flag_queue($method)
 		while($judgement_array[$x]){
 			if(substr($judgement_array[$x], 0, 1) == 'u'){
 			    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 2 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
-				echo "Quote ".substr($judgement_array[$x], 1)." has been unflagged! <br />";
+			    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' has been unflagged!');
 			}
 			if(substr($judgement_array[$x], 0, 1) == 'd'){
 			    $db->query("DELETE FROM ".db_tablename('quotes')." WHERE id=".$db->quote((int)substr($judgement_array[$x], 1)));
-				echo "Quote ".substr($judgement_array[$x], 1)." deleted from database!<br />";
+			    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' deleted from database!');
 			}
 			$x++;
 		}

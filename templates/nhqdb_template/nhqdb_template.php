@@ -1,6 +1,6 @@
 <?php
 
-class NHQDBTemplate {
+class NHQDBTemplate extends BaseTemplate {
 
 function printheader($title, $topleft='nhqdb', $topright='#NetHack Quote Database')
 {
@@ -164,23 +164,13 @@ function news_item($news, $date)
 function main_page($news)
 {
     global $lang;
-    return '<div id="home_all">
+    return $this->get_messages() . '<div id="home_all">
    <div id="home_news">'.$news.'</div>
    <div id="home_greeting">'.$lang['home_greeting'].'</div>
    </div>';
 }
 
 
-function add_quote_outputmsg($quotetxt)
-{
-    global $lang;
-    $str = '<div id="add_outputmsg">';
-    $str .= '<div id="add_outputmsg_top">'.$lang['add_outputmsg_top'].'</div>';
-    $str .= '<div id="add_outputmsg_quote">'.$quotetxt.'</div>';
-    $str .= '<div id="add_outputmsg_bottom">'.$lang['add_outputmsg_bottom'].'</div>';
-    $str .= '</div>';
-    return $str;
-}
 
 function add_quote_page($added_quote_html='')
 {
@@ -188,6 +178,8 @@ function add_quote_page($added_quote_html='')
     $str = '<div id="add_all">';
 
     $str .= '<div id="add_title">'.$lang['add_title'].'</div>';
+
+    $str .= $this->get_messages();
 
     $str .= $added_quote_html;
 
@@ -203,24 +195,7 @@ function add_quote_page($added_quote_html='')
     return $str;
 }
 
-function edit_quote_outputmsg($quotetxt)
-{
-    global $lang;
-    $str = '<div id="editquote_outputmsg">';
 
-    $str .= '<div id="editquote_outputmsg_top">'.$lang['editquote_outputmsg_top'].'</div>';
-    $str .= '<div id="editquote_outputmsg_quote">'.$quotetxt.'</div>';
-    $str .= '<div id="editquote_outputmsg_bottom">'.$lang['editquote_outputmsg_bottom'].'</div>';
-
-    $str .= '</div>';
-    return $str;
-}
-
-function edit_quote_button($quoteid)
-{
-    global $lang;
-    return '<a href="?'.urlargs('edit','edit',$quoteid).'" class="quote_edit" title="'.$lang['editquote'].'">[E]</a>';
-}
 
 function edit_quote_page($quoteid, $quotetxt, $edited_quote_html='')
 {
@@ -229,6 +204,8 @@ function edit_quote_page($quoteid, $quotetxt, $edited_quote_html='')
     $str = '<div id="editquote_all">';
 
     $str .= '<div id="editquote_title">'.$lang['editquote_title'].'</div>';
+
+    $str .= $this->get_messages();
 
     $str .= $edited_quote_html;
 
@@ -252,6 +229,8 @@ function search_quotes_page($fetched)
     if (!$fetched) {
 	$str .= '<div id="search_title">'.$lang['search_title'].'</div>';
     }
+
+    $str .= $this->get_messages();
 
     $str .= '<form method="post" action="?'.urlargs('search','fetch').'">';
     if ($fetched) { $str .= '<input type="submit" name="submit" id="search_submit-button">&nbsp;'; }
@@ -281,26 +260,12 @@ function search_quotes_page($fetched)
     return $str;
 }
 
-function flag_queue_page_iter($quoteid, $quotetxt)
-{
-  return '<tr>
-<td class="quote_delete">
-	<label>Delete<input type="radio" name="q'.$quoteid.'" value="d'.$quoteid.'"></label>
-</td>
-<td>
-<div class="quote_quote">'.$quotetxt.'
-
-</div>
-</td>
-<td class="quote_unflag">
-	<label><input type="radio" name="q'.$quoteid.'" value="u'.$quoteid.'">Unflag</label>
-</td>
-</tr>';
-}
 
 function flag_queue_page($inner_html)
 {
     $str = '<div id="admin_flag_title">Flags</div>';
+
+    $str .= $this->get_messages();
 
     $str .= '<form action="?'.urlargs('flag_queue','judgement').'" method="post">
 <table width="100%" class="admin_queue">';
@@ -324,7 +289,7 @@ function add_news_page()
     return '  <div id="admin_add-news_all">
    <div id="admin_add-news_title">
     Add News
-   </div>
+   </div>' . $this->get_messages() . '
    <form method="post" action="?'.urlargs('add_news','submit').'">
 	<textarea cols="80" rows="5" name="news" id="add_news_news"></textarea><br />
 	<input type="submit" value="Add News" id="add_news" />
@@ -339,7 +304,7 @@ function add_user_page()
     return '  <div id="admin_add-user_all">
    <div id="admin_add-user_title">
     Add User
-   </div>
+   </div> ' . $this->get_messages() . '
    <form method="post" action="?'.urlargs('add_user','update').'">
     Username: <input type="text" name="username" id="admin_add-user_username" /><br />
 	RANDOM Salt: <input type="text" name="salt" value="'.str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').'" id="admin_add-user_salt" /><br />
@@ -355,7 +320,7 @@ function change_password_page()
 {
     return '  <div id="admin_change-pw_title">
    Change Password
-  </div>
+  </div> ' . $this->get_messages() . '
   <form action="?'.urlargs('change_pw','update',$_SESSION['user']).'" method="post">
    Old Password: <input type="password" name="old_password"><br />
    New Password: <input type="password" name="new_password"><br />
@@ -365,41 +330,13 @@ function change_password_page()
 ';
 }
 
-function edit_user_page_form($who, $username, $level)
-{
-  return '<span style="font-style: underline">Editing user '.$who.'</span>
-  <form action="?'.urlargs('users','update',$who).'" method="post">
-   New Username: <input type="text" value="'.$username.'" name="user"><br />
-   New Password: <input type="text" name="password"> (insert as cleartext, the program will encrypt it or leave it blank for no pw change)<br />
-      New Level: '.user_level_select($level).'
-   <input type="submit">
-  </form>';
 
-}
-
-function edit_user_page_table_row($user, $password, $level)
-{
-    return '    <tr>
-     <td>
-      <a href="?'.urlargs('users','edit',$user).'">'.$user.'</a>
-     </td>
-     <td>
-      <a href="?'.urlargs('users','edit',$user).'">'.$password.'</a>
-     </td>
-     <td>
-      <a href="?'.urlargs('users','edit',$user).'">'.$level.'</a>
-     </td>
-     <td>
-      <input type="checkbox" name="d'.$user.'" value="'.$user.'" />
-    </tr>
-';
-}
 
 function edit_user_page_table($innerhtml)
 {
     $str = '  <div id="admin_users_title">
    Users
-  </div>
+  </div>' . $this->get_messages() . '
   <form action="?'.urlargs('users','delete').'" method="post">
    <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
     <tr>
@@ -432,7 +369,7 @@ function login_page()
 {
     global $lang;
 
-    return '<div id="admin_all">'.$lang['admin_login_greeting'].
+    return $this->get_messages() . '<div id="admin_all">'.$lang['admin_login_greeting'].
 	'<form action="?'.urlargs('admin','login').'" method="post">
     Username: <input type="text" name="rash_username" size="8" id="admin_login_username-box" /><br />
     Password: <input type="password" name="rash_password" size="8" id="admin_login_password-box" /><br />
@@ -440,28 +377,12 @@ function login_page()
    </form></div>';
 }
 
-function quote_queue_page_iter($quoteid, $quotetxt)
-{
-    return '     <tr>
-      <td class="quote_no">
-       <label>No<input type="radio" name="q'.$quoteid.'" value="n'.$quoteid.'"></label>
-      </td>
-      <td>
-        <div class="quote_quote">
-		'.$quotetxt.'
-        </div>
-      </td>
-	  <td class="quote_yes">
-       <label><input type="radio" name="q'.$quoteid.'" value="y'.$quoteid.'" style="text-align: right">Yes</label>
-	  </td>
-     </tr>
-';
-
-}
 
 function quote_queue_page($innerhtml)
 {
     $str = '<div id="admin_queue_title">Queue</div>';
+
+    $str .= $this->get_messages();
 
     $str .= '  <form action="?'.urlargs('queue','judgement').'" method="post">
    <table width="100%" cellspacing="0" class="admin_queue">';
