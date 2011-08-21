@@ -156,8 +156,8 @@ function printfooter($dbstats=null)
 
 function news_item($news, $date)
 {
-    return '<div class="home_news_date">'.$date.'</div>'.
-	   '<div class="home_news_news">'.$news.'</div>';
+    return '<div class="home_news_whole"><div class="home_news_date">'.$date.'</div>'.
+	   '<div class="home_news_news">'.$news.'</div></div>';
 }
 
 function main_page($news)
