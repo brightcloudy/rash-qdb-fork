@@ -1,8 +1,8 @@
 <?php
 
-class BashTemplate {
+class NHQDBTemplate {
 
-function printheader($title, $topleft='QMS', $topright='Quote Management System')
+function printheader($title, $topleft='nhqdb', $topright='#NetHack Quote Database')
 {
     global $lang;
 ob_start();
@@ -12,10 +12,24 @@ ob_start();
 <head>
  <title><?=$title?></title>
  <meta name="robots" content="noarchive,nofollow" />
+ <link rel="icon" type="image/png" href="./templates/nhqdb_template/favicon.png">
  <link rel="alternative" type="text/xml" title="RSS" href="?rss" />
  <style type="text/css" media="all">
-  @import "./templates/bash_template/style.css";
+  @import "./templates/nhqdb_template/style.css";
  </style>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24280817-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 </head>
 <body>
  <div id="site_all">
@@ -467,7 +481,7 @@ function quote_iter($quoteid, $rating, $quotetxt, $date=null)
 
 
 
-} // BashTemplate
+}
 
 
-$TEMPLATE = new BashTemplate;
+$TEMPLATE = new NHQDBTemplate;
