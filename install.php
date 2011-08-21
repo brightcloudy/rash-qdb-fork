@@ -32,15 +32,15 @@ function db_query($sql) {
 
 $def_template = './templates/bash_template/bash_template.php';
 
+require 'basetemplate.php';
+
 if (file_exists($def_template)) {
     /*require('language/US-english.lng');*/
     require $def_template;
 } else {
-    class BaseTemplate {
-	function printheader($txt, $topleft='', $topright='') {}
-	function printfooter() {}
+    class TempTemplate extends BaseTemplate  {
     }
-    $TEMPLATE = new BaseTemplate();
+    $TEMPLATE = new TempTemplate();
 }
 
 $TEMPLATE->printheader('Install Rash Quote Management System');
@@ -66,6 +66,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'language' => "'US-english'",
 		  'quote_limit' => $_POST['quote_limit'],
 		  'page_limit' => $_POST['page_limit'],
+		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
 		  'timezone' => "'".$_POST['timezone']."'",
 		  'news_time_format' => "'".$_POST['news_time_format']."'",
 		  'quote_time_format' => "'".$_POST['quote_time_format']."'",
@@ -100,11 +101,8 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 							quote text NOT NULL,
 							rating int(7) NOT NULL,
 							flag int(1) NOT NULL,
+                                                        queue int(1) NOT NULL,
 							date int(10) NOT NULL");
-
-    $error |= mk_db_table(db_tablename('queue'), "id int(11) NOT NULL auto_increment primary key,
-							quote text NOT NULL");
-
 
     $error |= mk_db_table(db_tablename('tracking'), "id int(11) NOT NULL auto_increment primary key,
 							ip varchar(15) NOT NULL,
@@ -156,10 +154,11 @@ else {
 
   Quote limit:        <input type="text" name="quote_limit" value="10"> (number of quotes shown per page when browsing)
   Page limit:         <input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
+  Moderated:          <input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
 
   Timezone:           <input type="text" name="timezone" value="America/New_York">
-  News time format:   <input type="text" name="news_time_format" value="Y-m-d">
-  Quote time format:  <input type="text" name="quote_time_format" value="F j, Y">
+  News time format:   <input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>)
+  Quote time format:  <input type="text" name="quote_time_format" value="F j, Y"> (example: <? print date("F j, Y"); ?>)
 
   <input type="submit" value="Submit">
  </form>
@@ -170,5 +169,3 @@ else {
     }
 }
 $TEMPLATE->printfooter();
-
-?>

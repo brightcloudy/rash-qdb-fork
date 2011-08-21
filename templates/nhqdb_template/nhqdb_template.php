@@ -13,7 +13,7 @@ ob_start();
  <title><?=$title?></title>
  <meta name="robots" content="noarchive,nofollow" />
  <link rel="icon" type="image/png" href="./templates/nhqdb_template/favicon.png">
- <link rel="alternative" type="text/xml" title="RSS" href="?rss" />
+ <link rel="alternate" type="application/rss+xml" href="?rss" title="RSS">
  <style type="text/css" media="all">
   @import "./templates/nhqdb_template/style.css";
  </style>

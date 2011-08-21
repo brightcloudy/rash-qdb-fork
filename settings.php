@@ -22,6 +22,7 @@ $CONFIG['language'] = 'US-english';
 // Misc configs
 $CONFIG['quote_limit'] = 10;	// how many quotes ?browse displays at once
 $CONFIG['page_limit'] = 5;	// how many page numbers to show
+$CONFIG['moderated_quotes'] = 1; // Quotes need to be accepted by a moderator
 $CONFIG['timezone'] = 'America/New_York';
 $CONFIG['news_time_format'] = 'Y-m-d';
 $CONFIG['quote_time_format'] = 'F j, Y';

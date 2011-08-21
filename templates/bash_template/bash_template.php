@@ -12,7 +12,7 @@ ob_start();
 <head>
  <title><?=$title?></title>
  <meta name="robots" content="noarchive,nofollow" />
- <link rel="alternative" type="text/xml" title="RSS" href="?rss" />
+ <link rel="alternate" type="application/rss+xml" href="?rss" title="RSS">
  <style type="text/css" media="all">
   @import "./templates/bash_template/style.css";
  </style>
