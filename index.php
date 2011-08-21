@@ -136,19 +136,21 @@ function ip_track($where, $quote_num)
 		case 'vote':
 			$where2 = 'flag';
 			break;
+		default:
+		        die('illegal tracking where.');
 	}
 
 
 	$res =& $db->query("SELECT ip FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 	if (DB::isError($res)) {
-		die($res->getMessage());
+		die('ip_track(1):'.$res->getMessage());
 	}
 
 	if($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // if ip is in database
 		$res->free();
 		$res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 		if (DB::isError($res)) {
-			die($res->getMessage());
+			die('ip_track(2):'.$res->getMessage());
 		}
 		$quote_array = $res->fetchRow(DB_FETCHMODE_ORDERED);
 		$quote_array = explode(",", $quote_array[0]);
@@ -156,16 +158,16 @@ function ip_track($where, $quote_num)
 		if(in_array($quote_num, $quote_array)){
 		    $res2 =& $db->query("SELECT $where FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
-				die($res->getMessage());
+				die('ip_track(3):'.$res->getMessage());
 			}
 			$where_result = $res2->fetchRow(DB_FETCHMODE_ORDERED);
 			$where_result = explode(",", $where_result[0]);
 			if(!$where_result[$quote_place]){
 				$where_result[$quote_place] = 1;
 				$where_result = implode(",", $where_result);
-				$db->query("UPDATE ".db_tablename('tracking')." SET ".$db->quote($where)."=".$db->quote($where_result)." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+				$db->query("UPDATE ".db_tablename('tracking')." SET $where = ".$db->quote($where_result)." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 				if (DB::isError($res)) {
-					die($res->getMessage());
+					die('ip_track(4):'.$res->getMessage());
 				}
 
 				return 1;
@@ -185,39 +187,39 @@ function ip_track($where, $quote_num)
 			// Update the quote_id
 		    $res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
-				die($res->getMessage());
+				die('ip_track(5):'.$res->getMessage());
 			}
 			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
 			$row[] = $quote_num;
 			$db->query("UPDATE ".db_tablename('tracking')." SET quote_id = ".$db->quote(implode(",", $row))." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
-				die($res->getMessage());
+				die('ip_track(6):'.$res->getMessage());
 			}
 			$res->free();
 
 			// Update $where
-			$res =& $db->query("SELECT ".$db->quote($where)." FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+			$res =& $db->query("SELECT $where FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
-				die($res->getMessage());
+				die('ip_track(7):'.$res->getMessage());
 			}
 			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
 			$row[] = '1';
-			$db->query("UPDATE ".db_tablename('tracking')." SET ".$db->quote($where)." = ".$db->quote(implode(",", $row)));
+			$db->query("UPDATE ".db_tablename('tracking')." SET $where = ".$db->quote(implode(",", $row)));
 			if (DB::isError($res)) {
-				die($res->getMessage());
+				die('ip_track(8):'.$res->getMessage());
 			}
 			$res->free();
 
 			// Update $where2
-			$res =& $db->query("SELECT ".$db->quote($where2)." FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+			$res =& $db->query("SELECT $where2 FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 			if (DB::isError($res)) {
-				die($res->getMessage());
+				die('ip_track(9):'.$res->getMessage());
 			}
 			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
 			$row[] = '0';
-			$db->query("UPDATE ".db_tablename('tracking')." SET ".$db->quote($where2)." = ".$db->quote(implode(",", $row)));
+			$db->query("UPDATE ".db_tablename('tracking')." SET $where2 = ".$db->quote(implode(",", $row)));
 			if (DB::isError($res)) {
-				die($res->getMessage());
+				die('ip_track(10):'.$res->getMessage());
 			}
 			$res->free();
 
@@ -225,9 +227,9 @@ function ip_track($where, $quote_num)
 		}
 	}
 	else{ // if ip isn't in database, add it and appropriate quote action
-	    $res = $db->query("INSERT INTO ".db_tablename('tracking')." (ip, quote_id, ".$db->quote($where).", ".$db->quote($where2).") VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", 1, 0);");
+	    $res = $db->query("INSERT INTO ".db_tablename('tracking')." (ip, quote_id, $where, $where2) VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", 1, 0);");
 		if (DB::isError($res)) {
-			die($res->getMessage());
+			die('ip_track(11):'.$res->getMessage());
 		}
 		return 2;
 	}
