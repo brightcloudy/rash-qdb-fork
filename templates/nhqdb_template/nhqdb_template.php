@@ -96,6 +96,7 @@ function printfooter($dbstats=null)
 {
     global $lang;
 ?>
+  <p>
   <div id="site_admin_nav">
    <div id="site_admin_nav_upper">
     <div id="site_admin_nav_upper_linkbar">
