@@ -100,11 +100,8 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 							quote text NOT NULL,
 							rating int(7) NOT NULL,
 							flag int(1) NOT NULL,
+                                                        queue int(1) NOT NULL,
 							date int(10) NOT NULL");
-
-    $error |= mk_db_table(db_tablename('queue'), "id int(11) NOT NULL auto_increment primary key,
-							quote text NOT NULL");
-
 
     $error |= mk_db_table(db_tablename('tracking'), "id int(11) NOT NULL auto_increment primary key,
 							ip varchar(15) NOT NULL,
@@ -170,5 +167,3 @@ else {
     }
 }
 $TEMPLATE->printfooter();
-
-?>

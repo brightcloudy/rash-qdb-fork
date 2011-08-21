@@ -51,10 +51,8 @@ function get_db_stats()
 {
     global $db;
 
-    if (DB::isError($db)) { return null; }
-
-    $ret['pending_quotes'] = $db->getOne('select count(id) from '.db_tablename('queue'));
-    $ret['approved_quotes'] = $db->getOne('SELECT COUNT(id) FROM '.db_tablename('quotes'));
+    $ret['pending_quotes'] = $db->getOne('select count(id) from '.db_tablename('quotes').' where queue=1');
+    $ret['approved_quotes'] = $db->getOne('SELECT COUNT(id) FROM '.db_tablename('quotes').' where queue=0');
 
     return $ret;
 }
@@ -63,7 +61,7 @@ function get_db_stats()
 function rash_rss()
 {
     global $db, $CONFIG, $TEMPLATE;
-    $query = "SELECT id, quote, rating, flag FROM ".db_tablename('quotes')." ORDER BY id DESC LIMIT 15";
+    $query = "SELECT id, quote, rating, flag FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 15";
     $res =& $db->query($query);
     $items = '';
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
@@ -297,7 +295,7 @@ function home_generation()
 function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 {
     global $CONFIG, $db, $lang;
-    $numrows = $db->getOne("SELECT COUNT(id) FROM ".db_tablename('quotes'));
+    $numrows = $db->getOne("SELECT COUNT(id) FROM ".db_tablename('quotes').' WHERE queue=0');
     $testrows = $numrows;
 
 	$pagenum = 0;
@@ -590,69 +588,46 @@ function login($method)
 
 
 
-// quote_queue($method)
-// This function displays the queue of quotes in the table queue, input from users is sent
-// to queue and an administrator has the privileges to send that quote into the main quote
-// database to be viewed by the public, or purge it from the system.
-//
 
 function quote_queue($method)
 {
     global $CONFIG, $TEMPLATE, $db;
-	if($method == 'judgement'){ // $method is a variable that is passed to the function to tell it how to act
-								// setting it to judgement tells the program to take moderator radio button input
-								// and either let the quotes into quotes or purge them
-	    $res =& $db->query("SELECT * FROM ".db_tablename('queue'));
-		$x = 0;
-		while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
-			if($_POST['q'.$row['id']]){ // sets up an array that can be looped through containing the ids of all the
-										// quotes that have been voted yes or no on
-				$judgement_array[$x] = $_POST['q'.$row['id']];
-				$x++;
-			}
-		}
-		$x = 0;
-		while($judgement_array[$x]){	// itinerates through $judgement_array, stops when it gets to the end of the quote list
-			if(substr($judgement_array[$x], 0, 1) == 'y'){	// checks to see if the first letter of
-															// the entry of a quote in the array is y
-															// a 'y' in there signifies it should be inserted
-															// into quotes
-			    $quote =& $db->query("SELECT quote FROM ".db_tablename('queue')." WHERE id =".$db->quote((int)substr($judgement_array[$x], 1))." LIMIT 1");
-										// query to grab the quote in question straight from queue
-				if (DB::isError($res)) {
-					die($res->getMessage());
-				}
-				$row = $quote->fetchRow(DB_FETCHMODE_ASSOC);	// fetches the quote from the database
-				$db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, date) VALUES (".$db->quote($row['quote']).", 0, 0, '".mktime()."');");
-				$TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' added to quote database!');
-															// inserts the quote into quotes and gives a confirmation message
-			}
-			$db->query("DELETE FROM ".db_tablename('queue')." WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)).";");
-															// the quote is deleted from queue regardless if it is
-															// submitted into quotes or not, since there's no reason
-															// for it to be there if it is checked as no or as yes
-			$TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' deleted from temporary database!');
-			$x++;	// increments x so the judgement_array goes to the next item
-		}
-	}
-
-	$res =& $db->query("SELECT * FROM ".db_tablename('queue')." order by id asc");
-					// query to grab all of the queued quotes to display
-	if (DB::isError($res)){
-		die($res->getMessage());
-	}
-
-	$innerhtml = '';
+    if ($method == 'judgement') {
+	$res =& $db->query("SELECT * FROM ".db_tablename('quotes').' where queue=1');
 	$x = 0;
-	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
-	    $innerhtml .= $TEMPLATE->quote_queue_page_iter($row['id'], mangle_quote_text($row['quote']));
+	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
+	    if ($_POST['q'.$row['id']]) {
+		$judgement_array[$x] = $_POST['q'.$row['id']];
+		$x++;
+	    }
+	}
+	$x = 0;
+	while ($judgement_array[$x]) {
+	    if(substr($judgement_array[$x], 0, 1) == 'y'){
+		$db->query("UPDATE ".db_tablename('quotes')." SET queue=0 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
+		$TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' accepted');
+	    } else {
+		$db->query("DELETE FROM ".db_tablename('quotes')." WHERE queue=1 AND id =".$db->quote((int)substr($judgement_array[$x], 1)));
+		$TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' deleted');
+	    }
 	    $x++;
 	}
+    }
 
-	print $TEMPLATE->quote_queue_page($innerhtml);
+    $res =& $db->query("SELECT * FROM ".db_tablename('quotes')." WHERE queue=1 order by id asc");
+    if (DB::isError($res)){
+	die($res->getMessage());
+    }
 
+    $innerhtml = '';
+    $x = 0;
+    while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	$innerhtml .= $TEMPLATE->quote_queue_page_iter($row['id'], mangle_quote_text($row['quote']));
+	$x++;
+    }
+
+    print $TEMPLATE->quote_queue_page($innerhtml);
 }
-// End quote_queue()
 
 
 // flag_queue($method)
@@ -674,28 +649,28 @@ function flag_queue($method)
 		}
 	    }
 
-		$res =& $db->query("SELECT * FROM ".db_tablename('quotes')." WHERE flag = 1");
+	    $res =& $db->query("SELECT * FROM ".db_tablename('quotes')." WHERE flag = 1");
 
-		$x = 0;
-		while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
-			if($_POST['q'.$row['id']]){
-				$judgement_array[$x] = $_POST['q'.$row['id']];
-				$x++;
-			}
+	    $x = 0;
+	    while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
+		if($_POST['q'.$row['id']]){
+		    $judgement_array[$x] = $_POST['q'.$row['id']];
+		    $x++;
 		}
+	    }
 
-		$x = 0;
-		while($judgement_array[$x]){
-			if(substr($judgement_array[$x], 0, 1) == 'u'){
-			    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 2 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
-			    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' has been unflagged!');
-			}
-			if(substr($judgement_array[$x], 0, 1) == 'd'){
-			    $db->query("DELETE FROM ".db_tablename('quotes')." WHERE id=".$db->quote((int)substr($judgement_array[$x], 1)));
-			    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' deleted from database!');
-			}
-			$x++;
+	    $x = 0;
+	    while($judgement_array[$x]){
+		if(substr($judgement_array[$x], 0, 1) == 'u'){
+		    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 2 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
+		    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' has been unflagged!');
 		}
+		if(substr($judgement_array[$x], 0, 1) == 'd'){
+		    $db->query("DELETE FROM ".db_tablename('quotes')." WHERE id=".$db->quote((int)substr($judgement_array[$x], 1)));
+		    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' deleted from database!');
+		}
+		$x++;
+	    }
 	}
 
 	$res =& $db->query("SELECT * FROM ".db_tablename('quotes')." WHERE flag = 1 ORDER BY id ASC");
@@ -736,7 +711,7 @@ function search($method)
 
 	$search = '%'.$search.'%';
 
-	$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
+	$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
 
 	quote_generation($query, $lang['search_results_title'], -1);
     }
@@ -770,10 +745,6 @@ function edit_quote($method, $quoteid)
 }
 
 
-// add_quote()
-// This function serves as the page catering to ?add, it can receive input
-// from an HTML form that will be inserted into queue for viewing when
-// logged in as an administrator.
 
 function add_quote($method)
 {
@@ -782,12 +753,9 @@ function add_quote($method)
     $innerhtml = '';
 
     if ($method == 'submit') {
-
 	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
-
 	$innerhtml = $TEMPLATE->add_quote_outputmsg(mangle_quote_text($quotxt));
-
-	$res =& $db->query("INSERT INTO ".db_tablename('queue')." (quote) VALUES(".$db->quote($quotxt).")");
+	$res =& $db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, queue, date) VALUES(".$db->quote($quotxt).", 0, 0, 1, '".mktime()."')");
 	if(DB::isError($res)){
 	    die($res->getMessage());
 	}
@@ -846,11 +814,11 @@ switch($page[0])
 		login($page[1]);
 		break;
 	case 'bottom':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE rating < 0 ORDER BY rating ASC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT 50";
 		quote_generation($query, $lang['bottom_title'], -1);
 		break;
 	case 'browse':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." ORDER BY id ASC ";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id ASC ";
 		quote_generation($query, $lang['browse_title'], $page[1], $CONFIG['quote_limit'], $CONFIG['page_limit']);
 		break;
 	case 'change_pw':
@@ -865,7 +833,7 @@ switch($page[0])
 			flag_queue($page[1]);
 		break;
 	case 'latest':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." ORDER BY id DESC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 50";
 		quote_generation($query, $lang['latest_title'], -1);
 		break;
 	case 'logout':
@@ -880,11 +848,11 @@ switch($page[0])
 			quote_queue($page[1]);
 		break;
 	case 'random':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." ORDER BY rand() LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT 50";
 		quote_generation($query, $lang['random_title'], -1);
 		break;
 	case 'random2':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE rating > 1 ORDER BY rand() LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 1 ORDER BY rand() LIMIT 50";
 		quote_generation($query, $lang['random2_title'], -1);
 		break;
 	case 'rss':
@@ -894,7 +862,7 @@ switch($page[0])
 		search($page[1]);
 		break;
 	case 'top':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE rating > 0 ORDER BY rating DESC LIMIT 50";
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT 50";
 		quote_generation($query, $lang['top_title'], -1);
 		break;
 	case 'edit':
@@ -910,7 +878,7 @@ switch($page[0])
 		break;
 	default:
 	    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE id =".$db->quote((int)$_SERVER['QUERY_STRING']);
+		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and id =".$db->quote((int)$_SERVER['QUERY_STRING']);
 		quote_generation($query, "#${_SERVER['QUERY_STRING']}", -1);
 	    } else {
 		home_generation();
