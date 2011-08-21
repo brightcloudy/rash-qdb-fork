@@ -69,23 +69,9 @@ ob_start();
 <?php
 
 	}
-?>
-   </div>
-   <div id="site_nav_lower">
-    <div id="site_nav_lower_linkbar">
-     <a href="./" id="site_nav_home"><?=$lang['menu_home']?></a> |
-     <a href="?latest" id="site_nav_latest"><?=$lang['menu_latest']?></a> |
-     <a href="?browse" id="site_nav_browse"><?=$lang['menu_browse']?></a> |
-     <a href="?random" id="site_nav_random"><?=$lang['menu_random']?></a> |
-     <a href="?random2" id="site_nav_random2"><?=$lang['menu_random2']?></a> |
-     <a href="?bottom" id="site_nav_bottom"><?=$lang['menu_bottom']?></a> |
-     <a href="?top" id="site_nav_top"><?=$lang['menu_top']?></a> |
-     <a href="?search" id="site_nav_search"><?=$lang['menu_search']?></a> |
-     <a href="?add" id="site_nav_add"><?=$lang['menu_contribute']?></a>
-    </div>
-   </div>
-  </div>
-<?
+	print '</div>';
+	print $this->get_menu();
+	print '</div>';
 }
 
 
@@ -101,35 +87,7 @@ function printfooter($dbstats=null)
    <div id="site_admin_nav_upper">
     <div id="site_admin_nav_upper_linkbar">
 <?
-	if(isset($_SESSION['logged_in'])){
-?>
-     <a href="?queue" id="site_admin_nav_upper_linkbar_queue"><?=$lang['menu_queue']?></a> |
-     <a href="?flag_queue" id="site_admin_nav_upper_linkbar_flagged"><?=$lang['menu_flagged']?></a> |
-<?
-
-		if($_SESSION['level'] < 3){
-
-?>
-     <a href="?add_news" id="site_admin_nav_upper_linkbar_add-news"><?=$lang['menu_addnews']?></a> |
-<?
-
-		}
-		if($_SESSION['level'] == 1){
-
-?>
-     <a href="?users" id="site_admin_nav_upper_linkbar_users"><?=$lang['menu_users']?></a> |
-     <a href="?add_user" id="site_admin_nav_upper_linkbar_add-user"><?=$lang['menu_adduser']?></a> |
-<?
-
-		}
-
-?>
-     <a href="?change_pw" id="site_admin_nav_upper_linkbar_change-password"><?=$lang['menu_changepass']?></a> |
-     <a href="?logout" id="site_admin_nav_upper_linkbar_logout"><?=$lang['menu_logout']?></a>
-<?
-
-	}
-
+       print $this->get_menu(1);
 ?>
     </div>
    </div>

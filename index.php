@@ -20,6 +20,32 @@ require("language/{$CONFIG['language']}.lng");
 require('basetemplate.php');
 require($CONFIG['template']);
 
+$mainmenu = array(array('url' => './', 'id' => 'site_nav_home', 'txt' => 'menu_home'),
+		  array('url' => '?latest', 'id' => 'site_nav_latest', 'txt' => 'menu_latest'),
+		  array('url' => '?browse', 'id' => 'site_nav_browse', 'txt' => 'menu_browse'),
+		  array('url' => '?random', 'id' => 'site_nav_random', 'txt' => 'menu_random'),
+		  array('url' => '?random2', 'id' => 'site_nav_random2', 'txt' => 'menu_random2'),
+		  array('url' => '?bottom', 'id' => 'site_nav_bottom', 'txt' => 'menu_bottom'),
+		  array('url' => '?top', 'id' => 'site_nav_top', 'txt' => 'menu_top'),
+		  array('url' => '?search', 'id' => 'site_nav_search', 'txt' => 'menu_search'),
+		  array('url' => '?add', 'id' => 'site_nav_add', 'txt' => 'menu_contribute')
+);
+if (isset($_SESSION['logged_in'])) {
+    $adminmenu = array(array('url' => '?queue', 'id' => 'site_admin_nav_queue', 'txt' => 'menu_queue'),
+		      array('url' => '?flag_queue', 'id' => 'site_admin_nav_flagged', 'txt' => 'menu_flagged'));
+    if ($_SESSION['level'] < 3)
+	$adminmenu[] = array('url' => '?add_news', 'id' => 'site_admin_nav_add-news', 'txt' => 'menu_addnews');
+    if ($_SESSION['level'] == 1) {
+	$adminmenu[] = array('url' => '?add_users', 'id' => 'site_admin_nav_users', 'txt' => 'menu_users');
+	$adminmenu[] = array('url' => '?add_user', 'id' => 'site_admin_nav_add-user', 'txt' => 'menu_adduser');
+    }
+    $adminmenu[] = array('url' => '?change_pw', 'id' => 'site_admin_nav_change-password', 'txt' => 'menu_changepass');
+    $adminmenu[] = array('url' => '?logout', 'id' => 'site_admin_nav_logout', 'txt' => 'menu_logout');
+}
+
+$TEMPLATE->set_menu(0, $mainmenu);
+$TEMPLATE->set_menu(1, $adminmenu);
+
 
 function get_db_stats()
 {

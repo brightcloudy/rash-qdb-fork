@@ -3,6 +3,8 @@
 abstract class BaseTemplate {
 
     private $messages = array();
+    private $mainmenu = array();
+    private $adminmenu = array();
 
     function __constructor()
     {
@@ -26,6 +28,28 @@ abstract class BaseTemplate {
 	}
 	return '';
     }
+
+    function set_menu($admin,$menudata)
+    {
+	if ($admin) {
+	    $this->adminmenu = $menudata;
+	} else {
+	    $this->mainmenu = $menudata;
+	}
+    }
+
+    function get_menu($admin = 0)
+    {
+	global $lang;
+	if ($admin) { $menudata = $this->adminmenu; } else { $menudata = $this->mainmenu; }
+	$arr = array();
+	foreach ($menudata as $m) {
+	    $arr[] = '<a href="'.$m['url'].'" id="'.$m['id'].'">'.$lang[$m['txt']].'</a>';
+	}
+	$str = join(' | ', $arr);
+	return '<div id="site_nav_lower"><div id="site_nav_lower_linkbar">'.$str.'</div></div>';
+    }
+
 
     function printheader($title, $topleft='', $topright='')
     {
