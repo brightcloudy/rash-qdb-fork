@@ -1,0 +1,14 @@
+div#site_all{
+	margin-left: 9%;
+	margin-right: 9%;
+}
+div#home_greeting{
+	float: left;
+	width: 50%;
+	clear: both;
+}
+div#home_news{
+	float: right;
+	clear: both;
+	width: 50%;
+}
