@@ -62,25 +62,16 @@ function get_db_stats()
 
 function rash_rss()
 {
-    global $db, $CONFIG;
+    global $db, $CONFIG, $TEMPLATE;
     $query = "SELECT id, quote, rating, flag FROM ".db_tablename('quotes')." ORDER BY id DESC LIMIT 15";
-
     $res =& $db->query($query);
-    print "<?xml version=\"1.0\" ?>\n";
-    print "<rss version=\"0.92\">\n";
-    print "<channel>\n";
-    print "<title>".$CONFIG['rss_title']."</title>\n";
-    print "<description>".$CONFIG['rss_desc']."</description>\n";
-    print "<link>".$CONFIG['rss_url']."</link>\n";
-
+    $items = '';
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
-	print "<item>\n";
-	print "<title>".$CONFIG['rss_url']."/?".$row['id']."</title>\n";
-	print "<description>".mangle_quote_text($row['quote'])."</description>\n";
-	print "<link>".$CONFIG['rss_url']."/?".$row['id']."</link>\n";
-	print "</item>\n\n";
+	$title = $CONFIG['rss_url']."/?".$row['id'];
+	$desc = mangle_quote_text(htmlspecialchars($row['quote']));
+	$items .= $TEMPLATE->rss_feed_item($title, $desc, $title);
     }
-    print "</channel></rss>";
+    print $TEMPLATE->rss_feed($CONFIG['rss_title'], $CONFIG['rss_desc'], $CONFIG['rss_url'], $items);
 }
 
 // function user_quote_status($where, $quote_num)

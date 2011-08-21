@@ -52,6 +52,29 @@ abstract class BaseTemplate {
 	return '<div id="site_nav_lower"><div id="site_nav_lower_linkbar">'.$str.'</div></div>';
     }
 
+    function rss_feed_item($title, $desc, $link)
+    {
+	$str = "<item>\n";
+	$str .= "<title>".$title."</title>\n";
+	$str .= "<description>".$desc."</description>\n";
+	$str .= "<link>".$link."</link>\n";
+	$str .= "</item>\n\n";
+	return $str;
+    }
+
+    function rss_feed($title, $desc, $link, $items)
+    {
+	$str = "<?xml version=\"1.0\" ?>\n";
+	$str .= "<rss version=\"0.92\">\n";
+	$str .= "<channel>\n";
+	$str .= "<title>".$title."</title>\n";
+	$str .= "<description>".$desc."</description>\n";
+	$str .= "<link>".$link."</link>\n";
+	$str .= $items;
+	$str .= "</channel></rss>";
+	return $str;
+    }
+
 
     function printheader($title, $topleft='', $topright='')
     {
