@@ -24,14 +24,13 @@ a#site_admin_flag, a#site_admin_queue{
 div.quote_quote{
 	font-family: courier new, lucida console, fixed;
 	font-size: smaller;
-	padding-bottom: 5pt;	
+	padding-bottom: 5pt;
 }
-div.quote_whole{
-	padding-top: 10pt;
-	padding-left:0.25em;
-	padding-right:0.25em;
+.quote_separator { display: none; }
+.quote_whole{
+    padding: 1em 0.25em;
 }
-div.quote_whole:nth-child(odd) {
+.quote_whole:nth-child(odd) {
 	background-color:#f0f0f0;
 }
 .quote_plus {
