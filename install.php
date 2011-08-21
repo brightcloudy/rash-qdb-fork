@@ -66,6 +66,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'language' => "'US-english'",
 		  'quote_limit' => $_POST['quote_limit'],
 		  'page_limit' => $_POST['page_limit'],
+		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
 		  'timezone' => "'".$_POST['timezone']."'",
 		  'news_time_format' => "'".$_POST['news_time_format']."'",
 		  'quote_time_format' => "'".$_POST['quote_time_format']."'",
@@ -153,6 +154,7 @@ else {
 
   Quote limit:        <input type="text" name="quote_limit" value="10"> (number of quotes shown per page when browsing)
   Page limit:         <input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
+  Moderated:          <input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
 
   Timezone:           <input type="text" name="timezone" value="America/New_York">
   News time format:   <input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>)
