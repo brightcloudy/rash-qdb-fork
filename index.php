@@ -248,7 +248,7 @@ function ip_track($where, $quote_num)
 //
 function home_generation()
 {
-    global $db, $lang, $TEMPLATE, $CONFIG;
+    global $db, $TEMPLATE, $CONFIG;
 
     $res =& $db->query("SELECT * FROM ".db_tablename('news')." ORDER BY date desc LIMIT 5");
     if(DB::isError($res)){
@@ -385,7 +385,7 @@ function edit_quote_button($quoteid)
 //
 function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_limit = 10)
 {
-    global $CONFIG, $TEMPLATE, $db, $lang;
+    global $CONFIG, $TEMPLATE, $db;
     if ($page != -1) {
 	if(!$page)
 	    $page = 1;
@@ -726,7 +726,7 @@ function search($method)
 
 function edit_quote($method, $quoteid)
 {
-    global $CONFIG, $TEMPLATE, $db, $lang;
+    global $CONFIG, $TEMPLATE, $db;
 
     if (!($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))) return;
 
@@ -757,7 +757,7 @@ function edit_quote($method, $quoteid)
 
 function add_quote($method)
 {
-    global $CONFIG, $TEMPLATE, $db, $lang;
+    global $CONFIG, $TEMPLATE, $db;
 
     $innerhtml = '';
 
