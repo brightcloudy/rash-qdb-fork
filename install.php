@@ -155,8 +155,8 @@ else {
   Page limit:         <input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
 
   Timezone:           <input type="text" name="timezone" value="America/New_York">
-  News time format:   <input type="text" name="news_time_format" value="Y-m-d">
-  Quote time format:  <input type="text" name="quote_time_format" value="F j, Y">
+  News time format:   <input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>)
+  Quote time format:  <input type="text" name="quote_time_format" value="F j, Y"> (example: <? print date("F j, Y"); ?>)
 
   <input type="submit" value="Submit">
  </form>
