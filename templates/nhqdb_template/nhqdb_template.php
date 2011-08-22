@@ -30,27 +30,8 @@ ob_start();
   })();
 
 
-  userAgentLowerCase = navigator.userAgent.toLowerCase();
-
-  function resizeTextarea(t) {
-    if ( !t.initialRows ) t.initialRows = t.rows;
-    a = t.value.split('\n');
-    b=0;
-    for (x=0; x < a.length; x++) {
-      if (a[x].length >= t.cols) b+= Math.floor(a[x].length / t.cols);
-    }
-    b += a.length;
-    if (userAgentLowerCase.indexOf('opera') != -1) b += 2;
-    if (b > t.rows || b < t.rows)
-	t.rows = (b < t.initialRows ? t.initialRows : ((b < 50) ? b : 50));
-  }
-
-  function setFocus(id) {
-      var e = document.getElementById(id);
-      if (e) e.focus();
-  }
-
 </script>
+<script src="./templates/nhqdb_template/util.js" type="text/javascript"></script>
 </head>
 <body>
  <div id="site_all">
@@ -142,12 +123,12 @@ function add_quote_page($added_quote_html='')
     $str .= $added_quote_html;
 
     $str .= '<form action="?'.urlargs('add','submit').'" method="post">
-     <textarea cols="80" rows="5" name="rash_quote" id="add_quote" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)"></textarea><br />
+     <textarea cols="80" rows="5" name="rash_quote" id="add_quote" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)"></textarea><br />
      <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
      <input type="reset" value="'.$lang['add_reset_btn'].'" id="add_reset" />
     </form>';
 
-    $str .= '<script type="text/javascript">setFocus("add_quote");</script>';
+    $str .= '<script type="text/javascript">setFocus("add_quote"); document.write("<input type=\'button\' onclick=\'javascript:mangle_quote(\"add_quote\")\' value=\''.$lang['remove_timestamps_btn'].'\'>");</script>';
 
     $str .= '</div>';
     return $str;
@@ -168,10 +149,12 @@ function edit_quote_page($quoteid, $quotetxt, $edited_quote_html='')
     $str .= $edited_quote_html;
 
     $str .= '<form action="?'.urlargs('edit','submit', $quoteid).'" method="post">
-     <textarea cols="80" rows="5" name="rash_quote" id="edit_quote">'.$quotetxt.'</textarea><br />
+     <textarea cols="80" rows="5" name="rash_quote" id="edit_quote" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)">'.$quotetxt.'</textarea><br />
      <input type="submit" value="'.$lang['edit_quote_btn'].'" id="edit_submit" />
      <input type="reset" value="'.$lang['edit_reset_btn'].'" id="edit_reset" />
     </form>';
+
+    $str .= '<script type="text/javascript">setFocus("edit_quote"); document.write("<input type=\'button\' onclick=\'javascript:mangle_quote(\"edit_quote\")\' value=\''.$lang['remove_timestamps_btn'].'\'>");</script>';
 
     $str .= '</div>';
 

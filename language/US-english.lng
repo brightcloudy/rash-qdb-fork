@@ -48,6 +48,7 @@ $lang = array (
 'add_title' => "Contribute",
 'add_quote_btn' => "Add Quote",
 'add_reset_btn' => "Reset",
+'remove_timestamps_btn' => "Remove timestamps",
 'browse_title' => "Browse",
 'latest_title' => "Latest",
 'random_title' => "Random",
