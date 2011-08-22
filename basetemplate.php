@@ -429,6 +429,15 @@ Are you sure?:<input type="checkbox" name="do_all">
 	return $str;
     }
 
-
+    function quote_list($title, $pagenumbers, $quotes)
+    {
+	$str = '';
+	if (isset($title))
+	    $str .= '<div id="quote_origin-name">'.$title.'</div>';
+	$str .= $pagenumbers;
+	$str .= $quotes;
+	$str .= $pagenumbers;
+	return $str;
+    }
 
 }
