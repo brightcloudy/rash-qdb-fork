@@ -60,7 +60,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'db_table_prefix' => "'".$_POST['db_table_prefix']."'",
 		  'site_short_title' => "'".$_POST['site_short_title']."'",
 		  'site_long_title' => "'".$_POST['site_long_title']."'",
-		  'rss_url' => "'".$_POST['rss_url']."'",
+		  'rss_url' => "'".preg_replace('/\/$/','',$_POST['rss_url'])."'",
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
 		  'language' => "'US-english'",
@@ -156,7 +156,7 @@ else {
   Page limit:         <input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
   Moderated:          <input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
 
-  Timezone:           <input type="text" name="timezone" value="America/New_York">
+  Timezone:           <input type="text" name="timezone" value="America/New_York"> (See <a href="http://www.php.net/manual/en/timezones.php">list of supported timezones</a>)
   News time format:   <input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>)
   Quote time format:  <input type="text" name="quote_time_format" value="F j, Y"> (example: <? print date("F j, Y"); ?>)
 
