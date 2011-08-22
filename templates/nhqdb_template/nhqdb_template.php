@@ -62,6 +62,7 @@ ob_start();
 function printfooter($dbstats=null)
 {
     global $lang;
+    print $this->get_messages(); /* in case the page itself didn't already get the messages */
 ?>
   <p>
   <div id="site_admin_nav">
