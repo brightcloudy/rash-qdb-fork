@@ -287,95 +287,70 @@ function home_generation()
 /************************************************************************
 ************************************************************************/
 
-// page_numbers()
-// This functino deals with all the page numbers in the (by default)
-// browse section. It first gets its variables in order, figured out
-// how many pages there ought to be based on the limit of quotes per page
-// then
 function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 {
     global $CONFIG, $db, $lang;
     $numrows = $db->getOne("SELECT COUNT(id) FROM ".db_tablename('quotes').' WHERE queue=0');
     $testrows = $numrows;
 
-	$pagenum = 0;
+    $pagenum = 0;
 
-    do{
-		$pagenum++;
+    $ret = '';
+
+    do {
+	$pagenum++;
         $testrows -= $quote_limit;
-    }while($testrows > 0);
+    } while ($testrows > 0);
 
-	// ensures $page_limit is an odd number so the algorithm output looks decent,
-	// as in the current page is in the middle of a number line containing the
-	// pages rather than a little left or right of the middle, which works as long
-	// as the pages are being viewed from the middle of the number set rather than
-	// either end, heh
-	if(!($page_limit % 2))
-		$page_limit += 1;
+    if(!($page_limit % 2))
+	$page_limit += 1;
 
-	// if $page_limit is 1, 0, or negative, it is automatically set to 5
-	if(($page_limit == 1) || ($page_limit < 0) || (!$page_limit))
-		$page_limit = 5;
+    if(($page_limit == 1) || ($page_limit < 0) || (!$page_limit))
+	$page_limit = 5;
 
-	// determines how many pages to show based on limit of pages ($page_limit)
-	// which is set in settings.php, $page_base is how many in EACH DIRECTION
-	// on a number line from $page_default to go
-
-	$page_base = 0;
-	do{	// determine how many pages to the left and right of the current page to
-		// show in the page numbers bar
-		$page_base++;
-		$page_limit -= 2;
-	}while($page_limit > 1);
-	echo "   <div class=\"quote_pagenums\">\n";
-	echo "    <a href=\"?".urlargs(strtolower($origin),'1')."\">".$lang['page_first']."</a>&nbsp;&nbsp;\n";
-	// this line is responsible for the -10 link in browse (by default), and the weird part in the middle
-	// is a conditional that checks to see if the current page - 10 is going to be 0 or negative, if it is,
-	// the -10 link defaults to page 1, if it turns out it's > 0, it links to the current page - 10 pages
-	//
-	echo "    <a href=\"?".urlargs(strtolower($origin),
+    $page_base = 0;
+    do {
+	$page_base++;
+	$page_limit -= 2;
+    } while ($page_limit > 1);
+    $ret .= "<div class=\"quote_pagenums\">";
+    $ret .= "<a href=\"?".urlargs(strtolower($origin),'1')."\">".$lang['page_first']."</a>&nbsp;&nbsp;";
+    $ret .= "<a href=\"?".urlargs(strtolower($origin),
 					     ((($page_default-10) > 1) ? ($page_default-10) : (1)))
-		."\">-10</a>&nbsp;&nbsp; \n";
+		."\">-10</a>&nbsp;&nbsp;";
 
-	if(($page_default - $page_base) > 1)
-	{	// an ellipse is echoed when there exist pages beyond the current sight of the user
-		echo "    ... \n";
-	}
-	$x = ($page_default - $page_base);
+    if (($page_default - $page_base) > 1) {
+	$ret .= "&nbsp;...&nbsp;";
+    }
+    $x = ($page_default - $page_base);
 
-	do{	// echo the page numbers before the current page, but only $page_limit many
-		if($x > 0) // keeps page numbers from going to zero or below
-		    echo "    <a href=\"?".urlargs(strtolower($origin),$x)."\">${x}</a> \n";
-		$x++;
-	}while($x < $page_default);
+    do {
+	if($x > 0)
+	    $ret .= "&nbsp;<a href=\"?".urlargs(strtolower($origin),$x)."\">${x}</a>&nbsp;";
+	$x++;
+    } while ($x < $page_default);
 
-	// echo the current page, no link
-	echo "    ${page_default} \n";
+    $ret .= "&nbsp;${page_default}&nbsp;";
 
-	$x = ($page_default + 1);
+    $x = ($page_default + 1);
 
-	do{	// echo the page numbers after the current page, but only $page_limit many
-		if($x <= $pagenum) // keeps page numbers from going higher than ones that have quotes
-		    echo "    <a href=\"?".urlargs(strtolower($origin),$x)."\">${x}</a> \n";
-		$x++;
-	}while($x < ($page_default + $page_base + 1));
+    do {
+	if($x <= $pagenum)
+	    $ret .= "&nbsp;<a href=\"?".urlargs(strtolower($origin),$x)."\">${x}</a>&nbsp;";
+	$x++;
+    } while ($x < ($page_default + $page_base + 1));
 
-	if(($page_default + $page_base) < $pagenum)
-	{	// an ellipse is echoed when there exist pages beyond the current sight of the user
-		echo "    ... \n";
-	}
+    if (($page_default + $page_base) < $pagenum) {
+	$ret .= "&nbsp;...&nbsp;";
+    }
 
-	// this line is responsible for the -10 link in browse (by default), and the weird part in the middle
-	// checks to see if the current page + 10 will end up being less than the highet actual possible page,
-	// if it turns out that's true, then it links to the current page + 10, if current page + 10 is higher
-	// than the highest possible page, then it just links to the highest possible page
-	//
-	echo "    &nbsp;&nbsp;<a href=\"?".urlargs(strtolower($origin),
+    $ret .= "&nbsp;&nbsp;<a href=\"?".urlargs(strtolower($origin),
 						   ((($page_default+10) < $pagenum) ? ($page_default+10) : ($pagenum)))
-		."\">+10</a>&nbsp;&nbsp;\n";
+		."\">+10</a>&nbsp;&nbsp;";
 
-	echo "    &nbsp;&nbsp;<a href=\"?".urlargs(strtolower($origin),$pagenum)."\">".$lang['page_last']."</a>\n";
-	echo "   </div>\n";
+    $ret .= "&nbsp;&nbsp;<a href=\"?".urlargs(strtolower($origin),$pagenum)."\">".$lang['page_last']."</a>";
+    $ret .= "</div>\n";
+    return $ret;
 }
 
 
@@ -406,14 +381,11 @@ function edit_quote_button($quoteid)
 function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_limit = 10)
 {
     global $CONFIG, $TEMPLATE, $db;
+    $pagenums = '';
     if ($page != -1) {
 	if(!$page)
 	    $page = 1;
-
-	print '<div class="quote_pagenums">';
-	page_numbers($origin, $quote_limit, $page, $page_limit);
-	print '</div>';
-
+	$pagenums = page_numbers($origin, $quote_limit, $page, $page_limit);
     }
     $up_lim = ($quote_limit * $page);
     $low_lim = $up_lim - $quote_limit;
@@ -426,17 +398,12 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 	die($res->getMessage());
     }
 
-    if (isset($origin)) {
-	print '<div id="quote_origin-name">'.$origin.'</div>';
-    }
+    $inner = '';
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
-	print $TEMPLATE->quote_iter($row['id'], $row['rating'], mangle_quote_text($row['quote']), date($CONFIG['quote_time_format'], $row['date']));
+	$inner .= $TEMPLATE->quote_iter($row['id'], $row['rating'], mangle_quote_text($row['quote']), date($CONFIG['quote_time_format'], $row['date']));
     }
-    if($page != -1){
-	print '<div class="quote_pagenums">';
-	page_numbers($origin, $quote_limit, $page, $page);
-	print '</div>';
-    }
+
+    print $TEMPLATE->quote_list($origin, $pagenums, $inner);
 }
 
 

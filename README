@@ -1,17 +1,16 @@
-RASH 2.0 BETA
+rash-qdb-fork - IRC Quote Database System
 
-This is the beta version of Rash 2.0: it includes no database upgrades for your current databases, no user database upgrades, no nothing that will exactly work with
-your old Rash 1.2.2.  This is being called Rash 2.0 because it is a complete rewrite of the entire system and is quite more elegant than before.
+This is a fork of the Rash Quote Management System (v 2.0 beta).
 
-A few things that must be noted; you must have PEAR::DB support on your PHP system or Rash 2.0 will not function.  It utilizes PEAR::DB for database abstraction that
-will work on most all databases meaning that you don't have to have MySQL anymore.  If you do not have PEAR::DB, please get your administrator to install it for you.
+Rash is Copyright (C) 2003 Tom Cuchta (tommah@instable.net / http://www.mastergoat.com) and Instable Network (p00p@instable.net / http://www.instable.net), and can be found at http://rqms.sourceforge.net
 
-***IMPORTANT******IMPORTANT***
-***IMPORTANT******IMPORTANT***
-***IMPORTANT******IMPORTANT***
-The file SQL_TABLES will give you the layout of the new database required for rash, everything must be exact.  Please don't convert your current installation into
-Rash 2.0 beta unless you want to do some conversion later on to fix it when Rash 2.0 is officially released.  
-***
 
-Many problems in Rash 1.2.2 are fixed and everything is much improved.  I will write up a complete page on all the changes and updates when the official version is 
-released.  Have fun playing with Rash 2.0 beta!
+Notes:
+
+* PEAR::DB is needed, still.
+
+* The database schema is different from the Rash 2.0 beta schema;
+  to update your database to rash-qdb-fork, do the following in mysql cli:
+    alter table rash_quotes add queue int(1) not null;
+    drop table rash_queue;
+  (Note that you will lose all pending quotes doing it this way)
