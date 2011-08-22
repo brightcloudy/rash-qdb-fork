@@ -81,7 +81,7 @@ abstract class BaseTemplate {
 	return '<html><head><title>'.$title.'</title></head><body>';
     }
 
-    function printfooter()
+    function printfooter($db_stats=null)
     {
 	return '</body></html>';
     }
