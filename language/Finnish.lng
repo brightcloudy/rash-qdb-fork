@@ -18,6 +18,8 @@ $lang = array (
 'upvote'  => "ƒ‰nest‰ t‰m‰ lainauksen puolesta",
 'downvote' => "ƒ‰nest‰ t‰t‰ lainausta vastaan",
 'flagquote' => "Merkitse lainaus moderaattorin tarkistettavaksi",
+'flag_quote_title' => "Merkitse lainaus",
+'flag_quote_explanation' => 'Merkitse t‰m‰ lainaus moderaattorin tarkistusta varten:',
 'menu_queue' => "Jono",
 'menu_flagged' => "Tarkistettavia",
 'menu_addnews' => "Lis‰‰ uutinen",
@@ -60,5 +62,7 @@ $lang = array (
 'editquote_outputmsg_top' => "",
 'editquote_outputmsg_bottom' => "",
 'edit_quote_btn' => "Tallenna",
-'edit_reset_btn' => "Nollaa"
+'edit_reset_btn' => "Nollaa",
+'captcha_wronganswer' => 'V‰‰r‰ vastaus CAPTCHA-kysymykseen.',
+'captcha_wrongid' => 'CAPTCHA id-numero on v‰‰rin?'
 );

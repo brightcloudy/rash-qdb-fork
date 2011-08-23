@@ -17,6 +17,9 @@ require('settings.php');
 require('util_funcs.php');
 require("language/{$CONFIG['language']}.lng");
 
+require('basecaptcha.php');
+require("captcha/{$CONFIG['captcha']}.php");
+
 require('basetemplate.php');
 require($CONFIG['template']);
 
@@ -99,31 +102,63 @@ function user_quote_status($where, $quote_num)
 }
 
 
-// flag()
-// User clicks on the (default) [X] link and it takes that quote and changes
-// a cell in the approved quote table. This change is shown in the administation
-// section to warn you that the quote is either bad or offensive. The admin can
-// do whatever is needed at the time. Times allowed to do it limited by a cookie.
-//
-function flag($quote_num)
+
+function flag($quote_num, $method)
 {
-    global $TEMPLATE, $lang, $db;
-	$tracking_verdict = user_quote_status('flag', $quote_num);
-	if($tracking_verdict == 1 || 2){
-	    global $db;
-	    $res =& $db->query("SELECT flag FROM ".db_tablename('quotes')." WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
-		$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
-		if($row[0] == 2){
+    global $TEMPLATE, $CAPTCHA, $lang, $db;
+
+    $res =& $db->query("SELECT flag,quote FROM ".db_tablename('quotes')." WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
+    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+
+    if ($method == 'verdict') {
+
+	switch ($CAPTCHA->check_CAPTCHA()) {
+	case 0:
+		    $tracking_verdict = user_quote_status('flag', $quote_num);
+		    if($tracking_verdict == 1 || 2){
+			if($row['flag'] == 2){
+			    $TEMPLATE->add_message($lang['flag_previously_flagged']);
+			}
+			elseif($row['flag'] == 1){
+			    $TEMPLATE->add_message($lang['flag_currently_flagged']);
+			}
+			else{
+			    $TEMPLATE->add_message($lang['flag_quote_flagged']);
+			    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
+			    $row['flag'] = 1;
+			}
+		    }
+	    break;
+	case 1: $TEMPLATE->add_message($lang['captcha_wronganswer']);
+	    break;
+	case 2: $TEMPLATE->add_message($lang['captcha_wrongid']);
+	    break;
+	default:
+	case 3: /* No CAPTCHA */
+	    $tracking_verdict = user_quote_status('flag', $quote_num);
+	    if($tracking_verdict == 1 || 2){
+		if($row['flag'] == 2){
 		    $TEMPLATE->add_message($lang['flag_previously_flagged']);
 		}
-		elseif($row[0] == 1){
+		elseif($row['flag'] == 1){
 		    $TEMPLATE->add_message($lang['flag_currently_flagged']);
 		}
-		else{
-		    $TEMPLATE->add_message($lang['flag_quote_flagged']);
-		    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
+	    }
+	    break;
+	}
+
+    } else {
+	$tracking_verdict = user_quote_status('flag', $quote_num);
+	if($tracking_verdict == 1 || 2){
+		if($row['flag'] == 2){
+		    $TEMPLATE->add_message($lang['flag_previously_flagged']);
+		}
+		elseif($row['flag'] == 1){
+		    $TEMPLATE->add_message($lang['flag_currently_flagged']);
 		}
 	}
+    }
+    print $TEMPLATE->flag_page($quote_num, mangle_quote_text($row['quote']), $row['flag']);
 }
 
 // function vote($quote_num, $method)
@@ -793,8 +828,8 @@ switch($page[0])
 			change_pw($page[1], $page[2]);
 		break;
 	case 'flag':
-		flag($page[1]);
-		break;
+	    flag($page[1], $page[2]);
+	    break;
 	case 'flag_queue':
 		if($_SESSION['logged_in'])
 			flag_queue($page[1]);

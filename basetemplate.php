@@ -440,4 +440,28 @@ Are you sure?:<input type="checkbox" name="do_all">
 	return $str;
     }
 
+    function flag_page($quoteid, $quotetxt, $flag)
+    {
+	global $lang, $CAPTCHA;
+
+	$str = '';
+
+	$str .= '<h1>'.$lang['flag_quote_title'].'</h1>';
+
+	$str .= $this->get_messages();
+	if ($flag == 0)
+	    $str .= '<p>'.$lang['flag_quote_explanation'];
+
+	$str .= '<div class="quote_quote">'.$quotetxt.'</div>';
+
+	if ($flag == 0) {
+	    $str .= '<form action="?'.urlargs('flag',$quoteid, 'verdict').'" method="post">';
+	    $str .= $CAPTCHA->get_CAPTCHA();
+	    $str .= '<input type="submit" value="Submit Query" />
+   <input type="reset" value="Reset" />
+  </form>';
+	}
+	return $str;
+    }
+
 }

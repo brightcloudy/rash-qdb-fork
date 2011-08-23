@@ -32,6 +32,8 @@ function db_query($sql) {
 
 $languages = array('US-english','Finnish');
 
+$captchas = array(array('name'=>'nocaptcha', 'desc'=>'No CAPTCHA'),
+		  array('name'=>'nhcaptcha', 'desc'=>'NetHack CAPTCHA'));
 
 $def_template = './templates/bash_template/bash_template.php';
 
@@ -67,6 +69,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
 		  'language' => "'".$_POST['language']."'",
+		  'captcha' => "'".$_POST['captcha']."'",
 		  'admin_email' => "'".$_POST['admin_email']."'",
 		  'quote_limit' => $_POST['quote_limit'],
 		  'page_limit' => $_POST['page_limit'],
@@ -162,6 +165,8 @@ else {
   Quote limit:        <input type="text" name="quote_limit" value="10"> (number of quotes shown per page when browsing)
   Page limit:         <input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
   Moderated:          <input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
+
+  CAPTCHA:            <select name="captcha"><? foreach($captchas as $c) { echo '<option value="'.$c['name'].'">'.$c['desc']; } ?></select>
 
   Timezone:           <input type="text" name="timezone" value="America/New_York"> (See <a href="http://www.php.net/manual/en/timezones.php">list of supported timezones</a>)
   News time format:   <input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>)

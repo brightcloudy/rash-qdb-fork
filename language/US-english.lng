@@ -18,6 +18,8 @@ $lang = array (
 'upvote'  => "Upvote quote",
 'downvote' => "Downvote quote",
 'flagquote' => "Flag quote for admin attention",
+'flag_quote_title' => "Flag a quote",
+'flag_quote_explanation' => 'Flag this quote for moderator attention:',
 'menu_queue' => "Quote Queue",
 'menu_flagged' => "Flagged Quotes",
 'menu_addnews' => "Add News",
@@ -60,5 +62,7 @@ $lang = array (
 'editquote_outputmsg_top' => "",
 'editquote_outputmsg_bottom' => "",
 'edit_quote_btn' => "Submit",
-'edit_reset_btn' => "Reset"
+'edit_reset_btn' => "Reset",
+'captcha_wronganswer' => 'Wrong answer to the CAPTCHA question.',
+'captcha_wrongid' => 'CAPTCHA id is wrong?'
 );

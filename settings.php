@@ -24,6 +24,7 @@ $CONFIG['admin_email'] = 'qdb@this.domain';
 $CONFIG['quote_limit'] = 10;	// how many quotes ?browse displays at once
 $CONFIG['page_limit'] = 5;	// how many page numbers to show
 $CONFIG['moderated_quotes'] = 1; // Quotes need to be accepted by a moderator
+$CONFIG['captcha'] = 'nocaptcha';
 $CONFIG['timezone'] = 'America/New_York';
 $CONFIG['news_time_format'] = 'Y-m-d';
 $CONFIG['quote_time_format'] = 'F j, Y';
@@ -31,3 +32,4 @@ $CONFIG['quote_time_format'] = 'F j, Y';
 // No need to change these
 $CONFIG['GET_SEPARATOR'] = ini_get('arg_separator.output');
 $CONFIG['GET_SEPARATOR_HTML'] = htmlspecialchars($CONFIG['GET_SEPARATOR'], ENT_QUOTES);
+
