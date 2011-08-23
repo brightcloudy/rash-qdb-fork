@@ -30,6 +30,9 @@ function db_query($sql) {
 }
 
 
+$languages = array('US-english','Finnish');
+
+
 $def_template = './templates/bash_template/bash_template.php';
 
 require 'basetemplate.php';
@@ -63,7 +66,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'rss_url' => "'".preg_replace('/\/$/','',$_POST['rss_url'])."'",
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
-		  'language' => "'US-english'",
+		  'language' => "'".$_POST['language']."'",
 		  'quote_limit' => $_POST['quote_limit'],
 		  'page_limit' => $_POST['page_limit'],
 		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
@@ -144,6 +147,8 @@ else {
 
   Admin Username:     <input type="text" name="adminuser" value="admin">
   Admin Password:     <input type="password" name="adminpass" value="password">
+
+  Site Language:      <select name="language"><? foreach($languages as $l) { echo '<option value="'.$l.'">'.$l; } ?></select>
 
   Site Short Title:   <input type="text" name="site_short_title" value="QMS">
   Site Long Title:    <input type="text" name="site_long_title" value="Quote Management System">
