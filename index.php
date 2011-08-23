@@ -17,6 +17,9 @@ require('settings.php');
 require('util_funcs.php');
 require("language/{$CONFIG['language']}.lng");
 
+require('basecaptcha.php');
+require("captcha/{$CONFIG['captcha']}.php");
+
 require('basetemplate.php');
 require($CONFIG['template']);
 
@@ -36,7 +39,7 @@ if (isset($_SESSION['logged_in'])) {
     if ($_SESSION['level'] < 3)
 	$adminmenu[] = array('url' => '?add_news', 'id' => 'site_admin_nav_add-news', 'txt' => 'menu_addnews');
     if ($_SESSION['level'] == 1) {
-	$adminmenu[] = array('url' => '?add_users', 'id' => 'site_admin_nav_users', 'txt' => 'menu_users');
+	$adminmenu[] = array('url' => '?users', 'id' => 'site_admin_nav_users', 'txt' => 'menu_users');
 	$adminmenu[] = array('url' => '?add_user', 'id' => 'site_admin_nav_add-user', 'txt' => 'menu_adduser');
     }
     $adminmenu[] = array('url' => '?change_pw', 'id' => 'site_admin_nav_change-password', 'txt' => 'menu_changepass');
@@ -99,31 +102,63 @@ function user_quote_status($where, $quote_num)
 }
 
 
-// flag()
-// User clicks on the (default) [X] link and it takes that quote and changes
-// a cell in the approved quote table. This change is shown in the administation
-// section to warn you that the quote is either bad or offensive. The admin can
-// do whatever is needed at the time. Times allowed to do it limited by a cookie.
-//
-function flag($quote_num)
+
+function flag($quote_num, $method)
 {
-    global $TEMPLATE, $lang, $db;
-	$tracking_verdict = user_quote_status('flag', $quote_num);
-	if($tracking_verdict == 1 || 2){
-	    global $db;
-	    $res =& $db->query("SELECT flag FROM ".db_tablename('quotes')." WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
-		$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
-		if($row[0] == 2){
+    global $TEMPLATE, $CAPTCHA, $lang, $db;
+
+    $res =& $db->query("SELECT flag,quote FROM ".db_tablename('quotes')." WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
+    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+
+    if ($method == 'verdict') {
+
+	switch ($CAPTCHA->check_CAPTCHA()) {
+	case 0:
+		    $tracking_verdict = user_quote_status('flag', $quote_num);
+		    if($tracking_verdict == 1 || 2){
+			if($row['flag'] == 2){
+			    $TEMPLATE->add_message($lang['flag_previously_flagged']);
+			}
+			elseif($row['flag'] == 1){
+			    $TEMPLATE->add_message($lang['flag_currently_flagged']);
+			}
+			else{
+			    $TEMPLATE->add_message($lang['flag_quote_flagged']);
+			    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
+			    $row['flag'] = 1;
+			}
+		    }
+	    break;
+	case 1: $TEMPLATE->add_message($lang['captcha_wronganswer']);
+	    break;
+	case 2: $TEMPLATE->add_message($lang['captcha_wrongid']);
+	    break;
+	default:
+	case 3: /* No CAPTCHA */
+	    $tracking_verdict = user_quote_status('flag', $quote_num);
+	    if($tracking_verdict == 1 || 2){
+		if($row['flag'] == 2){
 		    $TEMPLATE->add_message($lang['flag_previously_flagged']);
 		}
-		elseif($row[0] == 1){
+		elseif($row['flag'] == 1){
 		    $TEMPLATE->add_message($lang['flag_currently_flagged']);
 		}
-		else{
-		    $TEMPLATE->add_message($lang['flag_quote_flagged']);
-		    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
+	    }
+	    break;
+	}
+
+    } else {
+	$tracking_verdict = user_quote_status('flag', $quote_num);
+	if($tracking_verdict == 1 || 2){
+		if($row['flag'] == 2){
+		    $TEMPLATE->add_message($lang['flag_previously_flagged']);
+		}
+		elseif($row['flag'] == 1){
+		    $TEMPLATE->add_message($lang['flag_currently_flagged']);
 		}
 	}
+    }
+    print $TEMPLATE->flag_page($quote_num, mangle_quote_text($row['quote']), $row['flag']);
 }
 
 // function vote($quote_num, $method)
@@ -357,7 +392,7 @@ function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 function edit_quote_button($quoteid)
 {
     global $TEMPLATE;
-    if ($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2)) {
+    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2)) {
 	return $TEMPLATE->edit_quote_button($quoteid);
     }
     return '';
@@ -442,10 +477,10 @@ function add_user($method)
 {
     global $CONFIG, $TEMPLATE, $db;
     if ($method == 'update') {
-	$db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($_POST['username']).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
-		if (DB::isError($res)) {
-		    die($res-> getMessage());
-		}
+	$res =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($_POST['username']).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
+	if (DB::isError($res)) {
+	    die($res-> getMessage());
+	}
     }
 
     print $TEMPLATE->add_user_page();
@@ -477,7 +512,7 @@ function edit_users($method, $who)
 {
     global $CONFIG, $TEMPLATE, $db;
 	if($method == 'delete'){	// delete a user from users
-		if($_POST['verify']){
+	    if (isset($_POST['verify'])) {
 		    $res =& $db->query("SELECT * FROM ".db_tablename('users'));
 			while($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
 			{
@@ -606,7 +641,7 @@ function flag_queue($method)
     global $CONFIG, $TEMPLATE, $db;
 	if($method == 'judgement'){
 
-	    if ($_POST['do_all'] == 'on') {
+	    if (isset($_POST['do_all']) && ($_POST['do_all'] == 'on')) {
 		if (isset($_POST['unflag_all'])) {
 		    $db->query("UPDATE ".db_tablename('quotes')." SET flag=2 WHERE flag=1");
 		    $TEMPLATE->add_message('Unflagged all.');
@@ -620,14 +655,14 @@ function flag_queue($method)
 
 	    $x = 0;
 	    while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
-		if($_POST['q'.$row['id']]){
+		if (isset($_POST['q'.$row['id']])) {
 		    $judgement_array[$x] = $_POST['q'.$row['id']];
 		    $x++;
 		}
 	    }
 
 	    $x = 0;
-	    while($judgement_array[$x]){
+	    while (isset($judgement_array[$x])) {
 		if(substr($judgement_array[$x], 0, 1) == 'u'){
 		    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 2 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
 		    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' has been unflagged!');
@@ -690,7 +725,7 @@ function edit_quote($method, $quoteid)
 {
     global $CONFIG, $TEMPLATE, $db;
 
-    if (!($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))) return;
+    if (!(isset($_SESSION['logged_in']) && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))) return;
 
     $innerhtml = '';
 
@@ -758,25 +793,26 @@ if (DB::isError($db)) {
     exit;
 }
 
+$page[1] = (isset($page[1]) ? $page[1] : null);
+$page[2] = (isset($page[2]) ? $page[2] : null);
 
 switch($page[0])
 {
 	case 'add':
-		add_quote($page[1]);
-		break;
+	    add_quote($page[1]);
+	    break;
 	case 'add_news':
-		if($_SESSION['logged_in'])
-		{
-			add_news($page[1]);
-		}
-		break;
+	    if (isset($_SESSION['logged_in'])) {
+		add_news($page[1]);
+	    }
+	    break;
 	case 'add_user':
-		if($_SESSION['logged_in']){
-			if($_SESSION['level'] == 1){
-				add_user($page[1]);
-			}
+	    if (isset($_SESSION['logged_in'])) {
+		if ($_SESSION['level'] == 1) {
+		    add_user($page[1]);
 		}
-		break;
+	    }
+	    break;
 	case 'admin':
 		login($page[1]);
 		break;
@@ -789,16 +825,16 @@ switch($page[0])
 		quote_generation($query, $lang['browse_title'], $page[1], $CONFIG['quote_limit'], $CONFIG['page_limit']);
 		break;
 	case 'change_pw':
-		if($_SESSION['logged_in'])
-			change_pw($page[1], $page[2]);
-		break;
+	    if (isset($_SESSION['logged_in']))
+		change_pw($page[1], $page[2]);
+	    break;
 	case 'flag':
-		flag($page[1]);
-		break;
+	    flag($page[1], $page[2]);
+	    break;
 	case 'flag_queue':
-		if($_SESSION['logged_in'])
-			flag_queue($page[1]);
-		break;
+	    if (isset($_SESSION['logged_in']))
+		flag_queue($page[1]);
+	    break;
 	case 'latest':
 		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 50";
 		quote_generation($query, $lang['latest_title'], -1);
@@ -811,9 +847,9 @@ switch($page[0])
 			             . dirname($_SERVER['PHP_SELF'])
 				         . "/" . $relative_url);
 	case 'queue':
-		if($_SESSION['logged_in'])
-			quote_queue($page[1]);
-		break;
+	    if (isset($_SESSION['logged_in']))
+		quote_queue($page[1]);
+	    break;
 	case 'random':
 		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT 50";
 		quote_generation($query, $lang['random_title'], -1);
@@ -826,20 +862,20 @@ switch($page[0])
 	    rash_rss();
 	    break;
 	case 'search':
-		search($page[1]);
-		break;
+	    search($page[1]);
+	    break;
 	case 'top':
 		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT 50";
 		quote_generation($query, $lang['top_title'], -1);
 		break;
 	case 'edit':
-	    if ($_SESSION['logged_in'] && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))
+	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))
 		edit_quote($page[1], $page[2]);
 	    break;
 	case 'users':
-		if($_SESSION['logged_in'])
-			edit_users($page[1], $page[2]);
-		break;
+	    if (isset($_SESSION['logged_in']))
+		edit_users($page[1], $page[2]);
+	    break;
 	case 'vote':
 		vote($page[1], $page[2]);
 		break;

@@ -5,7 +5,7 @@ $lang = array (
 	."<p>Depending on if you like or dislike a quote, there are links that are + and - signs that you can click to promote or demote a quote."
 	."If you think a quote has slipped by our moderators and isn't appropriate for this website, you can always click the [X] link near it.</p>"
 	."<p>Note: The quote is not removed from the database, it just puts a flag up for the admins to check it to verify that it is alright, it may or may not be removed. </p>"
-	."<p>Queries? Remarks? <a href=\"mailto:rawrnix@rawrnix.com\">Email!</a></p>",
+	."<p>Queries? Remarks? <a href=\"mailto:".$CONFIG['admin_email']."\">Email!</a></p>",
 'add_outputmsg_top'			=> "The quote you have submitted is: ",
 'add_outputmsg_bottom'		=> "If this is not the quote you have entered, please contact the administrator and explain your problem.",
 'tracking_check_1'			=> "Quote has been modified, and data of your action has been recorded in the database.<br />Have a nice day!<br />",
@@ -18,6 +18,8 @@ $lang = array (
 'upvote'  => "Upvote quote",
 'downvote' => "Downvote quote",
 'flagquote' => "Flag quote for admin attention",
+'flag_quote_title' => "Flag a quote",
+'flag_quote_explanation' => 'Flag this quote for moderator attention:',
 'menu_queue' => "Quote Queue",
 'menu_flagged' => "Flagged Quotes",
 'menu_addnews' => "Add News",
@@ -60,5 +62,7 @@ $lang = array (
 'editquote_outputmsg_top' => "",
 'editquote_outputmsg_bottom' => "",
 'edit_quote_btn' => "Submit",
-'edit_reset_btn' => "Reset"
+'edit_reset_btn' => "Reset",
+'captcha_wronganswer' => 'Wrong answer to the CAPTCHA question.',
+'captcha_wrongid' => 'CAPTCHA id is wrong?'
 );

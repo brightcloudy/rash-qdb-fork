@@ -176,43 +176,6 @@ div#add_outputmsg_quote{
 }
 
 
-/* page titles */
-div#quote_origin-name{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
-div#search_title{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
-div#admin_add-news_title{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
-div#add_title{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
-div#admin_queue_title{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
-div#admin_flag_title{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
-div#admin_change-pw_title{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
-div#admin_users_title{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
-div#admin_add-user_title{
-	font-size: 23.6pt;
-	font-weight: bold;
-}
 
 div.quote_pagenums{
 	text-align: center;
