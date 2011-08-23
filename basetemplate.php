@@ -42,6 +42,7 @@ abstract class BaseTemplate {
     {
 	global $lang;
 	if ($admin) { $menudata = $this->adminmenu; } else { $menudata = $this->mainmenu; }
+	$str = '';
 	if ($menudata) {
 	    $arr = array();
 	    foreach ($menudata as $m) {
