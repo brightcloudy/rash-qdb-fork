@@ -17,7 +17,8 @@ $CONFIG['site_long_title'] = '#NetHack Quote Database';
 $CONFIG['rss_url'] = 'http://127.0.0.1';
 $CONFIG['rss_title'] = 'Rash QDB';
 $CONFIG['rss_desc'] = 'Quote Database for the IRC channel';
-$CONFIG['language'] = 'Finnish';
+$CONFIG['language'] = 'US-english';
+$CONFIG['admin_email'] = 'qdb@this.domain';
 
 // Misc configs
 $CONFIG['quote_limit'] = 10;	// how many quotes ?browse displays at once

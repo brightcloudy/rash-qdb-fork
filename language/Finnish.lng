@@ -5,7 +5,7 @@ $lang = array (
 	."<p>Jos pidät jostain lainauksesta, voit äänestää sen puolesta, tai sitä vastaan + ja - linkeillä."
 	." Jos sinusta tuntuu että jokin lainaus ei ole sovelias, voi merkitä sen moderaattorin tarkistettavaksi [X]-linkillä.</p>"
 	."<p>Huom: Lainausta ei poisteta heti, vaan moderaattori tarkistaa sen ensin, ja mahdollisesti poistaa sen.</p>"
-	."<p>Kysymyksiä tai muuta? <a href=\"mailto:rawrnix@rawrnix.com\">Lähetä sähköpostia!</a></p>",
+	."<p>Kysymyksiä tai muuta? <a href=\"mailto:".$CONFIG['admin_email']."\">Lähetä sähköpostia!</a></p>",
 'add_outputmsg_top'			=> "Lainaus jonka lähetit: ",
 'add_outputmsg_bottom'		=> "Jos tämä lainaus ei ollut oikein, heitäppä ylläpitäjää sähköpostilla.",
 'tracking_check_1'			=> "Lainauksen tietoja muutettiin, ja toiminnastasi jäi jälki tietokantaan.",

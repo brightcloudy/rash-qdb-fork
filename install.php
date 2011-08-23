@@ -67,6 +67,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
 		  'language' => "'".$_POST['language']."'",
+		  'admin_email' => "'".$_POST['admin_email']."'",
 		  'quote_limit' => $_POST['quote_limit'],
 		  'page_limit' => $_POST['page_limit'],
 		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
@@ -147,6 +148,7 @@ else {
 
   Admin Username:     <input type="text" name="adminuser" value="admin">
   Admin Password:     <input type="password" name="adminpass" value="password">
+  Admin EMail:        <input type="text" name="admin_email" value="qdb@<?php echo $_SERVER['SERVER_NAME']; ?>">
 
   Site Language:      <select name="language"><? foreach($languages as $l) { echo '<option value="'.$l.'">'.$l; } ?></select>
 
