@@ -116,7 +116,7 @@ abstract class BaseTemplate {
 	global $lang;
 	$str = '<div id="add_all">';
 
-	$str .= '<div id="add_title">'.$lang['add_title'].'</div>';
+	$str .= '<h1 id="add_title">'.$lang['add_title'].'</h1>';
 
 	$str .= $added_quote_html;
 
@@ -156,7 +156,7 @@ abstract class BaseTemplate {
 
 	$str = '<div id="editquote_all">';
 
-	$str .= '<div id="editquote_title">'.$lang['editquote_title'].'</div>';
+	$str .= '<h1 id="editquote_title">'.$lang['editquote_title'].'</h1>';
 
 	$str .= $edited_quote_html;
 
@@ -178,7 +178,7 @@ abstract class BaseTemplate {
 	$str = '<div class="search_all">';
 
 	if (!$fetched) {
-	    $str .= '<div id="search_title">'.$lang['search_title'].'</div>';
+	    $str .= '<h1 id="search_title">'.$lang['search_title'].'</h1>';
 	}
 
 	$str .= '<form method="post" action="?'.urlargs('search','fetch').'">';
@@ -226,7 +226,7 @@ abstract class BaseTemplate {
 
     function flag_queue_page($inner_html)
     {
-	$str = '<div id="admin_flag_title">Flags</div>';
+	$str = '<h1 id="admin_flag_title">Flags</h1>';
 
 	$str .= '<form action="?'.urlargs('flag_queue','judgement').'" method="post">
 <table width="100%" class="admin_queue">';
@@ -248,9 +248,9 @@ Are you sure?:<input type="checkbox" name="do_all">
     function add_news_page()
     {
 	return '  <div id="admin_add-news_all">
-   <div id="admin_add-news_title">
+   <h1 id="admin_add-news_title">
     Add News
-   </div>
+   </h1>
    <form method="post" action="?'.urlargs('add_news','submit').'">
 	<textarea cols="80" rows="5" name="news" id="add_news_news"></textarea><br />
 	<input type="submit" value="Add News" id="add_news" />
@@ -263,9 +263,9 @@ Are you sure?:<input type="checkbox" name="do_all">
     function add_user_page()
     {
 	return '  <div id="admin_add-user_all">
-   <div id="admin_add-user_title">
+   <h1 id="admin_add-user_title">
     Add User
-   </div>
+   </h1>
    <form method="post" action="?'.urlargs('add_user','update').'">
     Username: <input type="text" name="username" id="admin_add-user_username" /><br />
 	RANDOM Salt: <input type="text" name="salt" value="'.str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').'" id="admin_add-user_salt" /><br />
@@ -279,9 +279,9 @@ Are you sure?:<input type="checkbox" name="do_all">
 
     function change_password_page()
     {
-	return '  <div id="admin_change-pw_title">
+	return '  <h1 id="admin_change-pw_title">
    Change Password
-  </div>
+  </h1>
   <form action="?'.urlargs('change_pw','update',$_SESSION['user']).'" method="post">
    Old Password: <input type="password" name="old_password"><br />
    New Password: <input type="password" name="new_password"><br />
@@ -323,9 +323,9 @@ Are you sure?:<input type="checkbox" name="do_all">
 
     function edit_user_page_table($innerhtml)
     {
-	$str = '  <div id="admin_users_title">
+	$str = '  <h1 id="admin_users_title">
    Users
-  </div>
+  </h1>
   <form action="?'.urlargs('users','delete').'" method="post">
    <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
     <tr>
@@ -387,7 +387,7 @@ Are you sure?:<input type="checkbox" name="do_all">
 
     function quote_queue_page($innerhtml)
     {
-	$str = '<div id="admin_queue_title">Queue</div>';
+	$str = '<h1 id="admin_queue_title">Queue</h1>';
 
 	$str .= '  <form action="?'.urlargs('queue','judgement').'" method="post">
    <table width="100%" cellspacing="0" class="admin_queue">';
@@ -434,7 +434,7 @@ Are you sure?:<input type="checkbox" name="do_all">
     {
 	$str = '';
 	if (isset($title))
-	    $str .= '<div id="quote_origin-name">'.$title.'</div>';
+	    $str .= '<h1 id="quote_origin-name">'.$title.'</h1>';
 	$str .= $pagenumbers;
 	$str .= $quotes;
 	$str .= $pagenumbers;
