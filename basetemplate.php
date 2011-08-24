@@ -228,7 +228,7 @@ abstract class BaseTemplate {
     function flag_queue_page($inner_html)
     {
 	global $lang;
-	$str = '<h1 id="admin_flag_title">'.$lang['flag_quote_adminpage_title'].'Flags</h1>';
+	$str = '<h1 id="admin_flag_title">'.$lang['flag_quote_adminpage_title'].'</h1>';
 
 	$str .= '<form action="?'.urlargs('flag_queue','judgement').'" method="post">
 <table width="100%" class="admin_queue">';
