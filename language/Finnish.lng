@@ -63,6 +63,8 @@ $lang = array (
 'editquote_outputmsg_bottom' => "",
 'edit_quote_btn' => "Tallenna",
 'edit_reset_btn' => "Nollaa",
+'add_news_title' => "Lis‰‰ uutinen",
+'add_news_help' => "Voit k‰ytt‰‰ HTML-t‰gej‰. Rivinvaihdot muutetaan br-t‰geiksi.",
 'captcha_wronganswer' => 'V‰‰r‰ vastaus CAPTCHA-kysymykseen.',
 'captcha_wrongid' => 'CAPTCHA id-numero on v‰‰rin?'
 );

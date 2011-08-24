@@ -228,10 +228,10 @@ Are you sure?:<input type="checkbox" name="do_all">
 
 function add_news_page()
 {
+    global $lang;
     return '  <div id="admin_add-news_all">
-   <h1 id="admin_add-news_title">
-    Add News
-   </h1>' . $this->get_messages() . '
+   <h1 id="admin_add-news_title">'.$lang['add_news_title'].'</h1>' . $this->get_messages() . '
+   <p>'.$lang['add_news_help'].'
    <form method="post" action="?'.urlargs('add_news','submit').'">
 	<textarea cols="80" rows="5" name="news" id="add_news_news"></textarea><br />
 	<input type="submit" value="Add News" id="add_news" />
