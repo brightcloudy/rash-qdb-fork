@@ -209,9 +209,10 @@ abstract class BaseTemplate {
 
     function flag_queue_page_iter($quoteid, $quotetxt)
     {
+	global $lang;
 	return '<tr>
 <td class="quote_delete">
-	<label>Delete<input type="radio" name="q'.$quoteid.'" value="d'.$quoteid.'"></label>
+	<label>'.$lang['flag_quote_delete'].'<input type="radio" name="q'.$quoteid.'" value="d'.$quoteid.'"></label>
 </td>
 <td>
 <div class="quote_quote">'.$quotetxt.'
@@ -219,14 +220,15 @@ abstract class BaseTemplate {
 </div>
 </td>
 <td class="quote_unflag">
-	<label><input type="radio" name="q'.$quoteid.'" value="u'.$quoteid.'">Unflag</label>
+	<label><input type="radio" name="q'.$quoteid.'" value="u'.$quoteid.'">'.$lang['flag_quote_unflag'].'</label>
 </td>
 </tr>';
     }
 
     function flag_queue_page($inner_html)
     {
-	$str = '<h1 id="admin_flag_title">Flags</h1>';
+	global $lang;
+	$str = '<h1 id="admin_flag_title">'.$lang['flag_quote_adminpage_title'].'Flags</h1>';
 
 	$str .= '<form action="?'.urlargs('flag_queue','judgement').'" method="post">
 <table width="100%" class="admin_queue">';
@@ -234,12 +236,12 @@ abstract class BaseTemplate {
 	$str .= $inner_html;
 
 	$str .= '</table>
-<input type="submit" value="Submit Query" />
+<input type="submit" value="'.$lang['flag_quote_adminpage_submit_btn'].'" />
 <input type="reset" value="Reset" />
 &nbsp;&nbsp;&nbsp;&nbsp;
-<input type="submit" value="Unflag All" name="unflag_all">
-<input type="submit" value="Delete All" name="delete_all">
-Are you sure?:<input type="checkbox" name="do_all">
+<input type="submit" value="'.$lang['flag_quote_adminpage_unflag_all_btn'].'" name="unflag_all">
+<input type="submit" value="'.$lang['flag_quote_adminpage_delete_all_btn'].'" name="delete_all">
+'.$lang['flag_quote_adminpage_verify'].'Are you sure?:<input type="checkbox" name="do_all">
 </form>';
 
 	return $str;

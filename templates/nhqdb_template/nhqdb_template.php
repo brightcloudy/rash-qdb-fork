@@ -205,7 +205,8 @@ function search_quotes_page($fetched)
 
 function flag_queue_page($inner_html)
 {
-    $str = '<h1 id="admin_flag_title">Flags</h1>';
+    global $lang;
+    $str = '<h1 id="admin_flag_title">'.$lang['flag_quote_adminpage_title'].'</h1>';
 
     $str .= $this->get_messages();
 
@@ -215,12 +216,12 @@ function flag_queue_page($inner_html)
     $str .= $inner_html;
 
     $str .= '</table>
-<input type="submit" value="Submit Query" />
+<input type="submit" value="'.$lang['flag_quote_adminpage_submit_btn'].'" />
 <input type="reset" value="Reset" />
 &nbsp;&nbsp;&nbsp;&nbsp;
-<input type="submit" value="Unflag All" name="unflag_all">
-<input type="submit" value="Delete All" name="delete_all">
-Are you sure?:<input type="checkbox" name="do_all">
+<input type="submit" value="'.$lang['flag_quote_adminpage_unflag_all_btn'].'" name="unflag_all">
+<input type="submit" value="'.$lang['flag_quote_adminpage_delete_all_btn'].'" name="delete_all">
+'.$lang['flag_quote_adminpage_verify'].'<input type="checkbox" name="do_all">
 </form>';
 
     return $str;
