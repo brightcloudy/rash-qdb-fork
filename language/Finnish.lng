@@ -65,6 +65,7 @@ $lang = array (
 'edit_reset_btn' => "Nollaa",
 'add_news_title' => "Lis‰‰ uutinen",
 'add_news_help' => "Voit k‰ytt‰‰ HTML-t‰gej‰. Rivinvaihdot muutetaan br-t‰geiksi.",
+'add_news_btn' => "Lis‰‰",
 'captcha_wronganswer' => 'V‰‰r‰ vastaus CAPTCHA-kysymykseen.',
 'captcha_wrongid' => 'CAPTCHA id-numero on v‰‰rin?'
 );

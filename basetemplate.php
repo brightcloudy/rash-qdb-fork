@@ -253,7 +253,7 @@ Are you sure?:<input type="checkbox" name="do_all">
    <p>'.$lang['add_news_help'].'
    <form method="post" action="?'.urlargs('add_news','submit').'">
 	<textarea cols="80" rows="5" name="news" id="add_news_news"></textarea><br />
-	<input type="submit" value="Add News" id="add_news" />
+	<input type="submit" value="'.$lang['add_news_btn'].'" id="add_news" />
    </form>
   </div>
 ';
