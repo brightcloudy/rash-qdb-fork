@@ -76,6 +76,12 @@ $lang = array (
 'add_news_title' => "Add a news item",
 'add_news_help' => "You can use HTML. Newlines are converted to br-tags.",
 'add_news_btn' => "Add news",
+'add_user_title' => 'Add User',
+'add_user_username_label' => 'Username:',
+'add_user_randomsalt_label' => 'RANDOM Salt:',
+'add_user_password_label' => 'Default Password:',
+'add_user_level_label' => 'Level:',
+'add_user_btn' => 'Add',
 'captcha_wronganswer' => 'Wrong answer to the CAPTCHA question.',
 'captcha_wrongid' => 'CAPTCHA id is wrong?'
 );

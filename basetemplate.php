@@ -264,16 +264,15 @@ abstract class BaseTemplate {
 
     function add_user_page()
     {
+	global $lang;
 	return '  <div id="admin_add-user_all">
-   <h1 id="admin_add-user_title">
-    Add User
-   </h1>
+   <h1 id="admin_add-user_title">'.$lang['add_user_title'].'</h1>
    <form method="post" action="?'.urlargs('add_user','update').'">
-    Username: <input type="text" name="username" id="admin_add-user_username" /><br />
-	RANDOM Salt: <input type="text" name="salt" value="'.str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').'" id="admin_add-user_salt" /><br />
-	Default Password: <input type="text" name="password" /><br />
-       Level: '.user_level_select().'<br />
-	 <input type="submit" value="Submit" id="admin_add-user_submit" />
+    '.$lang['add_user_username_label'].' <input type="text" name="username" id="admin_add-user_username" /><br />
+	'.$lang['add_user_randomsalt_label'].' <input type="text" name="salt" value="'.str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').'" id="admin_add-user_salt" /><br />
+	'.$lang['add_user_password_label'].' <input type="text" name="password" /><br />
+       '.$lang['add_user_level_label'].' '.user_level_select().'<br />
+	 <input type="submit" value="'.$lang['add_user_btn'].'" id="admin_add-user_submit" />
    </form>
   </div>
 ';

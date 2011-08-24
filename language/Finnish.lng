@@ -76,6 +76,12 @@ $lang = array (
 'add_news_title' => "Lis‰‰ uutinen",
 'add_news_help' => "Voit k‰ytt‰‰ HTML-t‰gej‰. Rivinvaihdot muutetaan br-t‰geiksi.",
 'add_news_btn' => "Lis‰‰",
+'add_user_title' => 'K‰ytt‰j‰n lis‰ys',
+'add_user_username_label' => 'K‰ytt‰j‰n nimi:',
+'add_user_randomsalt_label' => 'RANDOM Salt:',
+'add_user_password_label' => 'Salasana:',
+'add_user_level_label' => 'K‰ytt‰j‰taso:',
+'add_user_btn' => 'Lis‰‰ k‰ytt‰j‰',
 'captcha_wronganswer' => 'V‰‰r‰ vastaus CAPTCHA-kysymykseen.',
 'captcha_wrongid' => 'CAPTCHA id-numero on v‰‰rin?'
 );
