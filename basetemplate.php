@@ -182,9 +182,9 @@ abstract class BaseTemplate {
 	}
 
 	$str .= '<form method="post" action="?'.urlargs('search','fetch').'">';
-	if ($fetched) { $str .= '<input type="submit" name="submit" id="search_submit-button">&nbsp;'; }
+	if ($fetched) { $str .= '<input type="submit" name="submit" value="'.$lang['search_btn'].'" id="search_submit-button">&nbsp;'; }
 	$str .= '<input type="text" name="search" size="28" id="search_query-box">&nbsp;';
-	if (!$fetched) { $str .= '<input type="submit" name="submit" id="search_submit-button">&nbsp;<br />'; }
+	if (!$fetched) { $str .= '<input type="submit" name="submit" value="'.$lang['search_btn'].'" id="search_submit-button">&nbsp;<br />'; }
 	$str .= $lang['search_sort'].': <select name="sortby" size="1" id="search_sortby-dropdown">';
 	$str .= '<option selected>'.$lang['search_opt_rating'];
 	$str .= '<option>'.$lang['search_opt_id'];

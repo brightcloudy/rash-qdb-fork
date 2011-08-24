@@ -54,6 +54,7 @@ $lang = array (
 'search_sort' => "Sort",
 'search_opt_rating' => "rating",
 'search_opt_id' => "id",
+'search_btn' => 'Search',
 'search_howmany' => "How many?",
 'search_results_title' => "Query Results",
 'add_title' => "Contribute",
