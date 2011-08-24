@@ -64,7 +64,7 @@ function get_db_stats()
 function rash_rss()
 {
     global $db, $CONFIG, $TEMPLATE;
-    $query = "SELECT id, quote, rating, flag FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 15";
+    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 15";
     $res =& $db->query($query);
     $items = '';
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
@@ -735,7 +735,7 @@ function search($method)
 
 	$search = '%'.$search.'%';
 
-	$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
+	$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
 
 	quote_generation($query, $lang['search_results_title'], -1);
     }
@@ -839,11 +839,11 @@ switch($page[0])
 		login($page[1]);
 		break;
 	case 'bottom':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT 50";
 		quote_generation($query, $lang['bottom_title'], -1);
 		break;
 	case 'browse':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id ASC ";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id ASC ";
 		quote_generation($query, $lang['browse_title'], $page[1], $CONFIG['quote_limit'], $CONFIG['page_limit']);
 		break;
 	case 'change_pw':
@@ -858,7 +858,7 @@ switch($page[0])
 		flag_queue($page[1]);
 	    break;
 	case 'latest':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 50";
 		quote_generation($query, $lang['latest_title'], -1);
 		break;
 	case 'logout':
@@ -873,11 +873,11 @@ switch($page[0])
 		quote_queue($page[1]);
 	    break;
 	case 'random':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT 50";
 		quote_generation($query, $lang['random_title'], -1);
 		break;
 	case 'random2':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 1 ORDER BY rand() LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 1 ORDER BY rand() LIMIT 50";
 		quote_generation($query, $lang['random2_title'], -1);
 		break;
 	case 'rss':
@@ -887,7 +887,7 @@ switch($page[0])
 	    search($page[1]);
 	    break;
 	case 'top':
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT 50";
 		quote_generation($query, $lang['top_title'], -1);
 		break;
 	case 'edit':
@@ -903,7 +903,7 @@ switch($page[0])
 		break;
 	default:
 	    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
-		$query = "SELECT id, quote, rating, flag, date FROM ".db_tablename('quotes')." WHERE queue=0 and id =".$db->quote((int)$_SERVER['QUERY_STRING']);
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and id =".$db->quote((int)$_SERVER['QUERY_STRING']);
 		quote_generation($query, "#${_SERVER['QUERY_STRING']}", -1);
 	    } else {
 		home_generation();
