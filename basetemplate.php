@@ -405,18 +405,41 @@ abstract class BaseTemplate {
 	return $str;
     }
 
+    function quote_upvote_button($quoteid, $canvote)
+    {
+	global $lang;
+	if ($canvote)
+	    return '<a href="?'.urlargs('vote',$quoteid,'plus').'" class="quote_plus" title="'.$lang['upvote'].'">+</a>';
+	return '<span class="quote_plus" title="'.$lang['already_voted'].'">+</span>';
+    }
 
-    function quote_iter($quoteid, $rating, $quotetxt, $date=null)
+    function quote_downvote_button($quoteid, $canvote)
+    {
+	global $lang;
+	if ($canvote)
+	    return '<a href="?'.urlargs('vote',$quoteid,'minus').'" class="quote_minus" title="'.$lang['downvote'].'">-</a>';
+	return '<span class="quote_minus" title="'.$lang['already_voted'].'">-</span>';
+    }
+
+    function quote_flag_button($quoteid, $canflag)
+    {
+	global $lang;
+	if ($canflag)
+	    return '<a href="?'.urlargs('flag',$quoteid).'" class="quote_flag" title="'.$lang['flagquote'].'">[X]</a>';
+	return '<span class="quote_flag" title="'.$lang['quote_already_flagged'].'">[X]</span>';
+    }
+
+    function quote_iter($quoteid, $rating, $quotetxt, $canflag, $canvote, $date=null)
     {
 	global $lang;
 	$str = '<div class="quote_whole">
     <div class="quote_option-bar">
-     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>
-     <a href="?'.urlargs('vote',$quoteid,'plus').'" class="quote_plus" title="'.$lang['upvote'].'">+</a>
-     <span class="quote_rating">('.$rating.')</span>
-     <a href="?'.urlargs('vote',$quoteid,'minus').'" class="quote_minus" title="'.$lang['downvote'].'">-</a>
-     <a href="?'.urlargs('flag',$quoteid).'" class="quote_flag" title="'.$lang['flagquote'].'">[X]</a>
-     '.edit_quote_button($quoteid);
+     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>'
+	    .' '.$this->quote_upvote_button($quoteid, $canvote)
+	    .' '.'<span class="quote_rating">('.$rating.')</span>'
+	    .' '.$this->quote_downvote_button($quoteid, $canvote)
+	    .' '.$this->quote_flag_button($quoteid, $canflag)
+	    .' '.edit_quote_button($quoteid);
 
 	if (isset($date)) {
 	    $str .= "     <span class=\"quote_date\">" . $date . "</span>\n";

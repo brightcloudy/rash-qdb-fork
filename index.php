@@ -398,6 +398,26 @@ function edit_quote_button($quoteid)
     return '';
 }
 
+function user_can_vote_quote($quoteid)
+{
+    global $db;
+
+    $res =& $db->query('select quote_id,vote from '.db_tablename('tracking').' where ip='.$db->quote(getenv("REMOTE_ADDR")));
+    if (DB::isError($res)) {
+	die($res->getMessage());
+    }
+    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+
+    $qids = explode(",", $row['quote_id']);
+    $idx = array_search($quoteid, $qids);
+    if ($idx !== FALSE) {
+	$votes = explode(",", $row['vote']);
+	if ($votes[$idx] == '1') return FALSE;
+    }
+    return TRUE;
+}
+
+
 /************************************************************************
 ************************************************************************/
 
@@ -435,7 +455,9 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 
     $inner = '';
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
-	$inner .= $TEMPLATE->quote_iter($row['id'], $row['rating'], mangle_quote_text($row['quote']), date($CONFIG['quote_time_format'], $row['date']));
+	$canvote = user_can_vote_quote($row['id']);
+	$datefmt = date($CONFIG['quote_time_format'], $row['date']);
+	$inner .= $TEMPLATE->quote_iter($row['id'], $row['rating'], mangle_quote_text($row['quote']), ($row['flag'] == 0), $canvote, $datefmt);
     }
 
     print $TEMPLATE->quote_list($origin, $pagenums, $inner);

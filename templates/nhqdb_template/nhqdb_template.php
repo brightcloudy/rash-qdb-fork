@@ -342,18 +342,18 @@ function quote_queue_page($innerhtml)
 }
 
 
-function quote_iter($quoteid, $rating, $quotetxt, $date=null)
+function quote_iter($quoteid, $rating, $quotetxt, $canflag, $canvote, $date=null)
 {
     global $lang;
     $str = '<div class="quote_whole">
     <div class="quote_separator">&nbsp;</div>
     <div class="quote_option-bar">
-     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>
-     <a href="?'.urlargs('vote',$quoteid,'plus').'" class="quote_plus" title="'.$lang['upvote'].'">+</a>
-     <span class="quote_rating">('.$rating.')</span>
-     <a href="?'.urlargs('vote',$quoteid,'minus').'" class="quote_minus" title="'.$lang['downvote'].'">-</a>
-     <a href="?'.urlargs('flag',$quoteid).'" class="quote_flag" title="'.$lang['flagquote'].'">[X]</a>
-     '.edit_quote_button($quoteid);
+     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>'
+	.' '.$this->quote_upvote_button($quoteid, $canvote)
+	.' '.'<span class="quote_rating">('.$rating.')</span>'
+	.' '.$this->quote_downvote_button($quoteid, $canvote)
+	.' '.$this->quote_flag_button($quoteid, $canflag)
+	.' '.edit_quote_button($quoteid);
 
     if (isset($date)) {
 	$str .= "     <span class=\"quote_date\">" . $date . "</span>\n";
