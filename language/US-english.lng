@@ -82,6 +82,11 @@ $lang = array (
 'add_user_password_label' => 'Default Password:',
 'add_user_level_label' => 'Level:',
 'add_user_btn' => 'Add',
+'change_password_title' => 'Change Password',
+'change_password_oldpass' => 'Old Password:',
+'change_password_newpass' => 'New Password:',
+'change_password_verify' => 'Verify:',
+'change_password_submit_btn' => 'Save',
 'captcha_wronganswer' => 'Wrong answer to the CAPTCHA question.',
 'captcha_wrongid' => 'CAPTCHA id is wrong?'
 );

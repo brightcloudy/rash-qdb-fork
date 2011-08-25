@@ -261,16 +261,15 @@ function add_user_page()
 
 function change_password_page()
 {
-    return '  <h1 id="admin_change-pw_title">
-   Change Password
-  </h1> ' . $this->get_messages() . '
+	global $lang;
+	return '  <h1 id="admin_change-pw_title">'.$lang['change_password_title'].'</h1>
+        ' . $this->get_messages() . '
   <form action="?'.urlargs('change_pw','update',$_SESSION['user']).'" method="post">
-   Old Password: <input type="password" name="old_password"><br />
-   New Password: <input type="password" name="new_password"><br />
-   Verify: <input type="password" name="verify_password"><br />
-   <input type="submit">
-  </form>
-';
+   '.$lang['change_password_oldpass'].' <input type="password" name="old_password"><br />
+   '.$lang['change_password_newpass'].' <input type="password" name="new_password"><br />
+   '.$lang['change_password_verify'].' <input type="password" name="verify_password"><br />
+   <input type="submit" value="'.$lang['change_password_submit_btn'].'">
+  </form>';
 }
 
 
