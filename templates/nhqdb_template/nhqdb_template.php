@@ -329,7 +329,7 @@ function login_page()
 function quote_queue_page($innerhtml)
 {
     global $lang;
-    $str = '<h1 id="admin_queue_title">'.$lang['quote_queue_title'].'</h1>';
+    $str = '<h1 id="admin_queue_title">'.$lang['quote_queue_admin_title'].'</h1>';
 
     $str .= $this->get_messages();
 

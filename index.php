@@ -871,6 +871,10 @@ switch($page[0])
 	case 'queue':
 	    if (isset($_SESSION['logged_in']))
 		quote_queue($page[1]);
+	    else {
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=1 ORDER BY rand() LIMIT 50";
+		quote_generation($query, $lang['quote_queue_title'], -1);
+	    }
 	    break;
 	case 'random':
 		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT 50";

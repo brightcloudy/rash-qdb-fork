@@ -397,7 +397,7 @@ abstract class BaseTemplate {
     function quote_queue_page($innerhtml)
     {
 	global $lang;
-	$str = '<h1 id="admin_queue_title">'.$lang['quote_queue_title'].'</h1>';
+	$str = '<h1 id="admin_queue_title">'.$lang['quote_queue_admin_title'].'</h1>';
 
 	$str .= '  <form action="?'.urlargs('queue','judgement').'" method="post">
    <table width="100%" cellspacing="0" class="admin_queue">';
