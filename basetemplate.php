@@ -241,7 +241,7 @@ abstract class BaseTemplate {
 &nbsp;&nbsp;&nbsp;&nbsp;
 <input type="submit" value="'.$lang['flag_quote_adminpage_unflag_all_btn'].'" name="unflag_all">
 <input type="submit" value="'.$lang['flag_quote_adminpage_delete_all_btn'].'" name="delete_all">
-'.$lang['flag_quote_adminpage_verify'].'Are you sure?:<input type="checkbox" name="do_all">
+'.$lang['flag_quote_adminpage_verify'].'<input type="checkbox" name="do_all">
 </form>';
 
 	return $str;
