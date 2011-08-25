@@ -484,8 +484,8 @@ abstract class BaseTemplate {
 	if ($flag == 0) {
 	    $str .= '<form action="?'.urlargs('flag',$quoteid, 'verdict').'" method="post">';
 	    $str .= $CAPTCHA->get_CAPTCHA();
-	    $str .= '<input type="submit" value="Submit Query" />
-   <input type="reset" value="Reset" />
+	    $str .= '<input type="submit" value="'.$lang['flag_quote_submit_btn'].'" />
+   <input type="reset" value="'.$lang['flag_quote_reset_btn'].'" />
   </form>';
 	}
 	return $str;
