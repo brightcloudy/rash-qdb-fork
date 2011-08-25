@@ -276,23 +276,22 @@ function change_password_page()
 
 function edit_user_page_table($innerhtml)
 {
-    $str = '  <h1 id="admin_users_title">
-   Users
-  </h1>' . $this->get_messages() . '
+	global $lang;
+	$str = '  <h1 id="admin_users_title">'.$lang['users_list_title'].'</h1>' . $this->get_messages() . '
   <form action="?'.urlargs('users','delete').'" method="post">
    <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
     <tr>
      <td>
-      &nbsp;Username&nbsp;
+      &nbsp;'.$lang['users_list_username'].'&nbsp;
      </td>
      <td>
-      &nbsp;PW_Hash&nbsp;
+      &nbsp;'.$lang['users_list_pwhash'].'&nbsp;
      </td>
      <td>
-      &nbsp;Level&nbsp;
+      &nbsp;'.$lang['users_list_level'].'&nbsp;
      </td>
      <td>
-      &nbsp;Delete&nbsp;
+      &nbsp;'.$lang['users_list_delete'].'&nbsp;
      </td>
     </tr>
 ';
@@ -300,7 +299,7 @@ function edit_user_page_table($innerhtml)
     $str .= $innerhtml;
 
     $str .= '  </table>
-  <input type="submit" value="Submit" />&nbsp;I\'m sure: <input type="checkbox" name="verify" value="1" />
+  <input type="submit" value="'.$lang['users_list_submit_btn'].'" />&nbsp;'.$lang['users_list_verify'].' <input type="checkbox" name="verify" value="1" />
  </form>
 ';
 

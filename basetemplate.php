@@ -293,12 +293,13 @@ abstract class BaseTemplate {
 
     function edit_user_page_form($who, $username, $level)
     {
-	return '<span style="font-style: underline">Editing user '.$who.'</span>
+	global $lang;
+	return '<h1 id="edit_user-title">'.$lang['edit_user_title'].' '.$who.'</h1>
   <form action="?'.urlargs('users','update',$who).'" method="post">
-   New Username: <input type="text" value="'.$username.'" name="user"><br />
-   New Password: <input type="text" name="password"> (insert as cleartext, the program will encrypt it or leave it blank for no pw change)<br />
-      New Level: '.user_level_select($level).'
-   <input type="submit">
+   '.$lang['edit_user_newname'].' <input type="text" value="'.$username.'" name="user"><br />
+   '.$lang['edit_user_newpass'].' <input type="text" name="password"> '.$lang['edit_user_newpass_help'].'<br />
+      '.$lang['edit_user_newlevel'].' '.user_level_select($level).'
+   <input type="submit" value="'.$lang['edit_user_submit_btn'].'">
   </form>';
 
     }
@@ -323,23 +324,22 @@ abstract class BaseTemplate {
 
     function edit_user_page_table($innerhtml)
     {
-	$str = '  <h1 id="admin_users_title">
-   Users
-  </h1>
+	global $lang;
+	$str = '  <h1 id="admin_users_title">'.$lang['users_list_title'].'</h1>
   <form action="?'.urlargs('users','delete').'" method="post">
    <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
     <tr>
      <td>
-      &nbsp;Username&nbsp;
+      &nbsp;'.$lang['users_list_username'].'&nbsp;
      </td>
      <td>
-      &nbsp;PW_Hash&nbsp;
+      &nbsp;'.$lang['users_list_pwhash'].'&nbsp;
      </td>
      <td>
-      &nbsp;Level&nbsp;
+      &nbsp;'.$lang['users_list_level'].'&nbsp;
      </td>
      <td>
-      &nbsp;Delete&nbsp;
+      &nbsp;'.$lang['users_list_delete'].'&nbsp;
      </td>
     </tr>
 ';
@@ -347,7 +347,7 @@ abstract class BaseTemplate {
 	$str .= $innerhtml;
 
 	$str .= '  </table>
-  <input type="submit" value="Submit" />&nbsp;I\'m sure: <input type="checkbox" name="verify" value="1" />
+  <input type="submit" value="'.$lang['users_list_submit_btn'].'" />&nbsp;'.$lang['users_list_verify'].' <input type="checkbox" name="verify" value="1" />
  </form>
 ';
 
