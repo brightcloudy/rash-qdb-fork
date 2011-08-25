@@ -104,6 +104,11 @@ $lang = array (
 'login_username' => 'Username:',
 'login_password' => 'Password:',
 'login_submit_btn' => 'Log In',
+'quote_queue_title' => 'Queue',
+'quote_queue_no' => 'No',
+'quote_queue_yes' => 'Yes',
+'quote_queue_submit_btn' => 'Submit Query',
+'quote_queue_reset_btn' => 'Reset',
 'captcha_wronganswer' => 'Wrong answer to the CAPTCHA question.',
 'captcha_wrongid' => 'CAPTCHA id is wrong?'
 );

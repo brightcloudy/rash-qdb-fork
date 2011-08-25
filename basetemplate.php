@@ -369,9 +369,10 @@ abstract class BaseTemplate {
 
     function quote_queue_page_iter($quoteid, $quotetxt)
     {
+	global $lang;
 	return '     <tr>
       <td class="quote_no">
-       <label>No<input type="radio" name="q'.$quoteid.'" value="n'.$quoteid.'"></label>
+       <label>'.$lang['quote_queue_no'].'<input type="radio" name="q'.$quoteid.'" value="n'.$quoteid.'"></label>
       </td>
       <td>
         <div class="quote_quote">
@@ -379,7 +380,7 @@ abstract class BaseTemplate {
         </div>
       </td>
 	  <td class="quote_yes">
-       <label><input type="radio" name="q'.$quoteid.'" value="y'.$quoteid.'" style="text-align: right">Yes</label>
+       <label><input type="radio" name="q'.$quoteid.'" value="y'.$quoteid.'" style="text-align: right">'.$lang['quote_queue_yes'].'</label>
 	  </td>
      </tr>
 ';
@@ -388,7 +389,8 @@ abstract class BaseTemplate {
 
     function quote_queue_page($innerhtml)
     {
-	$str = '<h1 id="admin_queue_title">Queue</h1>';
+	global $lang;
+	$str = '<h1 id="admin_queue_title">'.$lang['quote_queue_title'].'</h1>';
 
 	$str .= '  <form action="?'.urlargs('queue','judgement').'" method="post">
    <table width="100%" cellspacing="0" class="admin_queue">';
@@ -396,8 +398,8 @@ abstract class BaseTemplate {
 	$str .= $innerhtml;
 
 	$str .= '   </table>
-   <input type="submit" value="Submit Query" />
-   <input type="reset" value="Reset" />
+   <input type="submit" value="'.$lang['quote_queue_submit_btn'].'" />
+   <input type="reset" value="'.$lang['quote_queue_reset_btn'].'" />
   </form>
 ';
 

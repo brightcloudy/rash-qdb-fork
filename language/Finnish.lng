@@ -104,6 +104,11 @@ $lang = array (
 'login_username' => 'Nimi:',
 'login_password' => 'Salasana:',
 'login_submit_btn' => 'Kirjaudu',
+'quote_queue_title' => 'Hyv‰ksytt‰v‰t lainaukset',
+'quote_queue_no' => 'Ei',
+'quote_queue_yes' => 'Kyll‰',
+'quote_queue_submit_btn' => 'Tallenna',
+'quote_queue_reset_btn' => 'Reset',
 'captcha_wronganswer' => 'V‰‰r‰ vastaus CAPTCHA-kysymykseen.',
 'captcha_wrongid' => 'CAPTCHA id-numero on v‰‰rin?'
 );

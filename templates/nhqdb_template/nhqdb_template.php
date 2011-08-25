@@ -322,7 +322,8 @@ function login_page()
 
 function quote_queue_page($innerhtml)
 {
-    $str = '<h1 id="admin_queue_title">Queue</h1>';
+    global $lang;
+    $str = '<h1 id="admin_queue_title">'.$lang['quote_queue_title'].'</h1>';
 
     $str .= $this->get_messages();
 
@@ -332,8 +333,8 @@ function quote_queue_page($innerhtml)
     $str .= $innerhtml;
 
     $str .= '   </table>
-   <input type="submit" value="Submit Query" />
-   <input type="reset" value="Reset" />
+   <input type="submit" value="'.$lang['quote_queue_submit_btn'].'" />
+   <input type="reset" value="'.$lang['quote_queue_reset_btn'].'" />
   </form>
 ';
 
