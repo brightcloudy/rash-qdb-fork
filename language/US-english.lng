@@ -100,6 +100,10 @@ $lang = array (
 'users_list_delete' => 'Delete',
 'users_list_submit_btn' => 'Submit',
 'users_list_verify' => 'I\'m sure:',
+'login_title' => 'Login',
+'login_username' => 'Username:',
+'login_password' => 'Password:',
+'login_submit_btn' => 'Log In',
 'captcha_wronganswer' => 'Wrong answer to the CAPTCHA question.',
 'captcha_wrongid' => 'CAPTCHA id is wrong?'
 );

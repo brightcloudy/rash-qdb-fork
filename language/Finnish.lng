@@ -100,6 +100,10 @@ $lang = array (
 'users_list_delete' => 'Poista?',
 'users_list_submit_btn' => 'Poista',
 'users_list_verify' => 'Olen varma:',
+'login_title' => 'Kirjaudu sis‰‰n',
+'login_username' => 'Nimi:',
+'login_password' => 'Salasana:',
+'login_submit_btn' => 'Kirjaudu',
 'captcha_wronganswer' => 'V‰‰r‰ vastaus CAPTCHA-kysymykseen.',
 'captcha_wrongid' => 'CAPTCHA id-numero on v‰‰rin?'
 );

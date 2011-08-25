@@ -358,11 +358,12 @@ abstract class BaseTemplate {
     {
 	global $lang;
 
-	return '<div id="admin_all">'.$lang['admin_login_greeting'].
+	return '<h1 id="login_title">'.$lang['login_title'].'</h1>'.
+	    '<div id="admin_all">'.$lang['admin_login_greeting'].
 	'<form action="?'.urlargs('admin','login').'" method="post">
-    Username: <input type="text" name="rash_username" size="8" id="admin_login_username-box" /><br />
-    Password: <input type="password" name="rash_password" size="8" id="admin_login_password-box" /><br />
-    <input type="submit" value="Log In" id="admin_login_submit-button" />
+    '.$lang['login_username'].' <input type="text" name="rash_username" size="8" id="admin_login_username-box" /><br />
+    '.$lang['login_password'].' <input type="password" name="rash_password" size="8" id="admin_login_password-box" /><br />
+    <input type="submit" value="'.$lang['login_submit_btn'].'" id="admin_login_submit-button" />
    </form></div>';
     }
 
