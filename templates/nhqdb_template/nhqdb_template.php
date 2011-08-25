@@ -245,15 +245,17 @@ function add_news_page()
 function add_user_page()
 {
     global $lang;
-    return '  <div id="admin_add-user_all">
-   <h1 id="admin_add-user_title">'.$lang['add_user_title'].'</h1> '
-    . $this->get_messages() . '
+	return '  <div id="admin_add-user_all">
+   <h1 id="admin_add-user_title">'.$lang['add_user_title'].'</h1>
+   ' . $this->get_messages() . '
    <form method="post" action="?'.urlargs('add_user','update').'">
-    '.$lang['add_user_username_label'].' <input type="text" name="username" id="admin_add-user_username" /><br />
-	'.$lang['add_user_randomsalt_label'].' <input type="text" name="salt" value="'.str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').'" id="admin_add-user_salt" /><br />
-	'.$lang['add_user_password_label'].' <input type="text" name="password" /><br />
-       '.$lang['add_user_level_label'].' '.user_level_select().'<br />
-	 <input type="submit" value="'.$lang['add_user_btn'].'" id="admin_add-user_submit" />
+   <table>
+   <tr><td>'.$lang['add_user_username_label'].'</td><td><input type="text" name="username" id="admin_add-user_username" /></td></tr>
+   <tr><td>'.$lang['add_user_randomsalt_label'].'</td><td><input type="text" name="salt" value="'.str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').'" id="admin_add-user_salt" /></td></tr>
+   <tr><td>'.$lang['add_user_password_label'].'</td><td><input type="text" name="password" /></td></tr>
+   <tr><td>'.$lang['add_user_level_label'].'</td><td>'.user_level_select().'</td></tr>
+   <tr><td></td><td><input type="submit" value="'.$lang['add_user_btn'].'" id="admin_add-user_submit" /></td></tr>
+   </table>
    </form>
   </div>
 ';
@@ -265,10 +267,12 @@ function change_password_page()
 	return '  <h1 id="admin_change-pw_title">'.$lang['change_password_title'].'</h1>
         ' . $this->get_messages() . '
   <form action="?'.urlargs('change_pw','update',$_SESSION['user']).'" method="post">
-   '.$lang['change_password_oldpass'].' <input type="password" name="old_password"><br />
-   '.$lang['change_password_newpass'].' <input type="password" name="new_password"><br />
-   '.$lang['change_password_verify'].' <input type="password" name="verify_password"><br />
-   <input type="submit" value="'.$lang['change_password_submit_btn'].'">
+  <table>
+  <tr><td>'.$lang['change_password_oldpass'].'</td><td><input type="password" name="old_password"></td></tr>
+  <tr><td>'.$lang['change_password_newpass'].'</td><td><input type="password" name="new_password"></td></tr>
+  <tr><td>'.$lang['change_password_verify'].'</td><td><input type="password" name="verify_password"></td></tr>
+  <tr><td></td><td><input type="submit" value="'.$lang['change_password_submit_btn'].'"></td></tr>
+  </table>
   </form>';
 }
 
@@ -311,12 +315,14 @@ function login_page()
     global $lang;
 
     return '<h1 id="login_title">'.$lang['login_title'].'</h1>'.
-	$this->get_messages() . '<div id="admin_all">'.$lang['admin_login_greeting'].
-	'<form action="?'.urlargs('admin','login').'" method="post">
-    '.$lang['login_username'].' <input type="text" name="rash_username" size="8" id="admin_login_username-box" /><br />
-    '.$lang['login_password'].' <input type="password" name="rash_password" size="8" id="admin_login_password-box" /><br />
-    <input type="submit" value="'.$lang['login_submit_btn'].'" id="admin_login_submit-button" />
-   </form></div>';
+	$this->get_messages() . '<div id="admin_all"><p>'.$lang['admin_login_greeting'].'</p>
+    <form action="?'.urlargs('admin','login').'" method="post">
+    <table>
+    <tr><td>'.$lang['login_username'].'</td><td><input type="text" name="rash_username" size="8" id="admin_login_username-box" /></td></tr>
+    <tr><td>'.$lang['login_password'].'</td><td><input type="password" name="rash_password" size="8" id="admin_login_password-box" /></td></tr>
+    <tr><td></td><td><input type="submit" value="'.$lang['login_submit_btn'].'" id="admin_login_submit-button" /></td></tr>
+    </table>
+    </form></div>';
 }
 
 
