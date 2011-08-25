@@ -14,6 +14,9 @@ session_start();
 require_once 'DB.php';
 
 require('settings.php');
+
+if (!isset($CONFIG['quote_list_limit']) || !is_int($CONFIG['quote_list_limit'])) $CONFIG['quote_list_limit'] = 50;
+
 require('util_funcs.php');
 require("language/{$CONFIG['language']}.lng");
 
@@ -839,7 +842,7 @@ switch($page[0])
 		login($page[1]);
 		break;
 	case 'bottom':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT ".$CONFIG['quote_list_limit'];
 		quote_generation($query, $lang['bottom_title'], -1);
 		break;
 	case 'browse':
@@ -858,7 +861,7 @@ switch($page[0])
 		flag_queue($page[1]);
 	    break;
 	case 'latest':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT ".$CONFIG['quote_list_limit'];
 		quote_generation($query, $lang['latest_title'], -1);
 		break;
 	case 'logout':
@@ -872,16 +875,16 @@ switch($page[0])
 	    if (isset($_SESSION['logged_in']))
 		quote_queue($page[1]);
 	    else {
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=1 ORDER BY rand() LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=1 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
 		quote_generation($query, $lang['quote_queue_title'], -1);
 	    }
 	    break;
 	case 'random':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
 		quote_generation($query, $lang['random_title'], -1);
 		break;
 	case 'random2':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 1 ORDER BY rand() LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 1 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
 		quote_generation($query, $lang['random2_title'], -1);
 		break;
 	case 'rss':
@@ -891,7 +894,7 @@ switch($page[0])
 	    search($page[1]);
 	    break;
 	case 'top':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT 50";
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT ".$CONFIG['quote_list_limit'];
 		quote_generation($query, $lang['top_title'], -1);
 		break;
 	case 'edit':
