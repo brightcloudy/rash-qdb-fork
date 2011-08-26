@@ -284,7 +284,7 @@ abstract class BaseTemplate {
     {
 	global $lang;
 	return '  <h1 id="admin_change-pw_title">'.$lang['change_password_title'].'</h1>
-  <form action="?'.urlargs('change_pw','update',$_SESSION['user']).'" method="post">
+  <form action="?'.urlargs('change_pw','update',$_SESSION['userid']).'" method="post">
   <table>
   <tr><td>'.$lang['change_password_oldpass'].'</td><td><input type="password" name="old_password"></td></tr>
   <tr><td>'.$lang['change_password_newpass'].'</td><td><input type="password" name="new_password"></td></tr>
@@ -294,11 +294,11 @@ abstract class BaseTemplate {
   </form>';
     }
 
-    function edit_user_page_form($who, $username, $level)
+    function edit_user_page_form($id, $who, $username, $level)
     {
 	global $lang;
-	return '<h1 id="edit_user-title">'.$lang['edit_user_title'].' '.$who.'</h1>
-  <form action="?'.urlargs('users','update',$who).'" method="post">
+	return '<h1 id="edit_user-title">'.$lang['edit_user_title'].' '.$username.'</h1>
+  <form action="?'.urlargs('users','update',$id).'" method="post">
   <table>
   <tr><td>'.$lang['edit_user_newname'].'</td><td><input type="text" value="'.$username.'" name="user"></td></tr>
   <tr><td>'.$lang['edit_user_newpass'].'</td><td><input type="text" name="password"> '.$lang['edit_user_newpass_help'].'</td></tr>
@@ -309,20 +309,23 @@ abstract class BaseTemplate {
 
     }
 
-    function edit_user_page_table_row($user, $password, $level)
+    function edit_user_page_table_row($id, $user, $password, $level)
     {
 	return '    <tr>
      <td>
-      <a href="?'.urlargs('users','edit',$user).'">'.$user.'</a>
+      <a href="?'.urlargs('users','edit',$id).'">'.$id.'</a>
      </td>
      <td>
-      <a href="?'.urlargs('users','edit',$user).'">'.$password.'</a>
+      <a href="?'.urlargs('users','edit',$id).'">'.$user.'</a>
      </td>
      <td>
-      <a href="?'.urlargs('users','edit',$user).'">'.$level.'</a>
+      <a href="?'.urlargs('users','edit',$id).'">'.$password.'</a>
      </td>
      <td>
-      <input type="checkbox" name="d'.$user.'" value="'.$user.'" />
+      <a href="?'.urlargs('users','edit',$id).'">'.$level.'</a>
+     </td>
+     <td>
+      <input type="checkbox" name="d'.$id.'" value="'.$id.'" />
     </tr>
 ';
     }
@@ -334,6 +337,9 @@ abstract class BaseTemplate {
   <form action="?'.urlargs('users','delete').'" method="post">
    <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
     <tr>
+     <td>
+      &nbsp;'.$lang['users_list_id'].'&nbsp;
+     </td>
      <td>
       &nbsp;'.$lang['users_list_username'].'&nbsp;
      </td>

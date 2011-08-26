@@ -516,8 +516,8 @@ function add_user($method)
 	} else {
 	    $res =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($_POST['username']).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
 	    if (DB::isError($res)) {
-		die($res-> getMessage());
-	    }
+		$TEMPLATE->add_message($res->getMessage());
+	    } else $TEMPLATE->add_message(sprintf($lang['user_added'], $_POST['username']));
 	}
     }
 
@@ -528,20 +528,24 @@ function change_pw($method, $who)
 {
     global $CONFIG, $TEMPLATE, $db, $lang;
     if ($method == 'update') {
-		// created to keep errors at a minimum
-		$row['salt'] = 0;
+	// created to keep errors at a minimum
+	$row['salt'] = 0;
 
-		$res =& $db->query("SELECT `password`, salt FROM ".db_tablename('users')." WHERE user=".$db->quote($who));
-		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
-		$salt = "\$1\$".str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')."\$";
+	$res =& $db->query("SELECT `password`, salt FROM ".db_tablename('users')." WHERE id=".$db->quote((int)$who));
+	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
-		if((md5($_POST['old_password']) == $row['password']) || (crypt($_POST['old_password'], $row['salt']) == $row['password'])){
-			if($_POST['verify_password'] == $_POST['new_password']){
-				$db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['new_password'], $salt)."', salt='$salt' WHERE user='$who'");
-				$TEMPLATE->add_message($lang['password_updated']);
-			}
-		}
-    }
+	$salt = "\$1\$".str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')."\$";
+	if ($_POST['new_password'] == '') {
+	    $TEMPLATE->add_message($lang['password_empty']);
+	} else {
+	    if((md5($_POST['old_password']) == $row['password']) || (crypt($_POST['old_password'], $row['salt']) == $row['password'])){
+		if($_POST['verify_password'] == $_POST['new_password']){
+		    $db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['new_password'], $salt)."', salt='".$salt."' WHERE id=".$db->quote((int)$who));
+		    $TEMPLATE->add_message($lang['password_updated']);
+		} else $TEMPLATE->add_message($lang['password_verification_mismatch']);
+	    } else $TEMPLATE->add_message($lang['password_old_mismatch']);
+	}
+    };
 
     print $TEMPLATE->change_password_page();
 }
@@ -549,41 +553,35 @@ function change_pw($method, $who)
 function edit_users($method, $who)
 {
     global $CONFIG, $TEMPLATE, $db, $lang;
-	if($method == 'delete'){	// delete a user from users
-	    if (isset($_POST['verify'])) {
-		    $res =& $db->query("SELECT * FROM ".db_tablename('users'));
-			while($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
-			{
-				if(isset($_POST['d'.$row['user']])){
-					$db->query("DELETE FROM ".db_tablename('users')." WHERE user='{$_POST['d'.$row['user']]}'");
-					$TEMPLATE->add_message(sprintf($lang['user_removed'], $row['user']));
-				}
-			}
+    if ($method == 'delete') {	// delete a user from users
+	if (isset($_POST['verify'])) {
+	    $res =& $db->query("SELECT * FROM ".db_tablename('users'));
+	    while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+		if(isset($_POST['d'.$row['id']])){
+		    $db->query("DELETE FROM ".db_tablename('users')." WHERE id='{$_POST['d'.$row['id']]}'");
+		    $TEMPLATE->add_message(sprintf($lang['user_removed'], $row['user']));
 		}
+	    }
 	}
-	if($method == 'update'){	// parse the info from $method == 'edit' into the database
-	    $db->query("UPDATE ".db_tablename('users')." SET user=".$db->quote(strtolower($_POST['user'])).", level=".$db->quote((int)$_POST['level'])." WHERE user=".$db->quote($who));
-		if($_POST['password'])
-		    $db->query("UPDATE ".db_tablename('users')." SET `password`='".md5($_POST['password'])."' WHERE user=".$db->quote($who));
+    } else if ($method == 'update') {	// parse the info from $method == 'edit' into the database
+	$db->query("UPDATE ".db_tablename('users')." SET user=".$db->quote(strtolower($_POST['user'])).", level=".$db->quote((int)$_POST['level'])." WHERE id=".$db->quote((int)$who));
+	if($_POST['password']) {
+	    $salt = "\$1\$".str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')."\$";
+	    $db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['password'], $salt)."', salt='".$salt."' WHERE id=".$db->quote((int)$who));
 	}
-	if($method == 'edit'){		// take input from a superuser about how to change all users
-								// can change username, password, or user level
-	    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE user=".$db->quote($who));
-		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+    } else if ($method == 'edit') {
+	$res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE id=".$db->quote((int)$who));
+	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	print $TEMPLATE->edit_user_page_form($row['id'], $who, $row['user'], $row['level']);
+    }
 
-		print $TEMPLATE->edit_user_page_form($who, $row['user'], $row['level']);
-	}
+    $innerhtml = '';
 
-	$innerhtml = '';
-
-	$res =& $db->query("SELECT * FROM ".db_tablename('users'));
-	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC))
-	{
-	    $innerhtml .= $TEMPLATE->edit_user_page_table_row($row['user'], $row['password'], $row['level']);
-
-	}
-
-	print $TEMPLATE->edit_user_page_table($innerhtml);
+    $res =& $db->query("SELECT * FROM ".db_tablename('users')." ORDER BY level asc, user desc");
+    while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	$innerhtml .= $TEMPLATE->edit_user_page_table_row($row['id'], $row['user'], $row['password'], $row['level']);
+    }
+    print $TEMPLATE->edit_user_page_table($innerhtml);
 }
 
 // login($method)
@@ -591,37 +589,35 @@ function edit_users($method, $who)
 function login($method)
 {
     global $CONFIG, $TEMPLATE, $db, $lang;
-	if(!$method){
-	    print $TEMPLATE->login_page();
-	}
-	elseif($method == 'login'){
+	if ($method == 'login') {
 	    $res =& $db->query("SELECT salt FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username'])));
 		$salt = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
 		// if there is no presence of a salt, it is probably md5 since old rash used plain md5
 		if(!$salt['salt']){
-		    $res =& $db->query("SELECT user, password, level FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".md5($_POST['rash_password'])."'");
-			$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+		    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".md5($_POST['rash_password'])."'");
+		    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 		}
 		// if there is presense of a salt, it is probably new rash passwords, so it is salted md5
 		else{
-		    $res =& $db->query("SELECT user, password, level FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".crypt($_POST['rash_password'], $salt['salt'])."'");
-			$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+		    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".crypt($_POST['rash_password'], $salt['salt'])."'");
+		    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 		}
 
 		// if there is no row returned for the user, the password is expected to be false because of the AND conditional in the query
 		if(!$row['user']){
 		    $TEMPLATE->add_message($lang['login_error']);
-		}
-		else{
+		} else {
 			$_SESSION['user'] = $row['user'];		// site-wide accessible username
 			$_SESSION['level'] = $row['level'];		// site-wide accessible level
+			$_SESSION['userid'] = $row['id'];
 			$_SESSION['logged_in'] = 1;				// site-wide accessible login variable
 			// Go to the main page after being logged in
-			header("Location: http://"	. $_SERVER['HTTP_HOST']
-										. dirname($_SERVER['PHP_SELF']));
+			header("Location: http://". $_SERVER['HTTP_HOST']
+			       . dirname($_SERVER['PHP_SELF']));
 		}
 	}
+	print $TEMPLATE->login_page();
 }
 // End of login()
 

@@ -266,7 +266,7 @@ function change_password_page()
 	global $lang;
 	return '  <h1 id="admin_change-pw_title">'.$lang['change_password_title'].'</h1>
         ' . $this->get_messages() . '
-  <form action="?'.urlargs('change_pw','update',$_SESSION['user']).'" method="post">
+  <form action="?'.urlargs('change_pw','update',$_SESSION['userid']).'" method="post">
   <table>
   <tr><td>'.$lang['change_password_oldpass'].'</td><td><input type="password" name="old_password"></td></tr>
   <tr><td>'.$lang['change_password_newpass'].'</td><td><input type="password" name="new_password"></td></tr>
@@ -285,6 +285,9 @@ function edit_user_page_table($innerhtml)
   <form action="?'.urlargs('users','delete').'" method="post">
    <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
     <tr>
+     <td>
+      &nbsp;'.$lang['users_list_id'].'&nbsp;
+     </td>
      <td>
       &nbsp;'.$lang['users_list_username'].'&nbsp;
      </td>

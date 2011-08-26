@@ -1,5 +1,8 @@
 <?php
-
+/*
+error_reporting(E_ALL);
+ini_set('display_errors','On');
+*/
 include 'util_funcs.php';
 
 function db_query($sql) {
@@ -27,6 +30,67 @@ function db_query($sql) {
 	print "OK<br />";
 	return 0;
     }
+}
+
+function update_old_users()
+{
+    include 'settings.php';
+    require_once 'DB.php';
+    $dsn = array(
+		 'phptype'  => $CONFIG['phptype'],
+		 'username' => $CONFIG['username'],
+		 'password' => $CONFIG['password'],
+		 'hostspec' => $CONFIG['hostspec'],
+		 'port'     => $CONFIG['port'],
+		 'socket'   => $CONFIG['socket'],
+		 'database' => $CONFIG['database'],
+		 );
+    $db =& DB::connect($dsn);
+    if (DB::isError($db)) {
+	print $db->getMessage().'<br />';
+	return 1;
+    }
+
+    $users = array();
+
+    $res =& $db->query("SELECT * from ".db_tablename('users'));
+    if (!(DB::isError($res))) {
+	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	    if (isset($row['id'])) { /* already up-to-date */
+		print 'Users -table is up-to-date<br />';
+		return 0;
+	    }
+	    $users[] = $row;
+	}
+    }
+
+    if (count($users) > 0) {
+	print 'Updating old RASH-style users table...';
+	$res =& $db->query("DROP TABLE ".db_tablename('users'));
+    } else {
+	print 'Creating users table...';
+    }
+
+    $ret =& $db->query("CREATE TABLE ".db_tablename('users'). " (id int(11) NOT NULL auto_increment primary key,
+							user varchar(20) NOT NULL,
+							`password` varchar(255) NOT NULL,
+							level int(1) NOT NULL,
+							salt text)");
+
+    foreach ($users as $row) {
+	$ret =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES (".
+			   $db->quote($row['user']).",".
+			   $db->quote($row['password']).",".
+			   $db->quote($row['level']).",".
+			   $db->quote($row['salt']).")");
+    }
+
+    if (DB::isError($res)) {
+	print $db->getMessage().'<br />';
+	return 1;
+    }
+    print 'OK<br />';
+    return 0;
 }
 
 
@@ -119,16 +183,14 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 							vote text NOT NULL,
 							flag text NOT NULL");
 
-    $error |= mk_db_table(db_tablename('users'), "user varchar(20) NOT NULL,
-							`password` varchar(255) NOT NULL,
-							level int(1) NOT NULL,
-							salt text");
+    $error |= update_old_users();
 
     $error |= mk_db_table(db_tablename('news'), "id int(11) NOT NULL auto_increment primary key,
 							news text NOT NULL,
 							date int(10) NOT NULL");
 
-    $error |= mk_user($_POST['adminuser'], $_POST['adminpass']);
+    if (trim($_POST['adminuser']) != '')
+	$error |= mk_user($_POST['adminuser'], $_POST['adminpass']);
 
     if ($error) {
 	print 'There were some errors...';
@@ -151,7 +213,7 @@ else {
 
   DB table prefix:    <input type="text" name="db_table_prefix" value="rash">
 
-  Admin Username:     <input type="text" name="adminuser" value="admin">
+  Admin Username:     <input type="text" name="adminuser" value="admin"> (Leave empty for not creating one)
   Admin Password:     <input type="password" name="adminpass" value="password">
   Admin EMail:        <input type="text" name="admin_email" value="qdb@<?php echo $_SERVER['SERVER_NAME']; ?>">
 

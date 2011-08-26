@@ -27,7 +27,7 @@ ob_start();
     </div>&nbsp;
 <?
 
-	if(!$_SESSION['logged_in']){
+if(!isset($_SESSION['logged_in'])){
 
 ?>
     <a href="?admin" id="site_nav_admin"><?=$lang['menu_admin']?></a>
