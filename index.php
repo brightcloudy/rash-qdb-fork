@@ -438,7 +438,7 @@ function user_can_vote_quote($quoteid)
 //
 function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_limit = 10)
 {
-    global $CONFIG, $TEMPLATE, $db;
+    global $CONFIG, $TEMPLATE, $db, $lang;
     $pagenums = '';
     if ($page != -1) {
 	if(!$page)
@@ -456,12 +456,17 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 	die($res->getMessage());
     }
 
+    $nquotes = 0;
     $inner = '';
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)){
+	$nquotes++;
 	$canvote = user_can_vote_quote($row['id']);
 	$datefmt = date($CONFIG['quote_time_format'], $row['date']);
 	$inner .= $TEMPLATE->quote_iter($row['id'], $row['rating'], mangle_quote_text($row['quote']), ($row['flag'] == 0), $canvote, $datefmt);
     }
+
+    if (!$nquotes)
+	$TEMPLATE->add_message($lang['no_quote']);
 
     print $TEMPLATE->quote_list($origin, $pagenums, $inner);
 }

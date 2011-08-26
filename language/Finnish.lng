@@ -20,6 +20,7 @@ $lang = array (
 'flagquote' => "Merkitse lainaus moderaattorin tarkistettavaksi",
 'quote_already_flagged' => 'Lainaus on jo merkitty tarkistettavaksi',
 'already_voted' => 'Olet jo äänestänyt tätä lainausta',
+'no_quote' => 'Sori, ei löytynyt sellaista lainausta.',
 'flag_quote_title' => "Merkitse lainaus",
 'flag_quote_explanation' => 'Merkitse tämä lainaus moderaattorin tarkistusta varten:',
 'flag_quote_adminpage_title' => 'Tarkista lainaukset',

@@ -20,6 +20,7 @@ $lang = array (
 'flagquote' => "Flag quote for admin attention",
 'quote_already_flagged' => 'Quote has already been flagged',
 'already_voted' => 'You have already voted this quote',
+'no_quote' => 'Sorry, no such quote',
 'flag_quote_title' => "Flag a quote",
 'flag_quote_explanation' => 'Flag this quote for moderator attention:',
 'flag_quote_adminpage_title' => 'Flags',
