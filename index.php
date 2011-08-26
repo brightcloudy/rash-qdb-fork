@@ -526,7 +526,7 @@ function add_user($method)
 
 function change_pw($method, $who)
 {
-    global $CONFIG, $TEMPLATE, $db;
+    global $CONFIG, $TEMPLATE, $db, $lang;
     if ($method == 'update') {
 		// created to keep errors at a minimum
 		$row['salt'] = 0;
@@ -538,7 +538,7 @@ function change_pw($method, $who)
 		if((md5($_POST['old_password']) == $row['password']) || (crypt($_POST['old_password'], $row['salt']) == $row['password'])){
 			if($_POST['verify_password'] == $_POST['new_password']){
 				$db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['new_password'], $salt)."', salt='$salt' WHERE user='$who'");
-				$TEMPLATE->add_message('Password updated!');
+				$TEMPLATE->add_message($lang['password_updated']);
 			}
 		}
     }
@@ -548,7 +548,7 @@ function change_pw($method, $who)
 
 function edit_users($method, $who)
 {
-    global $CONFIG, $TEMPLATE, $db;
+    global $CONFIG, $TEMPLATE, $db, $lang;
 	if($method == 'delete'){	// delete a user from users
 	    if (isset($_POST['verify'])) {
 		    $res =& $db->query("SELECT * FROM ".db_tablename('users'));
@@ -556,7 +556,7 @@ function edit_users($method, $who)
 			{
 				if(isset($_POST['d'.$row['user']])){
 					$db->query("DELETE FROM ".db_tablename('users')." WHERE user='{$_POST['d'.$row['user']]}'");
-					$TEMPLATE->add_message($row['user'].' has been removed from the userlist!');
+					$TEMPLATE->add_message(sprintf($lang['user_removed'], $row['user']));
 				}
 			}
 		}
@@ -631,7 +631,7 @@ function login($method)
 
 function quote_queue($method)
 {
-    global $CONFIG, $TEMPLATE, $db;
+    global $CONFIG, $TEMPLATE, $db, $lang;
     if ($method == 'judgement') {
 	$res =& $db->query("SELECT * FROM ".db_tablename('quotes').' where queue=1');
 	$x = 0;
@@ -645,10 +645,10 @@ function quote_queue($method)
 	while ($judgement_array[$x]) {
 	    if(substr($judgement_array[$x], 0, 1) == 'y'){
 		$db->query("UPDATE ".db_tablename('quotes')." SET queue=0 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
-		$TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' accepted');
+		$TEMPLATE->add_message(sprintf($lang['quote_accepted'], substr($judgement_array[$x], 1)));
 	    } else {
 		$db->query("DELETE FROM ".db_tablename('quotes')." WHERE queue=1 AND id =".$db->quote((int)substr($judgement_array[$x], 1)));
-		$TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' deleted');
+		$TEMPLATE->add_message(sprintf($lang['quote_deleted'], substr($judgement_array[$x], 1)));
 	    }
 	    $x++;
 	}
@@ -676,16 +676,16 @@ function quote_queue($method)
 
 function flag_queue($method)
 {
-    global $CONFIG, $TEMPLATE, $db;
+    global $CONFIG, $TEMPLATE, $db, $lang;
 	if($method == 'judgement'){
 
 	    if (isset($_POST['do_all']) && ($_POST['do_all'] == 'on')) {
 		if (isset($_POST['unflag_all'])) {
 		    $db->query("UPDATE ".db_tablename('quotes')." SET flag=2 WHERE flag=1");
-		    $TEMPLATE->add_message('Unflagged all.');
+		    $TEMPLATE->add_message($lang['unflagged_all']);
 		} else if (isset($_POST['delete_all'])) {
 		    $db->query("DELETE FROM ".db_tablename('quotes')." WHERE flag=1");
-		    $TEMPLATE->add_message('Deleted all.');
+		    $TEMPLATE->add_message($lang['deleted_all']);
 		}
 	    }
 
@@ -703,11 +703,11 @@ function flag_queue($method)
 	    while (isset($judgement_array[$x])) {
 		if(substr($judgement_array[$x], 0, 1) == 'u'){
 		    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 2 WHERE id =".$db->quote((int)substr($judgement_array[$x], 1)));
-		    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' has been unflagged!');
+		    $TEMPLATE->add_message(sprintf($lang['quote_unflagged'], substr($judgement_array[$x], 1)));
 		}
 		if(substr($judgement_array[$x], 0, 1) == 'd'){
 		    $db->query("DELETE FROM ".db_tablename('quotes')." WHERE id=".$db->quote((int)substr($judgement_array[$x], 1)));
-		    $TEMPLATE->add_message('Quote '.substr($judgement_array[$x], 1).' deleted from database!');
+		    $TEMPLATE->add_message(sprintf($lang['quote_deleted'], substr($judgement_array[$x], 1)));
 		}
 		$x++;
 	    }
