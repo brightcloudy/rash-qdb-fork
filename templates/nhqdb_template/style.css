@@ -35,23 +35,62 @@ div.quote_quote{
 }
 .quote_plus {
   color: green;
+  border: 1px outset lightgreen;
   display: inline-block;
   min-width: 1.25em;
   text-align:center;
+  text-decoration: none;
+  font-weight:bold;
 }
-.quote_plus:hover {
+a.quote_plus:hover {
   background-color:lightgreen;
+  color: green;
+  border: 1px inset lightgreen;
 }
- 
+
 .quote_minus {
   color: red;
+  border: 1px outset pink;
   display: inline-block;
   min-width: 1.25em;
   text-align:center;
+  text-decoration: none;
+  font-weight:bold;
 }
-.quote_minus:hover {
+a.quote_minus:hover {
   background-color:pink;
+  color: red;
+  border: 1px inset pink;
 }
+
+a.quote_flag {
+  color: #808080;
+  border: 1px outset black;
+  text-decoration: none;
+  display: inline-block;
+  float:right;
+  min-width: 1.25em;
+  text-align:center;
+}
+a.quote_flag:hover {
+  color: white;
+  background-color: #808080;
+  border: 1px inset black;
+}
+
+span.quote_flag {
+  display:none;
+}
+
+span.quote_plus,
+span.quote_minus,
+span.quote_plus:hover,
+span.quote_minus:hover {
+  background-color:none;
+  color: #c0c0c0;
+  border: 1px outset #c0c0c0;
+}
+
 /* searchpage */
 input#search_submit-button{
 	background-color: #c08000;

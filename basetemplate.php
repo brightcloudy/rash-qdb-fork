@@ -433,8 +433,8 @@ abstract class BaseTemplate {
     {
 	global $lang;
 	if ($canflag)
-	    return '<a href="?'.urlargs('flag',$quoteid).'" class="quote_flag" title="'.$lang['flagquote'].'">[X]</a>';
-	return '<span class="quote_flag" title="'.$lang['quote_already_flagged'].'">[X]</span>';
+	    return '<a href="?'.urlargs('flag',$quoteid).'" class="quote_flag" title="'.$lang['flagquote'].'">X</a>';
+	return '<span class="quote_flag" title="'.$lang['quote_already_flagged'].'">X</span>';
     }
 
     function quote_iter($quoteid, $rating, $quotetxt, $canflag, $canvote, $date=null)
