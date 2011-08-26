@@ -79,6 +79,7 @@ $lang = array (
 'add_news_help' => "Voit käyttää HTML-tägejä. Rivinvaihdot muutetaan br-tägeiksi.",
 'add_news_btn' => "Lisää",
 'add_user_title' => 'Käyttäjän lisäys',
+'username_exists' => 'Käyttäjänimi on jo käytössä',
 'add_user_username_label' => 'Käyttäjän nimi:',
 'add_user_randomsalt_label' => 'RANDOM Salt:',
 'add_user_password_label' => 'Salasana:',

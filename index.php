@@ -498,13 +498,26 @@ function user_level_select($selected=3, $id='admin_add-user_level')
     return $str;
 }
 
+function username_exists($name)
+{
+    global $db;
+    $ret = $db->getOne('select count(1) from '.db_tablename('users').' where user='.$db->quote($name));
+    if ($ret > 0) return TRUE;
+    return FALSE;
+}
+
+
 function add_user($method)
 {
-    global $CONFIG, $TEMPLATE, $db;
+    global $CONFIG, $TEMPLATE, $db, $lang;
     if ($method == 'update') {
-	$res =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($_POST['username']).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
-	if (DB::isError($res)) {
-	    die($res-> getMessage());
+	if (username_exists($_POST['username'])) {
+	    $TEMPLATE->add_message($lang['username_exists']);
+	} else {
+	    $res =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($_POST['username']).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
+	    if (DB::isError($res)) {
+		die($res-> getMessage());
+	    }
 	}
     }
 
