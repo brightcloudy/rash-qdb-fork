@@ -476,7 +476,7 @@ abstract class BaseTemplate {
 	if (isset($title))
 	    $str .= '<h1 id="quote_origin-name">'.$title.'</h1>';
 	$str .= $pagenumbers;
-	$str .= $quotes;
+	$str .= '<div id="quote_list">'.$quotes.'</div>';
 	$str .= $pagenumbers;
 	return $str;
     }
