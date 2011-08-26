@@ -780,9 +780,10 @@ function add_quote($method)
     $innerhtml = '';
 
     if ($method == 'submit') {
+	$flag = (isset($CONFIG['auto_flagged_quotes']) && ($CONFIG['auto_flagged_quotes'] == 1)) ? 2 : 0;
 	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
 	$innerhtml = $TEMPLATE->add_quote_outputmsg(mangle_quote_text($quotxt));
-	$res =& $db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, queue, date) VALUES(".$db->quote($quotxt).", 0, 0, ".$CONFIG['moderated_quotes'].", '".mktime()."')");
+	$res =& $db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, queue, date) VALUES(".$db->quote($quotxt).", 0, ".$flag.", ".$CONFIG['moderated_quotes'].", '".mktime()."')");
 	if(DB::isError($res)){
 	    die($res->getMessage());
 	}

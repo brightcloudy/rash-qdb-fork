@@ -25,6 +25,7 @@ $CONFIG['quote_limit'] = 10;	// how many quotes ?browse displays at once
 $CONFIG['page_limit'] = 5;	// how many page numbers to show
 $CONFIG['quote_list_limit'] = 50; // Number of quotes shown in ?top/?bottom/?latest/?queue/?random
 $CONFIG['moderated_quotes'] = 1; // Quotes need to be accepted by a moderator
+$CONFIG['auto_flagged_quotes'] = 0; // Quotes are automatically marked checked by a moderator when they're added.
 $CONFIG['captcha'] = 'nocaptcha';
 $CONFIG['timezone'] = 'America/New_York';
 $CONFIG['news_time_format'] = 'Y-m-d';

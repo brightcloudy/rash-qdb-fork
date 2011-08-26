@@ -75,6 +75,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'page_limit' => $_POST['page_limit'],
 		  'quote_list_limit' => $_POST['quote_list_limit'],
 		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
+		  'auto_flagged_quotes' => (($_POST['auto_flagged_quotes'] == 'on') ? 0 : 1),
 		  'timezone' => "'".$_POST['timezone']."'",
 		  'news_time_format' => "'".$_POST['news_time_format']."'",
 		  'quote_time_format' => "'".$_POST['quote_time_format']."'",
@@ -167,6 +168,7 @@ else {
   Page limit:         <input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
   Quote List limit:   <input type="text" name="quote_list_limit" value="50"> (how many quotes are shown in non-browse pages, eg. ?top)
   Moderated:          <input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
+  Quote flagging:     <input type="checkbox" name="auto_flagged_quotes" checked> Can users flag quotes for admin attention?
 
   CAPTCHA:            <select name="captcha"><? foreach($captchas as $c) { echo '<option value="'.$c['name'].'">'.$c['desc']; } ?></select>
 

@@ -431,7 +431,8 @@ abstract class BaseTemplate {
 
     function quote_flag_button($quoteid, $canflag)
     {
-	global $lang;
+	global $lang, $CONFIG;
+	if ($CONFIG['auto_flagged_quotes'] == 1) return '';
 	if ($canflag)
 	    return '<a href="?'.urlargs('flag',$quoteid).'" class="quote_flag" title="'.$lang['flagquote'].'">X</a>';
 	return '<span class="quote_flag" title="'.$lang['quote_already_flagged'].'">X</span>';
