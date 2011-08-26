@@ -97,6 +97,7 @@ function update_old_users()
 $languages = array('US-english','Finnish');
 
 $captchas = array(array('name'=>'nocaptcha', 'desc'=>'No CAPTCHA'),
+		  array('name'=>'42captcha', 'desc'=>'The Ultimate Question CAPTCHA'),
 		  array('name'=>'nhcaptcha', 'desc'=>'NetHack CAPTCHA'));
 
 $def_template = './templates/bash_template/bash_template.php';
