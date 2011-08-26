@@ -33,7 +33,12 @@ div.quote_quote{
 .quote_whole:nth-child(odd) {
 	background-color:#f0f0f0;
 }
-.quote_plus {
+a.quote_plus:hover {
+  background-color:lightgreen;
+  color: green;
+  border: 1px inset lightgreen;
+}
+a.quote_plus {
   color: green;
   border: 1px outset lightgreen;
   display: inline-block;
@@ -42,13 +47,8 @@ div.quote_quote{
   text-decoration: none;
   font-weight:bold;
 }
-a.quote_plus:hover {
-  background-color:lightgreen;
-  color: green;
-  border: 1px inset lightgreen;
-}
 
-.quote_minus {
+a.quote_minus {
   color: red;
   border: 1px outset pink;
   display: inline-block;
@@ -89,6 +89,11 @@ span.quote_minus:hover {
   background-color:none;
   color: #c0c0c0;
   border: 1px outset #c0c0c0;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+  text-decoration: none;
+  font-weight:bold;
 }
 
 /* searchpage */
