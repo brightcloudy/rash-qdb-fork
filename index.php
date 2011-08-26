@@ -572,7 +572,8 @@ function edit_users($method, $who)
     } else if ($method == 'edit') {
 	$res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE id=".$db->quote((int)$who));
 	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
-	print $TEMPLATE->edit_user_page_form($row['id'], $who, $row['user'], $row['level']);
+	if (isset($row['user']))
+	    print $TEMPLATE->edit_user_page_form($row['id'], $who, $row['user'], $row['level']);
     }
 
     $innerhtml = '';
