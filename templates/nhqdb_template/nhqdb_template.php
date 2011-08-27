@@ -114,7 +114,7 @@ function main_page($news)
 
 function add_quote_page($added_quote_html='')
 {
-    global $lang;
+    global $CAPTCHA, $lang;
     $str = '<div id="add_all">';
 
     $str .= '<h1 id="add_title">'.$lang['add_title'].'</h1>';
@@ -124,8 +124,9 @@ function add_quote_page($added_quote_html='')
     $str .= $added_quote_html;
 
     $str .= '<form action="?'.urlargs('add','submit').'" method="post">
-     <textarea cols="80" rows="5" name="rash_quote" id="add_quote" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)"></textarea><br />
-     <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
+     <textarea cols="80" rows="5" name="rash_quote" id="add_quote" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)"></textarea><br />';
+    $str .= $CAPTCHA->get_CAPTCHA('add_quote');
+    $str .= '<input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
      <input type="reset" value="'.$lang['add_reset_btn'].'" id="add_reset" />
     </form>';
 

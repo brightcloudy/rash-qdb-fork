@@ -113,7 +113,7 @@ abstract class BaseTemplate {
 
     function add_quote_page($added_quote_html='')
     {
-	global $lang;
+	global $CAPTCHA, $lang;
 	$str = '<div id="add_all">';
 
 	$str .= '<h1 id="add_title">'.$lang['add_title'].'</h1>';
@@ -121,8 +121,9 @@ abstract class BaseTemplate {
 	$str .= $added_quote_html;
 
 	$str .= '<form action="?'.urlargs('add','submit').'" method="post">
-        <textarea cols="80" rows="5" name="rash_quote" id="add_quote"></textarea><br />
-        <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
+        <textarea cols="80" rows="5" name="rash_quote" id="add_quote"></textarea><br />';
+	$str .= $CAPTCHA->get_CAPTCHA('add_quote');
+        $str .= '<input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
         <input type="reset" value="'.$lang['add_reset_btn'].'" id="add_reset" />
         </form>';
 
@@ -497,7 +498,7 @@ abstract class BaseTemplate {
 
 	if ($flag == 0) {
 	    $str .= '<form action="?'.urlargs('flag',$quoteid, 'verdict').'" method="post">';
-	    $str .= $CAPTCHA->get_CAPTCHA();
+	    $str .= $CAPTCHA->get_CAPTCHA('flag');
 	    $str .= '<input type="submit" value="'.$lang['flag_quote_submit_btn'].'" />
    <input type="reset" value="'.$lang['flag_quote_reset_btn'].'" />
   </form>';

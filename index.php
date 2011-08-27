@@ -23,6 +23,8 @@ require("language/{$CONFIG['language']}.lng");
 require('basecaptcha.php');
 require("captcha/{$CONFIG['captcha']}.php");
 
+$CAPTCHA->init_settings($CONFIG['use_captcha']);
+
 require('basetemplate.php');
 require($CONFIG['template']);
 
@@ -63,6 +65,21 @@ function get_db_stats()
     return $ret;
 }
 
+function handle_captcha($type, $func, &$param=null)
+{
+    global $CAPTCHA, $TEMPLATE, $lang;
+    switch ($CAPTCHA->check_CAPTCHA($type)) {
+    case 0:
+	if (is_callable($func)) return call_user_func($func, $param);
+	break;
+    case 1: $TEMPLATE->add_message($lang['captcha_wronganswer']);
+	break;
+    case 2: $TEMPLATE->add_message($lang['captcha_wrongid']);
+	break;
+    default: break;
+    }
+    return FALSE;
+}
 
 function rash_rss()
 {
@@ -78,37 +95,32 @@ function rash_rss()
     print $TEMPLATE->rss_feed($CONFIG['rss_title'], $CONFIG['rss_desc'], $CONFIG['rss_url'], $items);
 }
 
+function flag_do_inner($row)
+{
+    global $TEMPLATE, $lang, $db;
+    if($row['flag'] == 2){
+	$TEMPLATE->add_message($lang['flag_previously_flagged']);
+    }
+    elseif($row['flag'] == 1){
+	$TEMPLATE->add_message($lang['flag_currently_flagged']);
+    }
+    else{
+	$TEMPLATE->add_message($lang['flag_quote_flagged']);
+	$db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$row['id']));
+	$row['flag'] = 1;
+    }
+    return $row;
+}
 
 function flag($quote_num, $method)
 {
-    global $TEMPLATE, $CAPTCHA, $lang, $db;
+    global $CONFIG, $TEMPLATE, $CAPTCHA, $lang, $db;
 
-    $res =& $db->query("SELECT flag,quote FROM ".db_tablename('quotes')." WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
+    $res =& $db->query("SELECT id,flag,quote FROM ".db_tablename('quotes')." WHERE id = ".$db->quote((int)$quote_num)." LIMIT 1");
     $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
     if ($method == 'verdict') {
-
-	switch ($CAPTCHA->check_CAPTCHA()) {
-	case 0:
-	    if($row['flag'] == 2){
-		$TEMPLATE->add_message($lang['flag_previously_flagged']);
-	    }
-	    elseif($row['flag'] == 1){
-		$TEMPLATE->add_message($lang['flag_currently_flagged']);
-	    }
-	    else{
-		$TEMPLATE->add_message($lang['flag_quote_flagged']);
-		$db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
-		$row['flag'] = 1;
-	    }
-	    break;
-	case 1: $TEMPLATE->add_message($lang['captcha_wronganswer']);
-	    break;
-	case 2: $TEMPLATE->add_message($lang['captcha_wrongid']);
-	    break;
-	default: break;
-	}
-
+	$row = handle_captcha('flag', 'flag_do_inner', $row);
     } else {
 	if($row['flag'] == 2){
 	    $TEMPLATE->add_message($lang['flag_previously_flagged']);
@@ -637,21 +649,27 @@ function edit_quote($method, $quoteid)
 }
 
 
+function add_quote_do_inner()
+{
+    global $CONFIG, $TEMPLATE, $db;
+    $flag = (isset($CONFIG['auto_flagged_quotes']) && ($CONFIG['auto_flagged_quotes'] == 1)) ? 2 : 0;
+    $quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
+    $innerhtml = $TEMPLATE->add_quote_outputmsg(mangle_quote_text($quotxt));
+    $res =& $db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, queue, date) VALUES(".$db->quote($quotxt).", 0, ".$flag.", ".$CONFIG['moderated_quotes'].", '".mktime()."')");
+    if(DB::isError($res)){
+	die($res->getMessage());
+    }
+    return $innerhtml;
+}
 
 function add_quote($method)
 {
-    global $CONFIG, $TEMPLATE, $db;
+    global $CONFIG, $TEMPLATE, $CAPTCHA, $db, $lang;
 
     $innerhtml = '';
 
     if ($method == 'submit') {
-	$flag = (isset($CONFIG['auto_flagged_quotes']) && ($CONFIG['auto_flagged_quotes'] == 1)) ? 2 : 0;
-	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
-	$innerhtml = $TEMPLATE->add_quote_outputmsg(mangle_quote_text($quotxt));
-	$res =& $db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, queue, date) VALUES(".$db->quote($quotxt).", 0, ".$flag.", ".$CONFIG['moderated_quotes'].", '".mktime()."')");
-	if(DB::isError($res)){
-	    die($res->getMessage());
-	}
+	$innerhtml = handle_captcha('add_quote', 'add_quote_do_inner');
     }
 
     print $TEMPLATE->add_quote_page($innerhtml);

@@ -237,6 +237,9 @@ $captchas = array(array('name'=>'nocaptcha', 'desc'=>'No CAPTCHA'),
 		  array('name'=>'42captcha', 'desc'=>'The Ultimate Question CAPTCHA'),
 		  array('name'=>'nhcaptcha', 'desc'=>'NetHack CAPTCHA'));
 
+$captcha_uses = array('flag'=>'Flagging a quote',
+		      'add_quote' => 'Adding a quote');
+
 $def_template = './templates/bash_template/bash_template.php';
 
 require 'basetemplate.php';
@@ -276,6 +279,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
 		  'language' => "'".$_POST['language']."'",
 		  'captcha' => "'".$_POST['captcha']."'",
+		  'use_captcha' => "array(".(isset($_POST['use_captcha']) ? ("'".implode("'=>1, '", $_POST['use_captcha'])."'=>1"): '').")",
 		  'admin_email' => "'".$_POST['admin_email']."'",
 		  'quote_limit' => $_POST['quote_limit'],
 		  'page_limit' => $_POST['page_limit'],
@@ -342,44 +346,145 @@ else {
     if(!file_exists('settings.php')){
 ?>
 <h2>Install</h2>
-<pre><form action="?<?=md5('create_file')?>" method="post">
-  Template File Path: <input type="text" name="template" value="<?php echo $def_template; ?>" style="width: 215pt">
-  DB Type:	      <input type="text" name="phptype" value="mysql">
-  DB Hostname:	      <input type="text" name="hostspec" value="localhost">
-  DB Database:	      <input type="text" name="database" value="rash">(which database to use)
-  DB Username:	      <input type="text" name="username" value="username">
-  DB Password:	      <input type="password" name="password" value="password">
-
-  DB table prefix:    <input type="text" name="db_table_prefix" value="rash">
-
-  Admin Username:     <input type="text" name="adminuser" value="admin"> (Leave empty for not creating one)
-  Admin Password:     <input type="password" name="adminpass" value="password">
-  Admin EMail:        <input type="text" name="admin_email" value="qdb@<?php echo $_SERVER['SERVER_NAME']; ?>">
-
-  Site Language:      <select name="language"><? foreach($languages as $l) { echo '<option value="'.$l.'">'.$l; } ?></select>
-
-  Site Short Title:   <input type="text" name="site_short_title" value="QMS">
-  Site Long Title:    <input type="text" name="site_long_title" value="Quote Management System">
-
-  RSS URL:            <input type="text" name="rss_url" value="<?php echo 'http://'.$_SERVER['SERVER_NAME'];?>">
-  RSS Title:          <input type="text" name="rss_title" value="Rash QDB">
-  RSS Description:    <input type="text" name="rss_desc" value="Quote Database for the IRC channel">
-
-  Quote limit:        <input type="text" name="quote_limit" value="10"> (number of quotes shown per page when browsing)
-  Page limit:         <input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
-  Quote List limit:   <input type="text" name="quote_list_limit" value="50"> (how many quotes are shown in non-browse pages, eg. ?top)
-  Moderated:          <input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
-  Quote flagging:     <input type="checkbox" name="auto_flagged_quotes" checked> Can users flag quotes for admin attention?
-
-  CAPTCHA:            <select name="captcha"><? foreach($captchas as $c) { echo '<option value="'.$c['name'].'">'.$c['desc']; } ?></select>
-
-  Timezone:           <input type="text" name="timezone" value="America/New_York"> (See <a href="http://www.php.net/manual/en/timezones.php">list of supported timezones</a>)
-  News time format:   <input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>)
-  Quote time format:  <input type="text" name="quote_time_format" value="F j, Y"> (example: <? print date("F j, Y"); ?>)
-
-  <input type="submit" value="Submit">
+<form action="?<?=md5('create_file')?>" method="post">
+<table>
+ <tr>
+  <td>Template File Path</td>
+  <td><input type="text" name="template" value="<?php echo $def_template; ?>" style="width: 215pt"></td>
+ </tr>
+ <tr>
+  <td>DB Type
+  <td><input type="text" name="phptype" value="mysql">
+ </tr>
+ <tr>
+  <td>DB Hostname
+  <td><input type="text" name="hostspec" value="localhost">
+ </tr>
+ <tr>
+  <td>DB Database
+  <td><input type="text" name="database" value="rash">(which database to use)
+ </tr>
+ <tr>
+  <td>DB Username
+  <td><input type="text" name="username" value="username">
+ </tr>
+ <tr>
+  <td>DB Password
+  <td><input type="password" name="password" value="password">
+ </tr>
+ <tr>
+	<td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>DB table prefix
+  <td><input type="text" name="db_table_prefix" value="rash">
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>Admin Username
+  <td><input type="text" name="adminuser" value="admin"> (Leave empty for not creating one)
+ </tr>
+ <tr>
+  <td>Admin Password
+  <td><input type="password" name="adminpass" value="password">
+ </tr>
+ <tr>
+  <td>Admin EMail
+  <td><input type="text" name="admin_email" value="qdb@<?php echo $_SERVER['SERVER_NAME']; ?>">
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>Site Language
+  <td><select name="language"><? foreach($languages as $l) { echo '<option value="'.$l.'">'.$l; } ?></select>
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>Site Short Title
+  <td><input type="text" name="site_short_title" value="QMS">
+ </tr>
+ <tr>
+  <td>Site Long Title
+  <td><input type="text" name="site_long_title" value="Quote Management System">
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>RSS URL
+  <td><input type="text" name="rss_url" value="<?php echo 'http://'.$_SERVER['SERVER_NAME'];?>">
+ </tr>
+ <tr>
+  <td>RSS Title
+  <td><input type="text" name="rss_title" value="Rash QDB">
+ </tr>
+ <tr>
+  <td>RSS Description
+  <td><input type="text" name="rss_desc" value="Quote Database for the IRC channel">
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>Quote limit
+  <td><input type="text" name="quote_limit" value="10"> (number of quotes shown per page when browsing)
+ </tr>
+ <tr>
+  <td>Page limit
+  <td><input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
+ </tr>
+ <tr>
+  <td>Quote List limit
+  <td><input type="text" name="quote_list_limit" value="50"> (how many quotes are shown in non-browse pages, eg. ?top)
+ </tr>
+ <tr>
+  <td>Moderated
+  <td><input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
+ </tr>
+ <tr>
+  <td>Quote flagging
+  <td><input type="checkbox" name="auto_flagged_quotes" checked> Can users flag quotes for admin attention?
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>CAPTCHA
+  <td><select name="captcha"><? foreach($captchas as $c) { echo '<option value="'.$c['name'].'">'.$c['desc']; } ?></select>
+ </tr>
+ <tr>
+  <td>Use CAPTCHA For
+  <td><? foreach ($captcha_uses as $k=>$v) { echo '<input type="checkbox" name="use_captcha[]" value="'.$k.'" checked>'.$v.'<br>'; } ?>
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>Timezone
+  <td><input type="text" name="timezone" value="America/New_York"> (See <a href="http://www.php.net/manual/en/timezones.php">list of supported timezones</a>)
+ </tr>
+ <tr>
+  <td>News time format
+  <td><input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>)
+ </tr>
+ <tr>
+  <td>Quote time format
+  <td><input type="text" name="quote_time_format" value="F j, Y"> (example: <? print date("F j, Y"); ?>)
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>&nbsp;</td>
+  <td><input type="submit" value="Submit">
+ </tr>
+ </table>
  </form>
-</pre>
 <?php
     } else {
 	die("settings.php already exists.");

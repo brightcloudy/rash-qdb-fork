@@ -4,8 +4,9 @@
 
 class _42CAPTCHA extends baseCAPTCHA {
 
-    function get_CAPTCHA()
+    function get_CAPTCHA($type)
     {
+	if (parent::check_passthru($type)) return '';
 	$ret = '<p class="CAPTCHAquestion">';
 	$ret .= 'What is the answer to the Ultimate Question of Life, the Universe, and Everything? ';
 	$ret .= '<input type="text" name="CAPTCHAanswer" size="2" maxlength="2">';
@@ -14,8 +15,9 @@ class _42CAPTCHA extends baseCAPTCHA {
 	return $ret;
     }
 
-    function check_CAPTCHA()
+    function check_CAPTCHA($type)
     {
+	if (parent::check_passthru($type)) return 0;
 	if ($_POST['CAPTCHA']) {
 	    $a = trim($_POST['CAPTCHAanswer']);
 	    if ($a == '42') return 0;
