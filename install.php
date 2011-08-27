@@ -257,7 +257,7 @@ if (file_exists($def_template)) {
 
 $TEMPLATE->printheader('Install Rash Quote Management System');
 
-If($_SERVER['QUERY_STRING'] == md5('create_file')){
+If (isset($_POST['submit'])) {
     if (file_exists('settings.php')){
 	die("settings.php already exists.");
     }
@@ -339,11 +339,10 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 	$error |= mk_user($_POST['adminuser'], $_POST['adminpass']);
 
     if ($error) {
-	print 'There were some errors...';
+	print '<p>There were some errors...';
     } else {
-	print 'Everything should now be OK.';
+	print '<p>Everything should now be OK.';
     }
-    print '<p><a href="./">QDB main page</a>';
 }
 else {
     if(!file_exists('settings.php')){
@@ -360,7 +359,7 @@ else {
 
 ?>
 <h2>Install</h2>
-<form action="?<?=md5('create_file')?>" method="post">
+<form action="./install.php" method="post">
 <table>
  <tr>
   <td>Template</td>
@@ -502,13 +501,14 @@ else {
  </tr>
  <tr>
   <td>&nbsp;</td>
-  <td><input type="submit" value="Submit">
+  <td><input type="submit" value="Submit" name="submit">
  </tr>
  </table>
  </form>
 <?php
     } else {
-	die("settings.php already exists.");
+	print "<p>settings.php already exists.";
     }
 }
+print '<p><a href="./">QDB main page</a></p>';
 $TEMPLATE->printfooter();
