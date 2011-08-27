@@ -78,30 +78,22 @@ function rash_rss()
     print $TEMPLATE->rss_feed($CONFIG['rss_title'], $CONFIG['rss_desc'], $CONFIG['rss_url'], $items);
 }
 
-// function user_quote_status($where, $quote_num)
-// This function checks the user's ip address against the stores entries to ensure
-// that multiple voting doesn't occur (it does this with the ip_track() function.
-// It returns a number for either flag or vote to tell them if you're able to
-// modify the quote.
-//
-function user_quote_status($where, $quote_num)
+function user_quote_status($quote_num)
 {
     global $TEMPLATE, $lang;
-	$tracking_verdict = ip_track($where, $quote_num);
-	if($where != 'flag'){
-		switch($tracking_verdict){
-			case 1:
-			    $TEMPLATE->add_message($lang['tracking_check_1']);
-			    break;
-			case 2:
-			    $TEMPLATE->add_message($lang['tracking_check_2']);
-			    break;
-			case 3:
-			    $TEMPLATE->add_message($lang['tracking_check_3']);
-			    break;
-		}
-	}
-	return $tracking_verdict;
+    $tracking_verdict = ip_track($quote_num);
+    switch($tracking_verdict){
+    case 1:
+	$TEMPLATE->add_message($lang['tracking_check_1']);
+	break;
+    case 2:
+	$TEMPLATE->add_message($lang['tracking_check_2']);
+	break;
+    case 3:
+	$TEMPLATE->add_message($lang['tracking_check_3']);
+	break;
+    }
+    return $tracking_verdict;
 }
 
 
@@ -117,48 +109,31 @@ function flag($quote_num, $method)
 
 	switch ($CAPTCHA->check_CAPTCHA()) {
 	case 0:
-		    $tracking_verdict = user_quote_status('flag', $quote_num);
-		    if($tracking_verdict == 1 || 2){
-			if($row['flag'] == 2){
-			    $TEMPLATE->add_message($lang['flag_previously_flagged']);
-			}
-			elseif($row['flag'] == 1){
-			    $TEMPLATE->add_message($lang['flag_currently_flagged']);
-			}
-			else{
-			    $TEMPLATE->add_message($lang['flag_quote_flagged']);
-			    $db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
-			    $row['flag'] = 1;
-			}
-		    }
+	    if($row['flag'] == 2){
+		$TEMPLATE->add_message($lang['flag_previously_flagged']);
+	    }
+	    elseif($row['flag'] == 1){
+		$TEMPLATE->add_message($lang['flag_currently_flagged']);
+	    }
+	    else{
+		$TEMPLATE->add_message($lang['flag_quote_flagged']);
+		$db->query("UPDATE ".db_tablename('quotes')." SET flag = 1 WHERE id = ".$db->quote((int)$quote_num));
+		$row['flag'] = 1;
+	    }
 	    break;
 	case 1: $TEMPLATE->add_message($lang['captcha_wronganswer']);
 	    break;
 	case 2: $TEMPLATE->add_message($lang['captcha_wrongid']);
 	    break;
-	default:
-	case 3: /* No CAPTCHA */
-	    $tracking_verdict = user_quote_status('flag', $quote_num);
-	    if($tracking_verdict == 1 || 2){
-		if($row['flag'] == 2){
-		    $TEMPLATE->add_message($lang['flag_previously_flagged']);
-		}
-		elseif($row['flag'] == 1){
-		    $TEMPLATE->add_message($lang['flag_currently_flagged']);
-		}
-	    }
-	    break;
+	default: break;
 	}
 
     } else {
-	$tracking_verdict = user_quote_status('flag', $quote_num);
-	if($tracking_verdict == 1 || 2){
-		if($row['flag'] == 2){
-		    $TEMPLATE->add_message($lang['flag_previously_flagged']);
-		}
-		elseif($row['flag'] == 1){
-		    $TEMPLATE->add_message($lang['flag_currently_flagged']);
-		}
+	if($row['flag'] == 2){
+	    $TEMPLATE->add_message($lang['flag_previously_flagged']);
+	}
+	elseif($row['flag'] == 1){
+	    $TEMPLATE->add_message($lang['flag_currently_flagged']);
 	}
     }
     print $TEMPLATE->flag_page($quote_num, mangle_quote_text($row['quote']), $row['flag']);
@@ -170,7 +145,7 @@ function flag($quote_num, $method)
 function vote($quote_num, $method)
 {
     global $db, $TEMPLATE;
-	$tracking_verdict = user_quote_status('vote', $quote_num);
+	$tracking_verdict = user_quote_status($quote_num);
 	if($tracking_verdict == 3){
 		$TEMPLATE->printfooter();
 		exit();
@@ -184,113 +159,88 @@ function vote($quote_num, $method)
 }
 
 
-function ip_track($where, $quote_num)
+function ip_track($quote_num)
 {
     global $db;
-	switch($where){
-		case 'flag':
-			$where2 = 'vote';
-			break;
-		case 'vote':
-			$where2 = 'flag';
-			break;
-		default:
-		        die('illegal tracking where.');
-	}
 
+    $res =& $db->query("SELECT ip FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+    if (DB::isError($res)) {
+	die('ip_track(1):'.$res->getMessage());
+    }
 
-	$res =& $db->query("SELECT ip FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+    if($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // if ip is in database
+	$res->free();
+	$res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 	if (DB::isError($res)) {
-		die('ip_track(1):'.$res->getMessage());
+	    die('ip_track(2):'.$res->getMessage());
 	}
-
-	if($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // if ip is in database
-		$res->free();
-		$res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+	$quote_array = $res->fetchRow(DB_FETCHMODE_ORDERED);
+	$quote_array = explode(",", $quote_array[0]);
+	$quote_place = array_search($quote_num, $quote_array);
+	if(in_array($quote_num, $quote_array)){
+	    $res2 =& $db->query("SELECT vote FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+	    if (DB::isError($res)) {
+		die('ip_track(3):'.$res->getMessage());
+	    }
+	    $where_result = $res2->fetchRow(DB_FETCHMODE_ORDERED);
+	    $where_result = explode(",", $where_result[0]);
+	    if(!$where_result[$quote_place]){
+		$where_result[$quote_place] = 1;
+		$where_result = implode(",", $where_result);
+		$db->query("UPDATE ".db_tablename('tracking')." SET vote = ".$db->quote($where_result)." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
 		if (DB::isError($res)) {
-			die('ip_track(2):'.$res->getMessage());
+		    die('ip_track(4):'.$res->getMessage());
 		}
-		$quote_array = $res->fetchRow(DB_FETCHMODE_ORDERED);
-		$quote_array = explode(",", $quote_array[0]);
-		$quote_place = array_search($quote_num, $quote_array);
-		if(in_array($quote_num, $quote_array)){
-		    $res2 =& $db->query("SELECT $where FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-			if (DB::isError($res)) {
-				die('ip_track(3):'.$res->getMessage());
-			}
-			$where_result = $res2->fetchRow(DB_FETCHMODE_ORDERED);
-			$where_result = explode(",", $where_result[0]);
-			if(!$where_result[$quote_place]){
-				$where_result[$quote_place] = 1;
-				$where_result = implode(",", $where_result);
-				$db->query("UPDATE ".db_tablename('tracking')." SET $where = ".$db->quote($where_result)." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-				if (DB::isError($res)) {
-					die('ip_track(4):'.$res->getMessage());
-				}
-
-				return 1;
-			}
-			else{
-				return 3;
-			}
-		}
-		else{	// if the quote doesn't exist in the array based on ip, the quote and relevent vote and flag
-				// entries are concatenated to the end of the current entries
-
-			// mysql_query("UPDATE $trackingtable SET $where=CONCAT($where,',1'),
-			// $where2=CONCAT($where2,',0'), $where3=CONCAT($where3,',0'),
-			// quote=CONCAT(quote,'," . $quote_num . "') WHERE ip ='" . getenv("REMOTE_ADDR") . "';");
-			// Oh how I miss thee mysql :(
-
-			// Update the quote_id
-		    $res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-			if (DB::isError($res)) {
-				die('ip_track(5):'.$res->getMessage());
-			}
-			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
-			$row[] = $quote_num;
-			$db->query("UPDATE ".db_tablename('tracking')." SET quote_id = ".$db->quote(implode(",", $row))." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-			if (DB::isError($res)) {
-				die('ip_track(6):'.$res->getMessage());
-			}
-			$res->free();
-
-			// Update $where
-			$res =& $db->query("SELECT $where FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-			if (DB::isError($res)) {
-				die('ip_track(7):'.$res->getMessage());
-			}
-			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
-			$row[] = '1';
-			$db->query("UPDATE ".db_tablename('tracking')." SET $where = ".$db->quote(implode(",", $row)));
-			if (DB::isError($res)) {
-				die('ip_track(8):'.$res->getMessage());
-			}
-			$res->free();
-
-			// Update $where2
-			$res =& $db->query("SELECT $where2 FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-			if (DB::isError($res)) {
-				die('ip_track(9):'.$res->getMessage());
-			}
-			$row = $res->fetchRow(DB_FETCHMODE_ORDERED);
-			$row[] = '0';
-			$db->query("UPDATE ".db_tablename('tracking')." SET $where2 = ".$db->quote(implode(",", $row)));
-			if (DB::isError($res)) {
-				die('ip_track(10):'.$res->getMessage());
-			}
-			$res->free();
-
-			return 1;
-		}
+		return 1;
+	    }
+	    else{
+		return 3;
+	    }
 	}
-	else{ // if ip isn't in database, add it and appropriate quote action
-	    $res = $db->query("INSERT INTO ".db_tablename('tracking')." (ip, quote_id, $where, $where2) VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", 1, 0);");
-		if (DB::isError($res)) {
-			die('ip_track(11):'.$res->getMessage());
-		}
-		return 2;
+	else{	// if the quote doesn't exist in the array based on ip, the quote and relevent vote and flag
+	    // entries are concatenated to the end of the current entries
+
+	    // mysql_query("UPDATE $trackingtable SET $where=CONCAT($where,',1'),
+	    // $where2=CONCAT($where2,',0'), $where3=CONCAT($where3,',0'),
+	    // quote=CONCAT(quote,'," . $quote_num . "') WHERE ip ='" . getenv("REMOTE_ADDR") . "';");
+	    // Oh how I miss thee mysql :(
+
+	    // Update the quote_id
+	    $res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+	    if (DB::isError($res)) {
+		die('ip_track(5):'.$res->getMessage());
+	    }
+	    $row = $res->fetchRow(DB_FETCHMODE_ORDERED);
+	    $row[] = $quote_num;
+	    $db->query("UPDATE ".db_tablename('tracking')." SET quote_id = ".$db->quote(implode(",", $row))." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+	    if (DB::isError($res)) {
+		die('ip_track(6):'.$res->getMessage());
+	    }
+	    $res->free();
+
+	    // Update $where
+	    $res =& $db->query("SELECT vote FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
+	    if (DB::isError($res)) {
+		die('ip_track(7):'.$res->getMessage());
+	    }
+	    $row = $res->fetchRow(DB_FETCHMODE_ORDERED);
+	    $row[] = '1';
+	    $db->query("UPDATE ".db_tablename('tracking')." SET vote = ".$db->quote(implode(",", $row)));
+	    if (DB::isError($res)) {
+		die('ip_track(8):'.$res->getMessage());
+	    }
+	    $res->free();
+
+	    return 1;
 	}
+    }
+    else{ // if ip isn't in database, add it and appropriate quote action
+	$res = $db->query("INSERT INTO ".db_tablename('tracking')." (ip, quote_id, vote, flag) VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", 1, 0);");
+	if (DB::isError($res)) {
+	    die('ip_track(11):'.$res->getMessage());
+	}
+	return 2;
+    }
 }
 
 
