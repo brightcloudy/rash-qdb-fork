@@ -623,8 +623,6 @@ function search($method, $searchparam=null)
 
 	$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and (quote LIKE ".$db->quote($searchx).$exactmatch.") ORDER BY ".$sortby." $how LIMIT ".$db->quote((int)$limit);
 
-	print $query;
-
 	quote_generation($query, $lang['search_results_title'], -1);
     }
 
