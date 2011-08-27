@@ -17,6 +17,7 @@ $CONFIG['site_long_title'] = '#NetHack Quote Database';
 $CONFIG['rss_url'] = 'http://127.0.0.1';
 $CONFIG['rss_title'] = 'Rash QDB';
 $CONFIG['rss_desc'] = 'Quote Database for the IRC channel';
+$CONFIG['rss_entries'] = 15;
 $CONFIG['language'] = 'US-english';
 $CONFIG['admin_email'] = 'qdb@this.domain';
 
