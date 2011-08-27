@@ -162,7 +162,7 @@ html>body div#site_admin_nav{ /* hack for firefox, disabled in opera and ie */
 .admin_queue .quote_unflag label,
 .admin_queue .quote_no label,
 .admin_queue .quote_yes label {
-  padding: 1em;
+  display:block;
 }
 .admin_queue .quote_delete label:hover,
 .admin_queue .quote_no label:hover {
