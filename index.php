@@ -793,8 +793,19 @@ switch($page[0])
 		quote_generation($query, $lang['random_title'], -1);
 		break;
 	case 'random2':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 1 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
+	case 'randomplus':
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating>0 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
 		quote_generation($query, $lang['random2_title'], -1);
+		break;
+	case 'random3':
+	case 'random0':
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating=0 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
+		quote_generation($query, $lang['random3_title'], -1);
+		break;
+	case 'random4':
+	case 'randomminus':
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating<0 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
+		quote_generation($query, $lang['random4_title'], -1);
 		break;
 	case 'rss':
 	    rash_rss();
