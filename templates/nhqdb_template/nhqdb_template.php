@@ -326,6 +326,7 @@ function login_page()
     <table>
     <tr><td>'.$lang['login_username'].'</td><td><input type="text" name="rash_username" size="8" id="admin_login_username-box" /></td></tr>
     <tr><td>'.$lang['login_password'].'</td><td><input type="password" name="rash_password" size="8" id="admin_login_password-box" /></td></tr>
+    <tr><td>'.$lang['login_remember'].'</td><td><input type="checkbox" name="remember_login"></td></tr>
     <tr><td></td><td><input type="submit" value="'.$lang['login_submit_btn'].'" id="admin_login_submit-button" /></td></tr>
     </table>
     </form></div>';

@@ -36,6 +36,18 @@ function write_settings($fname, $data)
     return TRUE;
 }
 
+function mk_cookie($name, $data = null)
+{
+    if ($data) {
+        setcookie($name, $data, time()+3600*24*365, '/');
+        $_COOKIE[$name] = $data;
+    } else {
+        setcookie($name, '', time()-3600, '/');
+        unset($_COOKIE[$name]);
+    }
+}
+
+
 
 
 /**

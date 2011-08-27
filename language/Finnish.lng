@@ -124,6 +124,7 @@ $lang = array (
 'login_title' => 'Kirjaudu sisään',
 'login_username' => 'Nimi:',
 'login_password' => 'Salasana:',
+'login_remember' => 'Muista kirjautuminen',
 'login_submit_btn' => 'Kirjaudu',
 'quote_queue_title' => 'Lainaukset odottamassa hyväksyntää',
 'quote_queue_admin_title' => 'Hyväksyttävät lainaukset',

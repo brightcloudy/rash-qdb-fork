@@ -19,6 +19,32 @@ if (!isset($CONFIG['quote_list_limit']) || !is_int($CONFIG['quote_list_limit']))
 if (!isset($CONFIG['rss_entries']) || ($CONFIG['rss_entries'] < 1)) $CONFIG['rss_entries'] = 15;
 
 require('util_funcs.php');
+
+function autologin()
+{
+    if (isset($_COOKIE['user']) && isset($_COOKIE['passwd']) && isset($_COOKIE['userid'])) {
+	global $db;
+	$pass = $_COOKIE['passwd'];
+	$user = $_COOKIE['user'];
+	$userid = $_COOKIE['userid'];
+
+	$res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE id=".$db->quote((int)$userid)." AND user=".$db->quote($user));
+	if (DB::isError($res)) return;
+	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	if (!isset($row['password'])) return;
+	$passchk = md5($row['password'].$row['salt']);
+	if ($pass == $passchk) {
+	    $_SESSION['user'] = $row['user'];
+	    $_SESSION['level'] = $row['level'];
+	    $_SESSION['userid'] = $row['id'];
+	    $_SESSION['logged_in'] = 1;
+	    mk_cookie('user', $row['user']);
+	    mk_cookie('userid', $row['id']);
+	    mk_cookie('passwd', $passchk);
+	}
+    }
+}
+
 require("language/{$CONFIG['language']}.lng");
 
 require('basecaptcha.php');
@@ -28,6 +54,27 @@ $CAPTCHA->init_settings($CONFIG['use_captcha']);
 
 require('basetemplate.php');
 require($CONFIG['template']);
+
+date_default_timezone_set($CONFIG['timezone']);
+
+$dsn = array(
+	     'phptype'  => $CONFIG['phptype'],
+	     'username' => $CONFIG['username'],
+	     'password' => $CONFIG['password'],
+	     'hostspec' => $CONFIG['hostspec'],
+	     'port'     => $CONFIG['port'],
+	     'socket'   => $CONFIG['socket'],
+	     'database' => $CONFIG['database'],
+	     );
+$db =& DB::connect($dsn);
+if (DB::isError($db)) {
+    if (!($page[0] == 'rss')) $TEMPLATE->printheader();
+    print $db->getMessage();
+    if (!($page[0] == 'rss')) $TEMPLATE->printfooter();
+    exit;
+}
+
+autologin();
 
 $mainmenu = array(array('url' => './', 'id' => 'site_nav_home', 'txt' => 'menu_home'),
 		  array('url' => '?latest', 'id' => 'site_nav_latest', 'txt' => 'menu_latest'),
@@ -481,6 +528,13 @@ function login($method)
 			$_SESSION['level'] = $row['level'];		// site-wide accessible level
 			$_SESSION['userid'] = $row['id'];
 			$_SESSION['logged_in'] = 1;				// site-wide accessible login variable
+
+			if (isset($_POST['remember_login'])) {
+			    mk_cookie('user', $row['user']);
+			    mk_cookie('userid', $row['id']);
+			    mk_cookie('passwd', md5($row['password'].$row['salt']));
+			}
+
 			// Go to the main page after being logged in
 			header("Location: http://". $_SERVER['HTTP_HOST']
 			       . dirname($_SERVER['PHP_SELF']));
@@ -699,26 +753,9 @@ $page[1] = 0;
 $page[2] = 0;
 $page = explode($CONFIG['GET_SEPARATOR'], $_SERVER['QUERY_STRING']);
 
-date_default_timezone_set($CONFIG['timezone']);
 
 if(!($page[0] == 'rss'))
     $TEMPLATE->printheader(title($page[0]), $CONFIG['site_short_title'], $CONFIG['site_long_title']); // templates/x_template/x_template.php
-
-$dsn = array(
-	     'phptype'  => $CONFIG['phptype'],
-	     'username' => $CONFIG['username'],
-	     'password' => $CONFIG['password'],
-	     'hostspec' => $CONFIG['hostspec'],
-	     'port'     => $CONFIG['port'],
-	     'socket'   => $CONFIG['socket'],
-	     'database' => $CONFIG['database'],
-	     );
-$db =& DB::connect($dsn);
-if (DB::isError($db)) {
-    print $db->getMessage();
-    if (!($page[0] == 'rss')) $TEMPLATE->printfooter();
-    exit;
-}
 
 $page[1] = (isset($page[1]) ? $page[1] : null);
 $page[2] = (isset($page[2]) ? $page[2] : null);
@@ -777,6 +814,9 @@ switch($page[0])
 		session_unset($_SESSION['logged_in']);
 		session_unset($_SESSION['level']);
 		session_unset($_SESSION['userid']);
+		mk_cookie('user');
+		mk_cookie('userid');
+		mk_cookie('passwd');
 		header("Location: http://" . $_SERVER['HTTP_HOST']
 			             . dirname($_SERVER['PHP_SELF'])
 				         . "/" . $relative_url);

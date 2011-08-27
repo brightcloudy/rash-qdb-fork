@@ -124,6 +124,7 @@ $lang = array (
 'login_title' => 'Login',
 'login_username' => 'Username:',
 'login_password' => 'Password:',
+'login_remember' => 'Remember me',
 'login_submit_btn' => 'Log In',
 'quote_queue_title' => 'Pending Quotes',
 'quote_queue_admin_title' => 'Queue',
