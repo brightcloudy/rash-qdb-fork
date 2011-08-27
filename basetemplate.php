@@ -100,6 +100,17 @@ abstract class BaseTemplate {
         <div id="home_greeting">'.$lang['home_greeting'].'</div></div>';
     }
 
+    function add_quote_preview($quotetxt)
+    {
+	global $lang;
+	$str = '<div id="add_outputmsg">';
+	$str .= '<div id="addw_outputmsg_top">'.$lang['preview_outputmsg_top'].'</div>';
+	$str .= '<div id="add_outputmsg_quote">'.$quotetxt.'</div>';
+	$str .= '<div id="add_outputmsg_bottom">'.$lang['preview_outputmsg_bottom'].'</div>';
+	$str .= '</div>';
+	return $str;
+    }
+
     function add_quote_outputmsg($quotetxt)
     {
 	global $lang;
@@ -111,7 +122,7 @@ abstract class BaseTemplate {
 	return $str;
     }
 
-    function add_quote_page($added_quote_html='')
+    function add_quote_page($quotetxt='', $added_quote_html='')
     {
 	global $CAPTCHA, $lang;
 	$str = '<div id="add_all">';
@@ -121,9 +132,11 @@ abstract class BaseTemplate {
 	$str .= $added_quote_html;
 
 	$str .= '<form action="?'.urlargs('add','submit').'" method="post">
-        <textarea cols="80" rows="5" name="rash_quote" id="add_quote"></textarea><br />';
+        <textarea cols="80" rows="5" name="rash_quote" id="add_quote">'.$quotetxt.'</textarea><br />';
 	$str .= $CAPTCHA->get_CAPTCHA('add_quote');
-        $str .= '<input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
+        $str .= '
+        <input type="submit" value="'.$lang['preview_quote_btn'].'" id="add_preview" name="preview" />
+        <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" name="submit" />
         <input type="reset" value="'.$lang['add_reset_btn'].'" id="add_reset" />
         </form>';
 

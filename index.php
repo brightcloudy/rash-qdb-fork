@@ -669,10 +669,15 @@ function add_quote($method)
     $innerhtml = '';
 
     if ($method == 'submit') {
-	$innerhtml = handle_captcha('add_quote', 'add_quote_do_inner');
+	if (isset($_POST['preview'])) {
+	    $quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
+	    $innerhtml = $TEMPLATE->add_quote_preview(mangle_quote_text($quotxt));
+	} else {
+	    $innerhtml = handle_captcha('add_quote', 'add_quote_do_inner');
+	}
     }
 
-    print $TEMPLATE->add_quote_page($innerhtml);
+    print $TEMPLATE->add_quote_page($quotxt, $innerhtml);
 }
 
 
