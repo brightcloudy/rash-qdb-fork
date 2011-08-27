@@ -240,6 +240,8 @@ $captchas = array(array('name'=>'nocaptcha', 'desc'=>'No CAPTCHA'),
 $captcha_uses = array('flag'=>'Flagging a quote',
 		      'add_quote' => 'Adding a quote');
 
+$templates = array('./templates/bash_template/bash_template.php' => 'bash.org lookalike',
+		   './templates/nhqdb_template/nhqdb_template.php' => 'nhqdb');
 $def_template = './templates/bash_template/bash_template.php';
 
 require 'basetemplate.php';
@@ -349,8 +351,8 @@ else {
 <form action="?<?=md5('create_file')?>" method="post">
 <table>
  <tr>
-  <td>Template File Path</td>
-  <td><input type="text" name="template" value="<?php echo $def_template; ?>" style="width: 215pt"></td>
+  <td>Template</td>
+  <td><select name="template"><? foreach ($templates as $k=>$v) { echo '<option value="'.$k.'">'.$v; } ?></select>
  </tr>
  <tr>
   <td>DB Type
