@@ -346,6 +346,12 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 }
 else {
     if(!file_exists('settings.php')){
+
+	if (!write_settings('settings.php', null)) {
+	    die('Cannot write settings.');
+	}
+	@unlink('settings.php');
+
 ?>
 <h2>Install</h2>
 <form action="?<?=md5('create_file')?>" method="post">
