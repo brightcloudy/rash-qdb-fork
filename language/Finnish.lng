@@ -65,6 +65,7 @@ $lang = array (
 'search_results_title' => "Etsinnän tulokset",
 'add_title' => "Lisää lainaus",
 'preview_quote_btn' => 'Esikatselu',
+'add_quote_short' => 'Lainaus on liian lyhyt',
 'add_quote_btn' => "Lisää",
 'add_reset_btn' => "Nollaa",
 'remove_timestamps_btn' => "Poista aikamerkinnät",

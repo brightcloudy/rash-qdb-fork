@@ -667,13 +667,18 @@ function add_quote($method)
     global $CONFIG, $TEMPLATE, $CAPTCHA, $db, $lang;
 
     $innerhtml = '';
+    $quotxt = '';
 
     if ($method == 'submit') {
-	if (isset($_POST['preview'])) {
-	    $quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
-	    $innerhtml = $TEMPLATE->add_quote_preview(mangle_quote_text($quotxt));
+	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
+	if (strlen($quotxt) < 3) {
+	    $TEMPLATE->add_message($lang['add_quote_short']);
 	} else {
-	    $innerhtml = handle_captcha('add_quote', 'add_quote_do_inner');
+	    if (isset($_POST['preview'])) {
+		$innerhtml = $TEMPLATE->add_quote_preview(mangle_quote_text($quotxt));
+	    } else {
+		$innerhtml = handle_captcha('add_quote', 'add_quote_do_inner');
+	    }
 	}
     }
 

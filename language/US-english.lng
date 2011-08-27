@@ -65,6 +65,7 @@ $lang = array (
 'search_results_title' => "Query Results",
 'add_title' => "Contribute",
 'preview_quote_btn' => 'Preview',
+'add_quote_short' => 'The quote is too short',
 'add_quote_btn' => "Add Quote",
 'add_reset_btn' => "Reset",
 'remove_timestamps_btn' => "Remove timestamps",
