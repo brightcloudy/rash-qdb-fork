@@ -752,6 +752,7 @@ switch($page[0])
 		session_unset($_SESSION['user']);
 		session_unset($_SESSION['logged_in']);
 		session_unset($_SESSION['level']);
+		session_unset($_SESSION['userid']);
 		header("Location: http://" . $_SERVER['HTTP_HOST']
 			             . dirname($_SERVER['PHP_SELF'])
 				         . "/" . $relative_url);
