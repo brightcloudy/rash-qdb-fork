@@ -122,7 +122,7 @@ abstract class BaseTemplate {
 	return $str;
     }
 
-    function add_quote_page($quotetxt='', $added_quote_html='')
+    function add_quote_page($quotetxt='', $added_quote_html='', $wasadded=null)
     {
 	global $CAPTCHA, $lang;
 	$str = '<div id="add_all">';
@@ -132,7 +132,7 @@ abstract class BaseTemplate {
 	$str .= $added_quote_html;
 
 	$str .= '<form action="?'.urlargs('add','submit').'" method="post">
-        <textarea cols="80" rows="5" name="rash_quote" id="add_quote">'.$quotetxt.'</textarea><br />';
+        <textarea cols="80" rows="5" name="rash_quote" id="add_quote">'.($wasadded ? '' : $quotetxt).'</textarea><br />';
 	$str .= $CAPTCHA->get_CAPTCHA('add_quote');
         $str .= '
         <input type="submit" value="'.$lang['preview_quote_btn'].'" id="add_preview" name="preview" />

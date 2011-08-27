@@ -740,11 +740,12 @@ function add_quote($method)
 		$innerhtml = $TEMPLATE->add_quote_preview(mangle_quote_text($quotxt));
 	    } else {
 		$innerhtml = handle_captcha('add_quote', 'add_quote_do_inner');
+		$added = 1;
 	    }
 	}
     }
 
-    print $TEMPLATE->add_quote_page($quotxt, $innerhtml);
+    print $TEMPLATE->add_quote_page($quotxt, $innerhtml, $added);
 }
 
 
