@@ -66,19 +66,20 @@ function update_old_users()
 
     if (count($users) > 0) {
 	print 'Updating old RASH-style users table...';
-	$res =& $db->query("DROP TABLE ".db_tablename('users'));
     } else {
 	print 'Creating users table...';
     }
 
-    $ret =& $db->query("CREATE TABLE ".db_tablename('users'). " (id int(11) NOT NULL auto_increment primary key,
+    $res =& $db->query("DROP TABLE ".db_tablename('users'));
+
+    $res =& $db->query("CREATE TABLE ".db_tablename('users'). " (id int(11) NOT NULL auto_increment primary key,
 							user varchar(20) NOT NULL,
 							`password` varchar(255) NOT NULL,
 							level int(1) NOT NULL,
 							salt text)");
 
     foreach ($users as $row) {
-	$ret =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES (".
+	$res =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES (".
 			   $db->quote($row['user']).",".
 			   $db->quote($row['password']).",".
 			   $db->quote($row['level']).",".
@@ -86,13 +87,89 @@ function update_old_users()
     }
 
     if (DB::isError($res)) {
-	print $db->getMessage().'<br />';
+	print $res->getMessage().'<br />';
 	return 1;
     }
     print 'OK<br />';
     return 0;
 }
 
+function update_old_tracking()
+{
+    include 'settings.php';
+    require_once 'DB.php';
+    $dsn = array(
+		 'phptype'  => $CONFIG['phptype'],
+		 'username' => $CONFIG['username'],
+		 'password' => $CONFIG['password'],
+		 'hostspec' => $CONFIG['hostspec'],
+		 'port'     => $CONFIG['port'],
+		 'socket'   => $CONFIG['socket'],
+		 'database' => $CONFIG['database'],
+		 );
+    $db =& DB::connect($dsn);
+    if (DB::isError($db)) {
+	print $db->getMessage().'<br />';
+	return 1;
+    }
+
+    $tracking = array();
+
+    $res =& $db->query("SELECT * from ".db_tablename('tracking'));
+    if (!(DB::isError($res))) {
+	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	    if (isset($row['user_ip'])) { /* already up-to-date */
+		print 'Tracking -table is up-to-date<br />';
+		return 0;
+	    }
+	    $tracking[] = $row;
+	}
+    }
+
+    if (count($tracking) > 0) {
+	print 'Updating old RASH-style '.db_tablename('tracking').' table...';
+    } else {
+	print 'Creating '.db_tablename('tracking').' table...';
+    }
+
+    $res =& $db->query("DROP TABLE ".db_tablename('tracking'));
+
+    $res =& $db->query("CREATE TABLE ".db_tablename('tracking'). " (id int NOT NULL auto_increment primary key,
+                              user_ip varchar(15) NOT NULL,
+                              user_id int,
+                              quote_id int NOT NULL,
+                              vote int NOT NULL)");
+
+    foreach ($tracking as $row) {
+
+	$qids = explode(",", $row['quote_id']);
+	$votes = explode(",", $row['vote']);
+
+	for ($idx = 0; $idx < count($qids); $idx++) {
+	    if ($votes[$idx] == '1') {
+		$query ="INSERT INTO ".db_tablename('tracking')." (user_ip, user_id, quote_id, vote) VALUES (".
+		    $db->quote($row['ip']).",".
+				   "null,".
+				   $qids[$idx].",".
+				   "2)"; /* 2 = assumed + vote, old table doesn't keep track! */
+		$res =& $db->query($query);
+		if (DB::isError($res)) {
+		    print $res->getMessage().'<br />'.$query.'<br>';
+		    return 1;
+		}
+
+	    }
+	}
+    }
+
+    if (DB::isError($res)) {
+	print $res->getMessage().'<br />';
+	return 1;
+    }
+    print 'OK<br />';
+    return 0;
+
+}
 
 $languages = array('US-english','Finnish');
 
@@ -118,6 +195,10 @@ $TEMPLATE->printheader('Install Rash Quote Management System');
 If($_SERVER['QUERY_STRING'] == md5('create_file')){
     if (file_exists('settings.php')){
 	die("settings.php already exists.");
+    }
+    if (!isset($_POST['template'])) {
+	header('Location: install.php');
+	exit;
     }
     $data = array('template' => "'".$_POST['template']."'",
 		  'phptype' => "'".$_POST['phptype']."'",
@@ -178,12 +259,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
                                                         queue int(1) NOT NULL,
 							date int(10) NOT NULL");
 
-    $error |= mk_db_table(db_tablename('tracking'), "id int(11) NOT NULL auto_increment primary key,
-							ip varchar(15) NOT NULL,
-							quote_id text NOT NULL,
-							vote text NOT NULL,
-							flag text NOT NULL");
-
+    $error |= update_old_tracking();
     $error |= update_old_users();
 
     $error |= mk_db_table(db_tablename('news'), "id int(11) NOT NULL auto_increment primary key,

@@ -78,25 +78,6 @@ function rash_rss()
     print $TEMPLATE->rss_feed($CONFIG['rss_title'], $CONFIG['rss_desc'], $CONFIG['rss_url'], $items);
 }
 
-function user_quote_status($quote_num)
-{
-    global $TEMPLATE, $lang;
-    $tracking_verdict = ip_track($quote_num);
-    switch($tracking_verdict){
-    case 1:
-	$TEMPLATE->add_message($lang['tracking_check_1']);
-	break;
-    case 2:
-	$TEMPLATE->add_message($lang['tracking_check_2']);
-	break;
-    case 3:
-	$TEMPLATE->add_message($lang['tracking_check_3']);
-	break;
-    }
-    return $tracking_verdict;
-}
-
-
 
 function flag($quote_num, $method)
 {
@@ -144,104 +125,28 @@ function flag($quote_num, $method)
 //
 function vote($quote_num, $method)
 {
-    global $db, $TEMPLATE;
-	$tracking_verdict = user_quote_status($quote_num);
-	if($tracking_verdict == 3){
-		$TEMPLATE->printfooter();
-		exit();
-	}
-	if($tracking_verdict == 1 || 2){
-		if($method == "plus")
-		    $db->query("UPDATE ".db_tablename('quotes')." SET rating = rating+1 WHERE id = ".$db->quote((int)$quote_num));
-		elseif($method == "minus")
-		    $db->query("UPDATE ".db_tablename('quotes')." SET rating = rating-1 WHERE id = ".$db->quote((int)$quote_num));
-	}
-}
+    global $db, $TEMPLATE, $lang;
 
-
-function ip_track($quote_num)
-{
-    global $db;
-
-    $res =& $db->query("SELECT ip FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-    if (DB::isError($res)) {
-	die('ip_track(1):'.$res->getMessage());
+    $qid = $db->getOne("SELECT quote_id FROM ".db_tablename('tracking')." WHERE user_ip=".$db->quote(getenv("REMOTE_ADDR")).' AND quote_id='.$db->quote((int)$quote_num));
+    if (isset($qid) && $qid == $quote_num) {
+	$TEMPLATE->add_message($lang['tracking_check_2']);
+	return;
     }
 
-    if($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){ // if ip is in database
-	$res->free();
-	$res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-	if (DB::isError($res)) {
-	    die('ip_track(2):'.$res->getMessage());
-	}
-	$quote_array = $res->fetchRow(DB_FETCHMODE_ORDERED);
-	$quote_array = explode(",", $quote_array[0]);
-	$quote_place = array_search($quote_num, $quote_array);
-	if(in_array($quote_num, $quote_array)){
-	    $res2 =& $db->query("SELECT vote FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-	    if (DB::isError($res)) {
-		die('ip_track(3):'.$res->getMessage());
-	    }
-	    $where_result = $res2->fetchRow(DB_FETCHMODE_ORDERED);
-	    $where_result = explode(",", $where_result[0]);
-	    if(!$where_result[$quote_place]){
-		$where_result[$quote_place] = 1;
-		$where_result = implode(",", $where_result);
-		$db->query("UPDATE ".db_tablename('tracking')." SET vote = ".$db->quote($where_result)." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-		if (DB::isError($res)) {
-		    die('ip_track(4):'.$res->getMessage());
-		}
-		return 1;
-	    }
-	    else{
-		return 3;
-	    }
-	}
-	else{	// if the quote doesn't exist in the array based on ip, the quote and relevent vote and flag
-	    // entries are concatenated to the end of the current entries
-
-	    // mysql_query("UPDATE $trackingtable SET $where=CONCAT($where,',1'),
-	    // $where2=CONCAT($where2,',0'), $where3=CONCAT($where3,',0'),
-	    // quote=CONCAT(quote,'," . $quote_num . "') WHERE ip ='" . getenv("REMOTE_ADDR") . "';");
-	    // Oh how I miss thee mysql :(
-
-	    // Update the quote_id
-	    $res =& $db->query("SELECT quote_id FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-	    if (DB::isError($res)) {
-		die('ip_track(5):'.$res->getMessage());
-	    }
-	    $row = $res->fetchRow(DB_FETCHMODE_ORDERED);
-	    $row[] = $quote_num;
-	    $db->query("UPDATE ".db_tablename('tracking')." SET quote_id = ".$db->quote(implode(",", $row))." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-	    if (DB::isError($res)) {
-		die('ip_track(6):'.$res->getMessage());
-	    }
-	    $res->free();
-
-	    // Update $where
-	    $res =& $db->query("SELECT vote FROM ".db_tablename('tracking')." WHERE ip=".$db->quote(getenv("REMOTE_ADDR")));
-	    if (DB::isError($res)) {
-		die('ip_track(7):'.$res->getMessage());
-	    }
-	    $row = $res->fetchRow(DB_FETCHMODE_ORDERED);
-	    $row[] = '1';
-	    $db->query("UPDATE ".db_tablename('tracking')." SET vote = ".$db->quote(implode(",", $row)));
-	    if (DB::isError($res)) {
-		die('ip_track(8):'.$res->getMessage());
-	    }
-	    $res->free();
-
-	    return 1;
-	}
+    $vote = 0;
+    if ($method == "plus") {
+	$vote = 1;
+	$db->query("UPDATE ".db_tablename('quotes')." SET rating = rating+1 WHERE id = ".$db->quote((int)$quote_num));
+    } elseif ($method == "minus") {
+	$vote = -1;
+	$db->query("UPDATE ".db_tablename('quotes')." SET rating = rating-1 WHERE id = ".$db->quote((int)$quote_num));
     }
-    else{ // if ip isn't in database, add it and appropriate quote action
-	$res = $db->query("INSERT INTO ".db_tablename('tracking')." (ip, quote_id, vote, flag) VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", 1, 0);");
-	if (DB::isError($res)) {
-	    die('ip_track(11):'.$res->getMessage());
-	}
-	return 2;
+    if ($vote != 0) {
+	$res = $db->query("INSERT INTO ".db_tablename('tracking')." (user_ip, quote_id, vote) VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", ".$vote.")");
+	$TEMPLATE->add_message($lang['tracking_check_1']);
     }
 }
+
 
 
 // home_generation()
@@ -355,18 +260,13 @@ function user_can_vote_quote($quoteid)
 {
     global $db;
 
-    $res =& $db->query('select quote_id,vote from '.db_tablename('tracking').' where ip='.$db->quote(getenv("REMOTE_ADDR")));
+    $res =& $db->query('select vote from '.db_tablename('tracking').' where user_ip='.$db->quote(getenv("REMOTE_ADDR")).' AND quote_id='.$db->quote((int)$quoteid));
     if (DB::isError($res)) {
-	die($res->getMessage());
+	die('user_can_vote_quote():'.$res->getMessage());
     }
     $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
-    $qids = explode(",", $row['quote_id']);
-    $idx = array_search($quoteid, $qids);
-    if ($idx !== FALSE) {
-	$votes = explode(",", $row['vote']);
-	if ($votes[$idx] == '1') return FALSE;
-    }
+    if (isset($row['vote']) && $row['vote']) return FALSE;
     return TRUE;
 }
 
