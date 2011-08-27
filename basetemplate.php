@@ -379,7 +379,7 @@ abstract class BaseTemplate {
 	return $str;
     }
 
-    function login_page()
+    function admin_login_page()
     {
 	global $lang;
 

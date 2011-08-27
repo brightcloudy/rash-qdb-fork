@@ -500,9 +500,7 @@ function edit_users($method, $who)
     print $TEMPLATE->edit_user_page_table($innerhtml);
 }
 
-// login($method)
-//
-function login($method)
+function adminlogin($method)
 {
     global $CONFIG, $TEMPLATE, $db, $lang;
 	if ($method == 'login') {
@@ -540,12 +538,8 @@ function login($method)
 			       . dirname($_SERVER['PHP_SELF']));
 		}
 	}
-	print $TEMPLATE->login_page();
+	print $TEMPLATE->admin_login_page();
 }
-// End of login()
-
-
-
 
 
 function quote_queue($method)
@@ -785,7 +779,7 @@ switch($page[0])
 	    }
 	    break;
 	case 'admin':
-		login($page[1]);
+		adminlogin($page[1]);
 		break;
 	case 'bottom':
 		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT ".$CONFIG['quote_list_limit'];
