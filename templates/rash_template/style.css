@@ -1,5 +1,34 @@
 /* ORGANIZE THE CSS SOMETIME YOU SHIT */
 
+#rash_head_container {
+    padding-bottom:140px;
+}
+#rash_head {
+    position:absolute;
+    top:10px;
+    left:75px;
+    width:250px;
+    height:100px;
+}
+#rash_rash {
+    font-size:100px;
+    font-family:Courier, monospace;
+    margin:0;
+    padding:0;
+    margin-bottom: -33px;
+    margin-top:-30px;
+}
+#rash_qms {
+    font-family:Courier, monospace;
+    background-color:red;
+    color:white;
+    font-size:60px;
+    margin:0;
+    padding:0;
+    margin-bottom:-40px;
+    text-align:right;
+}
+
 div.quote_quote{
 	padding-bottom: 5pt;	
 }
