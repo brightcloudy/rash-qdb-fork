@@ -602,10 +602,6 @@ function search($method, $searchparam=null)
     global $CONFIG, $TEMPLATE, $lang, $db;
     if ($method == 'fetch' || isset($searchparam)) {
 	$method = 'fetch';
-	if($_POST['sortby'] == 'rating')
-	    $how = 'desc';
-	else
-	    $how = 'asc';
 
 	$search = (isset($_POST['search']) ? $_POST['search'] : $searchparam);
 
@@ -617,6 +613,12 @@ function search($method, $searchparam=null)
 
 	$sortby = (isset($_POST['sortby']) ? $_POST['sortby'] : 'rating');
 	$sortby = preg_replace('/[^a-zA-Z0-9]+/', '', $sortby);
+
+	if ($sortby == 'rating')
+	    $how = 'desc';
+	else
+	    $how = 'asc';
+
 	$limit = (isset($_POST['number']) ? $_POST['number'] : 10);
 
 	$searchx = '%'.$search.'%';
