@@ -11,3 +11,53 @@ Notes:
 
 * The database schema is different from the Rash 2.0 beta schema; The installer
   should be able to update your old database to the new format.
+
+
+Current database schema:
+
+mysql> describe rash_news;
++-------+---------+------+-----+---------+----------------+
+| Field | Type    | Null | Key | Default | Extra          |
++-------+---------+------+-----+---------+----------------+
+| id    | int(11) | NO   | PRI | NULL    | auto_increment |
+| news  | text    | NO   |     | NULL    |                |
+| date  | int(10) | NO   |     | NULL    |                |
++-------+---------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> describe rash_users;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| id       | int(11)      | NO   | PRI | NULL    | auto_increment |
+| user     | varchar(20)  | NO   |     | NULL    |                |
+| password | varchar(255) | NO   |     | NULL    |                |
+| level    | int(1)       | NO   |     | NULL    |                |
+| salt     | text         | YES  |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> describe rash_quotes;
++--------+---------+------+-----+---------+----------------+
+| Field  | Type    | Null | Key | Default | Extra          |
++--------+---------+------+-----+---------+----------------+
+| id     | int(11) | NO   | PRI | NULL    | auto_increment |
+| quote  | text    | NO   |     | NULL    |                |
+| rating | int(7)  | NO   |     | NULL    |                |
+| flag   | int(1)  | NO   |     | NULL    |                |
+| date   | int(10) | NO   |     | NULL    |                |
+| queue  | int(1)  | NO   |     | NULL    |                |
++--------+---------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> describe rash_tracking;
++----------+-------------+------+-----+---------+----------------+
+| Field    | Type        | Null | Key | Default | Extra          |
++----------+-------------+------+-----+---------+----------------+
+| id       | int(11)     | NO   | PRI | NULL    | auto_increment |
+| user_ip  | varchar(15) | NO   |     | NULL    |                |
+| user_id  | int(11)     | YES  |     | NULL    |                |
+| quote_id | int(11)     | NO   |     | NULL    |                |
+| vote     | int(11)     | NO   |     | NULL    |                |
++----------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
