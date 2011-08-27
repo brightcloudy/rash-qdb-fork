@@ -279,6 +279,7 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 		  'rss_url' => "'".preg_replace('/\/$/','',$_POST['rss_url'])."'",
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
+		  'rss_entries' => (!isset($_POST['rss_entries']) || ($_POST['rss_entries'] < 1)) ? 15 : $_POST['rss_entries'],
 		  'language' => "'".$_POST['language']."'",
 		  'captcha' => "'".$_POST['captcha']."'",
 		  'use_captcha' => "array(".(isset($_POST['use_captcha']) ? ("'".implode("'=>1, '", $_POST['use_captcha'])."'=>1"): '').")",
@@ -352,6 +353,11 @@ else {
 	}
 	@unlink('settings.php');
 
+	function mk_rss_url()
+	{
+	    return 'http://'.$_SERVER['SERVER_NAME'] . preg_replace('/\/install.php$/', '', $_SERVER['REQUEST_URI']);
+	}
+
 ?>
 <h2>Install</h2>
 <form action="?<?=md5('create_file')?>" method="post">
@@ -359,6 +365,9 @@ else {
  <tr>
   <td>Template</td>
   <td><select name="template"><? foreach ($templates as $k=>$v) { echo '<option value="'.$k.'">'.$v; } ?></select>
+ </tr>
+ <tr>
+	<td>&nbsp;</td><td>&nbsp;</td>
  </tr>
  <tr>
   <td>DB Type
@@ -392,7 +401,7 @@ else {
  </tr>
  <tr>
   <td>Admin Username
-  <td><input type="text" name="adminuser" value="admin"> (Leave empty for not creating one)
+  <td><input type="text" name="adminuser" value="admin"> (Leave empty to not create one)
  </tr>
  <tr>
   <td>Admin Password
@@ -418,14 +427,14 @@ else {
  </tr>
  <tr>
   <td>Site Long Title
-  <td><input type="text" name="site_long_title" value="Quote Management System">
+  <td><input type="text" name="site_long_title" value="Quote Management System" size="40">
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
  </tr>
  <tr>
   <td>RSS URL
-  <td><input type="text" name="rss_url" value="<?php echo 'http://'.$_SERVER['SERVER_NAME'];?>">
+  <td><input type="text" name="rss_url" value="<?php echo mk_rss_url(); ?>" size="40">
  </tr>
  <tr>
   <td>RSS Title
@@ -433,22 +442,26 @@ else {
  </tr>
  <tr>
   <td>RSS Description
-  <td><input type="text" name="rss_desc" value="Quote Database for the IRC channel">
+  <td><input type="text" name="rss_desc" value="Quote Database for the IRC channel" size="40">
+ </tr>
+ <tr>
+  <td>RSS Entries
+  <td><input type="text" name="rss_entries" value="15" size="4"> (number of quotes shown in RSS feed)
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
  </tr>
  <tr>
   <td>Quote limit
-  <td><input type="text" name="quote_limit" value="10"> (number of quotes shown per page when browsing)
+  <td><input type="text" name="quote_limit" value="10" size="4"> (number of quotes shown per page when browsing)
  </tr>
  <tr>
   <td>Page limit
-  <td><input type="text" name="page_limit" value="5"> (how many page numbers shown when browsing)
+  <td><input type="text" name="page_limit" value="5" size="4"> (how many page numbers shown when browsing)
  </tr>
  <tr>
   <td>Quote List limit
-  <td><input type="text" name="quote_list_limit" value="50"> (how many quotes are shown in non-browse pages, eg. ?top)
+  <td><input type="text" name="quote_list_limit" value="50" size="4"> (how many quotes are shown in non-browse pages, eg. ?top)
  </tr>
  <tr>
   <td>Moderated
@@ -478,7 +491,7 @@ else {
  </tr>
  <tr>
   <td>News time format
-  <td><input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>)
+				 <td><input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>, See <a href="http://php.net/manual/en/function.date.php">list of date format characters</a>)
  </tr>
  <tr>
   <td>Quote time format

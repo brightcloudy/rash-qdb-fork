@@ -16,6 +16,7 @@ require_once 'DB.php';
 require('settings.php');
 
 if (!isset($CONFIG['quote_list_limit']) || !is_int($CONFIG['quote_list_limit'])) $CONFIG['quote_list_limit'] = 50;
+if (!isset($CONFIG['rss_entries']) || ($CONFIG['rss_entries'] < 1)) $CONFIG['rss_entries'] = 15;
 
 require('util_funcs.php');
 require("language/{$CONFIG['language']}.lng");
@@ -84,7 +85,7 @@ function handle_captcha($type, $func, &$param=null)
 function rash_rss()
 {
     global $db, $CONFIG, $TEMPLATE;
-    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT 15";
+    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT ".$CONFIG['rss_entries'];
     $res =& $db->query($query);
     $items = '';
     while($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
