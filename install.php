@@ -235,6 +235,7 @@ $languages = array('US-english','Finnish');
 
 $captchas = array(array('name'=>'nocaptcha', 'desc'=>'No CAPTCHA'),
 		  array('name'=>'42captcha', 'desc'=>'The Ultimate Question CAPTCHA'),
+		  array('name'=>'mathcaptcha', 'desc'=>'Math CAPTCHA'),
 		  array('name'=>'nhcaptcha', 'desc'=>'NetHack CAPTCHA'));
 
 $captcha_uses = array('flag'=>'Flagging a quote',
