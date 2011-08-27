@@ -165,7 +165,7 @@ function edit_quote_page($quoteid, $quotetxt, $edited_quote_html='')
     return $str;
 }
 
-function search_quotes_page($fetched)
+function search_quotes_page($fetched, $searchstr)
 {
     global $lang;
 
@@ -179,7 +179,7 @@ function search_quotes_page($fetched)
 
     $str .= '<form method="post" action="?'.urlargs('search','fetch').'">';
     if ($fetched) { $str .= '<input type="submit" name="submit" value="'.$lang['search_btn'].'" id="search_submit-button">&nbsp;'; }
-    $str .= '<input type="text" name="search" size="28" id="search_query-box">&nbsp;';
+    $str .= '<input type="text" name="search" size="28" id="search_query-box" value="'.$searchstr.'">&nbsp;';
     if (!$fetched) { $str .= '<input type="submit" name="submit" value="'.$lang['search_btn'].'" id="search_submit-button">&nbsp;<br />'; }
     $str .= $lang['search_sort'].': <select name="sortby" size="1" id="search_sortby-dropdown">';
     $str .= '<option selected>'.$lang['search_opt_rating'];

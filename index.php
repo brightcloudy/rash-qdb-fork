@@ -597,16 +597,17 @@ function flag_queue($method)
 // quotes with those words in it. Pretty simple.
 //
 
-function search($method)
+function search($method, $searchparam=null)
 {
     global $CONFIG, $TEMPLATE, $lang, $db;
-    if ($method == 'fetch') {
+    if ($method == 'fetch' || isset($searchparam)) {
+	$method = 'fetch';
 	if($_POST['sortby'] == 'rating')
 	    $how = 'desc';
 	else
 	    $how = 'asc';
 
-	$search = $_POST['search'];
+	$search = (isset($_POST['search']) ? $_POST['search'] : $searchparam);
 
 	if (preg_match('/^#[0-9]+$/', trim($search))) {
 	    $exactmatch = ' or id='.substr(trim($search), 1);
@@ -614,14 +615,20 @@ function search($method)
 	    $exactmatch = '';
 	}
 
-	$search = '%'.$search.'%';
+	$sortby = (isset($_POST['sortby']) ? $_POST['sortby'] : 'rating');
+	$sortby = preg_replace('/[^a-zA-Z0-9]+/', '', $sortby);
+	$limit = (isset($_POST['number']) ? $_POST['number'] : 10);
 
-	$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and (quote LIKE ".$db->quote($search).$exactmatch.") ORDER BY ".$db->quote($_POST['sortby'])." $how LIMIT ".$db->quote((int)$_POST['number']);
+	$searchx = '%'.$search.'%';
+
+	$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and (quote LIKE ".$db->quote($searchx).$exactmatch.") ORDER BY ".$sortby." $how LIMIT ".$db->quote((int)$limit);
+
+	print $query;
 
 	quote_generation($query, $lang['search_results_title'], -1);
     }
 
-    print $TEMPLATE->search_quotes_page(($method == 'fetch'));
+    print $TEMPLATE->search_quotes_page(($method == 'fetch'), htmlspecialchars($search));
 }
 
 function edit_quote($method, $quoteid)
@@ -716,6 +723,12 @@ if (DB::isError($db)) {
 $page[1] = (isset($page[1]) ? $page[1] : null);
 $page[2] = (isset($page[2]) ? $page[2] : null);
 
+if (preg_match('/=/', $page[0])) {
+    $tmppage = split("=", $page[0], 2);
+    $page[0] = trim($tmppage[0]);
+    $pageparam = trim($tmppage[1]);
+}
+
 switch($page[0])
 {
 	case 'add':
@@ -787,7 +800,7 @@ switch($page[0])
 	    rash_rss();
 	    break;
 	case 'search':
-	    search($page[1]);
+	    search($page[1], $pageparam);
 	    break;
 	case 'top':
 		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT ".$CONFIG['quote_list_limit'];
