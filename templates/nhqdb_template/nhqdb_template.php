@@ -235,7 +235,7 @@ function add_news_page()
    <h1 id="admin_add-news_title">'.$lang['add_news_title'].'</h1>' . $this->get_messages() . '
    <p>'.$lang['add_news_help'].'
    <form method="post" action="?'.urlargs('add_news','submit').'">
-	<textarea cols="80" rows="5" name="news" id="add_news_news"></textarea><br />
+	<textarea cols="80" rows="5" name="news" id="add_news_news" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)"></textarea><br />
 	<input type="submit" value="'.$lang['add_news_btn'].'" id="add_news" />
    </form>
   </div>
