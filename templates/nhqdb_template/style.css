@@ -5,11 +5,15 @@ div#site_all{
 	margin-left: 9%;
 	margin-right: 9%;
 }
-a, a:visited, a:hover, a:visited:hover{
-	color: #c08000;
+a, a:visited {
+	color: #004662;
+}
+a:hover, a:visited:hover {
+	color: #0080b0;
+	text-shadow: #006080 1px 0px;
 }
 a#site_nav_admin{
-	color: #c08000;
+	color: #0099d7;
 }
 a#site_nav_logout{
 	color: #000000;
@@ -18,6 +22,13 @@ a#site_admin_flag, a#site_admin_queue{
 	color: #336699;
 }
 
+select:focus,
+textarea:focus,
+input:focus {
+    -moz-box-shadow: 0px 0px 5px #ffff80;
+    -webkit-box-shadow: 0px 0px 5px #ffff80;
+    box-shadow: 0px 0px 5px #ffff80;
+}
 
 /* quote-output styles */
 
@@ -33,29 +44,70 @@ div.quote_quote{
 .quote_whole:nth-child(odd) {
 	background-color:#f0f0f0;
 }
-.quote_plus {
-  color: green;
-  display: inline-block;
-  min-width: 1.25em;
-  text-align:center;
-}
-.quote_plus:hover {
+a.quote_plus:hover {
   background-color:lightgreen;
+  color: green;
+  border: 1px inset lightgreen;
 }
- 
-.quote_minus {
-  color: red;
+a.quote_plus {
+  color: green;
+  border: 1px outset lightgreen;
   display: inline-block;
   min-width: 1.25em;
   text-align:center;
+  text-decoration: none;
+  font-weight:bold;
 }
-.quote_minus:hover {
+
+a.quote_minus {
+  color: red;
+  border: 1px outset pink;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+  text-decoration: none;
+  font-weight:bold;
+}
+a.quote_minus:hover {
   background-color:pink;
+  color: red;
+  border: 1px inset pink;
 }
+
+a.quote_flag {
+  color: #808080;
+  border: 1px outset black;
+  text-decoration: none;
+  display: inline-block;
+  float:right;
+  min-width: 1.25em;
+  text-align:center;
+}
+a.quote_flag:hover {
+  color: white;
+  background-color: #808080;
+  border: 1px inset black;
+}
+
+span.quote_flag {
+  display:none;
+}
+
+span.quote_plus,
+span.quote_minus,
+span.quote_plus:hover,
+span.quote_minus:hover {
+  background-color:none;
+  color: #c0c0c0;
+  border: 1px outset #c0c0c0;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+  text-decoration: none;
+  font-weight:bold;
+}
+
 /* searchpage */
-input#search_submit-button{
-	background-color: #c08000;
-}
 input#search_query-box{
 	background-color: #f0f0f0;
 }
@@ -94,7 +146,7 @@ div#site_admin_nav_upper_linkbar{
 	background-color: #f0f0f0;
 }
 div#site_admin_nav_lower_infobar{
-	background-color: #c08000;
+	background-color: #0099d7;
 	text-align: right;
 }
 html>body div#site_admin_nav{ /* hack for firefox, disabled in opera and ie */
@@ -110,7 +162,7 @@ html>body div#site_admin_nav{ /* hack for firefox, disabled in opera and ie */
 .admin_queue .quote_unflag label,
 .admin_queue .quote_no label,
 .admin_queue .quote_yes label {
-  padding: 1em;
+  display:block;
 }
 .admin_queue .quote_delete label:hover,
 .admin_queue .quote_no label:hover {
@@ -129,7 +181,7 @@ input#admin_login_password-box{
 	background-color: #f0f0f0;
 }
 input#admin_login_submit-button{
-	background-color: #c08000;
+	background-color: #0099d7;
 }
 
 
@@ -143,7 +195,7 @@ div#site_nav_lower_linkbar{
 	text-align: right;
 }
 div#site_nav_upper{
-	background-color: #c08000;
+	background-color: #0099d7;
 	padding: 3px;
 }
 div#site_nav_upper_qms{

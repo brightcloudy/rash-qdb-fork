@@ -112,9 +112,9 @@ function main_page($news)
 
 
 
-function add_quote_page($added_quote_html='')
+function add_quote_page($quotetxt='', $added_quote_html='', $wasadded=null)
 {
-    global $lang;
+    global $CAPTCHA, $lang;
     $str = '<div id="add_all">';
 
     $str .= '<h1 id="add_title">'.$lang['add_title'].'</h1>';
@@ -124,8 +124,11 @@ function add_quote_page($added_quote_html='')
     $str .= $added_quote_html;
 
     $str .= '<form action="?'.urlargs('add','submit').'" method="post">
-     <textarea cols="80" rows="5" name="rash_quote" id="add_quote" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)"></textarea><br />
-     <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" />
+     <textarea cols="80" rows="5" name="rash_quote" id="add_quote" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)">'.($wasadded ? '' : $quotetxt).'</textarea><br />';
+    $str .= $CAPTCHA->get_CAPTCHA('add_quote');
+    $str .= '
+        <input type="submit" value="'.$lang['preview_quote_btn'].'" id="add_preview" name="preview" />
+        <input type="submit" value="'.$lang['add_quote_btn'].'" id="add_submit" name="submit" />
      <input type="reset" value="'.$lang['add_reset_btn'].'" id="add_reset" />
     </form>';
 
@@ -162,7 +165,7 @@ function edit_quote_page($quoteid, $quotetxt, $edited_quote_html='')
     return $str;
 }
 
-function search_quotes_page($fetched)
+function search_quotes_page($fetched, $searchstr)
 {
     global $lang;
 
@@ -175,9 +178,9 @@ function search_quotes_page($fetched)
     $str .= $this->get_messages();
 
     $str .= '<form method="post" action="?'.urlargs('search','fetch').'">';
-    if ($fetched) { $str .= '<input type="submit" name="submit" id="search_submit-button">&nbsp;'; }
-    $str .= '<input type="text" name="search" size="28" id="search_query-box">&nbsp;';
-    if (!$fetched) { $str .= '<input type="submit" name="submit" id="search_submit-button">&nbsp;<br />'; }
+    if ($fetched) { $str .= '<input type="submit" name="submit" value="'.$lang['search_btn'].'" id="search_submit-button">&nbsp;'; }
+    $str .= '<input type="text" name="search" size="28" id="search_query-box" value="'.$searchstr.'">&nbsp;';
+    if (!$fetched) { $str .= '<input type="submit" name="submit" value="'.$lang['search_btn'].'" id="search_submit-button">&nbsp;<br />'; }
     $str .= $lang['search_sort'].': <select name="sortby" size="1" id="search_sortby-dropdown">';
     $str .= '<option selected>'.$lang['search_opt_rating'];
     $str .= '<option>'.$lang['search_opt_id'];
@@ -205,7 +208,8 @@ function search_quotes_page($fetched)
 
 function flag_queue_page($inner_html)
 {
-    $str = '<h1 id="admin_flag_title">Flags</h1>';
+    global $lang;
+    $str = '<h1 id="admin_flag_title">'.$lang['flag_quote_adminpage_title'].'</h1>';
 
     $str .= $this->get_messages();
 
@@ -215,12 +219,12 @@ function flag_queue_page($inner_html)
     $str .= $inner_html;
 
     $str .= '</table>
-<input type="submit" value="Submit Query" />
+<input type="submit" value="'.$lang['flag_quote_adminpage_submit_btn'].'" />
 <input type="reset" value="Reset" />
 &nbsp;&nbsp;&nbsp;&nbsp;
-<input type="submit" value="Unflag All" name="unflag_all">
-<input type="submit" value="Delete All" name="delete_all">
-Are you sure?:<input type="checkbox" name="do_all">
+<input type="submit" value="'.$lang['flag_quote_adminpage_unflag_all_btn'].'" name="unflag_all">
+<input type="submit" value="'.$lang['flag_quote_adminpage_delete_all_btn'].'" name="delete_all">
+'.$lang['flag_quote_adminpage_verify'].'<input type="checkbox" name="do_all">
 </form>';
 
     return $str;
@@ -228,13 +232,13 @@ Are you sure?:<input type="checkbox" name="do_all">
 
 function add_news_page()
 {
+    global $lang;
     return '  <div id="admin_add-news_all">
-   <h1 id="admin_add-news_title">
-    Add News
-   </h1>' . $this->get_messages() . '
+   <h1 id="admin_add-news_title">'.$lang['add_news_title'].'</h1>' . $this->get_messages() . '
+   <p>'.$lang['add_news_help'].'
    <form method="post" action="?'.urlargs('add_news','submit').'">
-	<textarea cols="80" rows="5" name="news" id="add_news_news"></textarea><br />
-	<input type="submit" value="Add News" id="add_news" />
+	<textarea cols="80" rows="5" name="news" id="add_news_news" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)"></textarea><br />
+	<input type="submit" value="'.$lang['add_news_btn'].'" id="add_news" />
    </form>
   </div>
 ';
@@ -243,16 +247,18 @@ function add_news_page()
 
 function add_user_page()
 {
-    return '  <div id="admin_add-user_all">
-   <h1 id="admin_add-user_title">
-    Add User
-   </h1> ' . $this->get_messages() . '
+    global $lang;
+	return '  <div id="admin_add-user_all">
+   <h1 id="admin_add-user_title">'.$lang['add_user_title'].'</h1>
+   ' . $this->get_messages() . '
    <form method="post" action="?'.urlargs('add_user','update').'">
-    Username: <input type="text" name="username" id="admin_add-user_username" /><br />
-	RANDOM Salt: <input type="text" name="salt" value="'.str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').'" id="admin_add-user_salt" /><br />
-	Default Password: <input type="text" name="password" /><br />
-       Level: '.user_level_select().'<br />
-	 <input type="submit" value="Submit" id="admin_add-user_submit" />
+   <table>
+   <tr><td>'.$lang['add_user_username_label'].'</td><td><input type="text" name="username" id="admin_add-user_username" /></td></tr>
+   <tr><td>'.$lang['add_user_randomsalt_label'].'</td><td><input type="text" name="salt" value="'.str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').'" id="admin_add-user_salt" /></td></tr>
+   <tr><td>'.$lang['add_user_password_label'].'</td><td><input type="text" name="password" /></td></tr>
+   <tr><td>'.$lang['add_user_level_label'].'</td><td>'.user_level_select().'</td></tr>
+   <tr><td></td><td><input type="submit" value="'.$lang['add_user_btn'].'" id="admin_add-user_submit" /></td></tr>
+   </table>
    </form>
   </div>
 ';
@@ -260,39 +266,42 @@ function add_user_page()
 
 function change_password_page()
 {
-    return '  <h1 id="admin_change-pw_title">
-   Change Password
-  </h1> ' . $this->get_messages() . '
-  <form action="?'.urlargs('change_pw','update',$_SESSION['user']).'" method="post">
-   Old Password: <input type="password" name="old_password"><br />
-   New Password: <input type="password" name="new_password"><br />
-   Verify: <input type="password" name="verify_password"><br />
-   <input type="submit">
-  </form>
-';
+	global $lang;
+	return '  <h1 id="admin_change-pw_title">'.$lang['change_password_title'].'</h1>
+        ' . $this->get_messages() . '
+  <form action="?'.urlargs('change_pw','update',$_SESSION['userid']).'" method="post">
+  <table>
+  <tr><td>'.$lang['change_password_oldpass'].'</td><td><input type="password" name="old_password"></td></tr>
+  <tr><td>'.$lang['change_password_newpass'].'</td><td><input type="password" name="new_password"></td></tr>
+  <tr><td>'.$lang['change_password_verify'].'</td><td><input type="password" name="verify_password"></td></tr>
+  <tr><td></td><td><input type="submit" value="'.$lang['change_password_submit_btn'].'"></td></tr>
+  </table>
+  </form>';
 }
 
 
 
 function edit_user_page_table($innerhtml)
 {
-    $str = '  <h1 id="admin_users_title">
-   Users
-  </h1>' . $this->get_messages() . '
+	global $lang;
+	$str = '  <h1 id="admin_users_title">'.$lang['users_list_title'].'</h1>' . $this->get_messages() . '
   <form action="?'.urlargs('users','delete').'" method="post">
    <table border="1" cellpadding="1" cellspacing="0" style="border-style: solid;border-color: #125443">
     <tr>
      <td>
-      &nbsp;Username&nbsp;
+      &nbsp;'.$lang['users_list_id'].'&nbsp;
      </td>
      <td>
-      &nbsp;PW_Hash&nbsp;
+      &nbsp;'.$lang['users_list_username'].'&nbsp;
      </td>
      <td>
-      &nbsp;Level&nbsp;
+      &nbsp;'.$lang['users_list_pwhash'].'&nbsp;
      </td>
      <td>
-      &nbsp;Delete&nbsp;
+      &nbsp;'.$lang['users_list_level'].'&nbsp;
+     </td>
+     <td>
+      &nbsp;'.$lang['users_list_delete'].'&nbsp;
      </td>
     </tr>
 ';
@@ -300,29 +309,34 @@ function edit_user_page_table($innerhtml)
     $str .= $innerhtml;
 
     $str .= '  </table>
-  <input type="submit" value="Submit" />&nbsp;I\'m sure: <input type="checkbox" name="verify" value="1" />
+  <input type="submit" value="'.$lang['users_list_submit_btn'].'" />&nbsp;'.$lang['users_list_verify'].' <input type="checkbox" name="verify" value="1" />
  </form>
 ';
 
     return $str;
 }
 
-function login_page()
+function admin_login_page()
 {
     global $lang;
 
-    return $this->get_messages() . '<div id="admin_all">'.$lang['admin_login_greeting'].
-	'<form action="?'.urlargs('admin','login').'" method="post">
-    Username: <input type="text" name="rash_username" size="8" id="admin_login_username-box" /><br />
-    Password: <input type="password" name="rash_password" size="8" id="admin_login_password-box" /><br />
-    <input type="submit" value="Log In" id="admin_login_submit-button" />
-   </form></div>';
+    return '<h1 id="login_title">'.$lang['login_title'].'</h1>'.
+	$this->get_messages() . '<div id="admin_all"><p>'.$lang['admin_login_greeting'].'</p>
+    <form action="?'.urlargs('admin','login').'" method="post">
+    <table>
+    <tr><td>'.$lang['login_username'].'</td><td><input type="text" name="rash_username" size="8" id="admin_login_username-box" /></td></tr>
+    <tr><td>'.$lang['login_password'].'</td><td><input type="password" name="rash_password" size="8" id="admin_login_password-box" /></td></tr>
+    <tr><td>'.$lang['login_remember'].'</td><td><input type="checkbox" name="remember_login"></td></tr>
+    <tr><td></td><td><input type="submit" value="'.$lang['login_submit_btn'].'" id="admin_login_submit-button" /></td></tr>
+    </table>
+    </form></div>';
 }
 
 
 function quote_queue_page($innerhtml)
 {
-    $str = '<h1 id="admin_queue_title">Queue</h1>';
+    global $lang;
+    $str = '<h1 id="admin_queue_title">'.$lang['quote_queue_admin_title'].'</h1>';
 
     $str .= $this->get_messages();
 
@@ -332,8 +346,8 @@ function quote_queue_page($innerhtml)
     $str .= $innerhtml;
 
     $str .= '   </table>
-   <input type="submit" value="Submit Query" />
-   <input type="reset" value="Reset" />
+   <input type="submit" value="'.$lang['quote_queue_submit_btn'].'" />
+   <input type="reset" value="'.$lang['quote_queue_reset_btn'].'" />
   </form>
 ';
 
@@ -341,18 +355,18 @@ function quote_queue_page($innerhtml)
 }
 
 
-function quote_iter($quoteid, $rating, $quotetxt, $date=null)
+function quote_iter($quoteid, $rating, $quotetxt, $canflag, $canvote, $date=null)
 {
     global $lang;
     $str = '<div class="quote_whole">
     <div class="quote_separator">&nbsp;</div>
     <div class="quote_option-bar">
-     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>
-     <a href="?'.urlargs('vote',$quoteid,'plus').'" class="quote_plus" title="'.$lang['upvote'].'">+</a>
-     <span class="quote_rating">('.$rating.')</span>
-     <a href="?'.urlargs('vote',$quoteid,'minus').'" class="quote_minus" title="'.$lang['downvote'].'">-</a>
-     <a href="?'.urlargs('flag',$quoteid).'" class="quote_flag" title="'.$lang['flagquote'].'">[X]</a>
-     '.edit_quote_button($quoteid);
+     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>'
+	.' '.$this->quote_upvote_button($quoteid, $canvote)
+	.' '.'<span class="quote_rating">('.$rating.')</span>'
+	.' '.$this->quote_downvote_button($quoteid, $canvote)
+	.' '.$this->quote_flag_button($quoteid, $canflag)
+	.' '.edit_quote_button($quoteid);
 
     if (isset($date)) {
 	$str .= "     <span class=\"quote_date\">" . $date . "</span>\n";

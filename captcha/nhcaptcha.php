@@ -25,8 +25,9 @@ class nhCAPTCHA extends baseCAPTCHA {
 			       array('char'=>':','text'=>'a lizard'),
 			       );
 
-    function get_CAPTCHA()
+    function get_CAPTCHA($type)
     {
+	if (parent::check_passthru($type)) return '';
 	$qn = rand(0,count($this->questions)-1);
 	$qni = rand(0,32000);
 	$qnix = $qni + count($this->questions) - ($qni % count($this->questions)) + $qn;
@@ -40,8 +41,9 @@ class nhCAPTCHA extends baseCAPTCHA {
 	return $ret;
     }
 
-    function check_CAPTCHA()
+    function check_CAPTCHA($type)
     {
+	if (parent::check_passthru($type)) return 0;
 	if ($_POST['CAPTCHA']) {
 	    $c_qid = $_POST['CAPTCHAquestionid'];
 	    $c_ans = $_POST['CAPTCHAanswer'];
