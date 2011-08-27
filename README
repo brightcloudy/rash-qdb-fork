@@ -9,8 +9,5 @@ Notes:
 
 * PEAR::DB is needed, still.
 
-* The database schema is different from the Rash 2.0 beta schema;
-  to update your database to rash-qdb-fork, do the following in mysql cli:
-    alter table rash_quotes add queue int(1) not null;
-    drop table rash_queue;
-  (Note that you will lose all pending quotes doing it this way)
+* The database schema is different from the Rash 2.0 beta schema; The installer
+  should be able to update your old database to the new format.

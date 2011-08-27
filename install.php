@@ -32,6 +32,66 @@ function db_query($sql) {
     }
 }
 
+function update_rash_quotes()
+{
+    include 'settings.php';
+    require_once 'DB.php';
+    $dsn = array(
+		 'phptype'  => $CONFIG['phptype'],
+		 'username' => $CONFIG['username'],
+		 'password' => $CONFIG['password'],
+		 'hostspec' => $CONFIG['hostspec'],
+		 'port'     => $CONFIG['port'],
+		 'socket'   => $CONFIG['socket'],
+		 'database' => $CONFIG['database'],
+		 );
+    $db =& DB::connect($dsn);
+    if (DB::isError($db)) {
+	print $db->getMessage().'<br />';
+	return 1;
+    }
+
+    $res =& $db->query("SELECT * from ".db_tablename('quotes').' LIMIT 1');
+    if (!(DB::isError($res))) {
+	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	    if (isset($row['queue'])) { /* already up-to-date */
+		print 'Quotes -table is up-to-date<br />';
+		return 0;
+	    }
+	}
+    }
+
+    $res =& $db->query("SELECT * from ".db_tablename('queue'));
+    if (!(DB::isError($res))) {
+	while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	    $pending[] = $row;
+	}
+    } else {
+	print 'Queue -table is already dropped.<br>';
+	return 0;
+    }
+
+    if (count($pending) > 0) {
+	print 'Updating queued quotes...';
+    }
+
+    $res =& $db->query("DROP TABLE ".db_tablename('queue'));
+
+    $res =& $db->query("ALTER TABLE ".db_tablename('quotes'). " ADD queue int(1) not null");
+    $res =& $db->query("UPDATE ".db_tablename('quotes'). " SET queue=0");
+
+    foreach ($pending as $row) {
+        $res =& $db->query("INSERT INTO ".db_tablename('quotes')." (quote, rating, flag, queue, date) VALUES(".$db->quote($row['quote']).", 0, 0, 1, '".mktime()."')");
+    }
+
+    if (DB::isError($res)) {
+	print $res->getMessage().'<br />';
+	return 1;
+    }
+    print 'OK<br />';
+    return 0;
+}
+
 function update_old_users()
 {
     include 'settings.php';
@@ -258,6 +318,8 @@ If($_SERVER['QUERY_STRING'] == md5('create_file')){
 							flag int(1) NOT NULL,
                                                         queue int(1) NOT NULL,
 							date int(10) NOT NULL");
+
+    $error |= update_rash_quotes();
 
     $error |= update_old_tracking();
     $error |= update_old_users();
