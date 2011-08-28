@@ -57,6 +57,12 @@ require($CONFIG['template']);
 
 date_default_timezone_set($CONFIG['timezone']);
 
+if (isset($_COOKIE['lastvisit']) && !isset($_SESSION['lastvisit'])) {
+    $_SESSION['lastvisit'] = $_COOKIE['lastvisit'];
+}
+mk_cookie('lastvisit', mktime());
+
+
 $dsn = array(
 	     'phptype'  => $CONFIG['phptype'],
 	     'username' => $CONFIG['username'],
@@ -801,9 +807,15 @@ switch($page[0])
 		flag_queue($page[1]);
 	    break;
 	case 'latest':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT ".$CONFIG['quote_list_limit'];
-		quote_generation($query, $lang['latest_title'], -1);
-		break;
+	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT ".$CONFIG['quote_list_limit'];
+	    if (isset($_SESSION['lastvisit'])) {
+		$nlatest = $db->getOne("SELECT count(1) FROM ".db_tablename('quotes')." WHERE queue=0 AND date>=".$_SESSION['lastvisit']);
+		if (($nlatest >= 3) && ($nlatest <= $CONFIG['quote_list_limit'])) {
+		    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 AND date>=".$_SESSION['lastvisit']." ORDER BY id DESC";
+		}
+	    }
+	    quote_generation($query, $lang['latest_title'], -1);
+	    break;
 	case 'logout':
 		session_unset($_SESSION['user']);
 		session_unset($_SESSION['logged_in']);
