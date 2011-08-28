@@ -455,7 +455,7 @@ function change_pw($method, $who)
 	$res =& $db->query("SELECT `password`, salt FROM ".db_tablename('users')." WHERE id=".$db->quote((int)$who));
 	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
-	$salt = "\$1\$".str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')."\$";
+	$salt = "\$1\$".str_rand()."\$";
 	if ($_POST['new_password'] == '') {
 	    $TEMPLATE->add_message($lang['password_empty']);
 	} else {
@@ -487,7 +487,7 @@ function edit_users($method, $who)
     } else if ($method == 'update') {	// parse the info from $method == 'edit' into the database
 	$db->query("UPDATE ".db_tablename('users')." SET user=".$db->quote(strtolower($_POST['user'])).", level=".$db->quote((int)$_POST['level'])." WHERE id=".$db->quote((int)$who));
 	if($_POST['password']) {
-	    $salt = "\$1\$".str_rand(8,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')."\$";
+	    $salt = "\$1\$".str_rand()."\$";
 	    $db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['password'], $salt)."', salt='".$salt."' WHERE id=".$db->quote((int)$who));
 	}
     } else if ($method == 'edit') {

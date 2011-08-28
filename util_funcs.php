@@ -58,7 +58,7 @@ function mk_cookie($name, $data = null)
  * @param        int     $length  Length of the string you want generated
  * @param        string  $seeds   The seeds you want the string to be generated from
  */
-function str_rand($length = 8, $seeds = 'abcdefghijklmnopqrstuvwxyz0123456789')
+function str_rand($length = 8, $seeds = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')
 {
     $str = '';
     $seeds_count = strlen($seeds);
