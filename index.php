@@ -62,6 +62,7 @@ if (isset($_COOKIE['lastvisit']) && !isset($_SESSION['lastvisit'])) {
 }
 mk_cookie('lastvisit', mktime());
 
+set_voteip();
 
 $dsn = array(
 	     'phptype'  => $CONFIG['phptype'],
@@ -193,7 +194,7 @@ function vote($quote_num, $method)
 {
     global $db, $TEMPLATE, $lang;
 
-    $qid = $db->getOne("SELECT quote_id FROM ".db_tablename('tracking')." WHERE user_ip=".$db->quote(getenv("REMOTE_ADDR")).' AND quote_id='.$db->quote((int)$quote_num));
+    $qid = $db->getOne("SELECT quote_id FROM ".db_tablename('tracking')." WHERE user_ip=".$db->quote($_SESSION['voteip']).' AND quote_id='.$db->quote((int)$quote_num));
     if (isset($qid) && $qid == $quote_num) {
 	$TEMPLATE->add_message($lang['tracking_check_2']);
 	return;
@@ -208,7 +209,7 @@ function vote($quote_num, $method)
 	$db->query("UPDATE ".db_tablename('quotes')." SET rating = rating-1 WHERE id = ".$db->quote((int)$quote_num));
     }
     if ($vote != 0) {
-	$res = $db->query("INSERT INTO ".db_tablename('tracking')." (user_ip, quote_id, vote) VALUES(".$db->quote(getenv("REMOTE_ADDR")).", ".$db->quote($quote_num).", ".$vote.")");
+	$res = $db->query("INSERT INTO ".db_tablename('tracking')." (user_ip, quote_id, vote) VALUES(".$db->quote($_SESSION['voteip']).", ".$db->quote($quote_num).", ".$vote.")");
 	$TEMPLATE->add_message($lang['tracking_check_1']);
     }
 }
@@ -326,7 +327,7 @@ function user_can_vote_quote($quoteid)
 {
     global $db;
 
-    $res =& $db->query('select vote from '.db_tablename('tracking').' where user_ip='.$db->quote(getenv("REMOTE_ADDR")).' AND quote_id='.$db->quote((int)$quoteid));
+    $res =& $db->query('select vote from '.db_tablename('tracking').' where user_ip='.$db->quote($_SESSION['voteip']).' AND quote_id='.$db->quote((int)$quoteid));
     if (DB::isError($res)) {
 	die('user_can_vote_quote():'.$res->getMessage());
     }
