@@ -433,23 +433,39 @@ function user_level_select($selected=USER_MOD, $id='admin_add-user_level')
 function username_exists($name)
 {
     global $db;
-    $ret = $db->getOne('select count(1) from '.db_tablename('users').' where user='.$db->quote($name));
+    $name = strtolower($name);
+    $ret = $db->getOne('select count(1) from '.db_tablename('users').' where LOWER(user)='.$db->quote($name));
     if ($ret > 0) return TRUE;
     return FALSE;
 }
 
+function check_username($username)
+{
+    global $TEMPLATE, $lang;
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+	$TEMPLATE->add_message($lang['username_illegal_chars']);
+    } else if (strlen($username) < 2) {
+	$TEMPLATE->add_message($lang['username_too_short']);
+    } else if (strlen($username) > 20) {
+	$TEMPLATE->add_message($lang['username_too_long']);
+    } else if (username_exists($username)) {
+	$TEMPLATE->add_message($lang['username_exists']);
+    } else {
+	return TRUE;
+    }
+    return FALSE;
+}
 
 function add_user($method)
 {
     global $CONFIG, $TEMPLATE, $db, $lang;
     if ($method == 'update') {
-	if (username_exists($_POST['username'])) {
-	    $TEMPLATE->add_message($lang['username_exists']);
-	} else {
-	    $res =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($_POST['username']).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
+	$username = trim($_POST['username']);
+	if (check_username($username)) {
+	    $res =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($username).", '".crypt($_POST['password'], "\$1\$".substr($_POST['salt'], 0, 8)."\$")."', ".$db->quote((int)$_POST['level']).", '\$1\$".$_POST['salt']."\$');");
 	    if (DB::isError($res)) {
 		$TEMPLATE->add_message($res->getMessage());
-	    } else $TEMPLATE->add_message(sprintf($lang['user_added'], $_POST['username']));
+	    } else $TEMPLATE->add_message(sprintf($lang['user_added'], htmlspecialchars($username)));
 	}
     }
 
@@ -496,23 +512,26 @@ function edit_users($method, $who)
 	    }
 	}
     } else if ($method == 'update') {	// parse the info from $method == 'edit' into the database
-	$db->query("UPDATE ".db_tablename('users')." SET user=".$db->quote(strtolower($_POST['user'])).", level=".$db->quote((int)$_POST['level'])." WHERE id=".$db->quote((int)$who));
-	if($_POST['password']) {
-	    $salt = "\$1\$".str_rand()."\$";
-	    $db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['password'], $salt)."', salt='".$salt."' WHERE id=".$db->quote((int)$who));
+	$user = trim($_POST['user']);
+	if (check_username($user)) {
+	    $db->query("UPDATE ".db_tablename('users')." SET user=".$db->quote($user).", level=".$db->quote((int)$_POST['level'])." WHERE id=".$db->quote((int)$who));
+	    if($_POST['password']) {
+		$salt = "\$1\$".str_rand()."\$";
+		$db->query("UPDATE ".db_tablename('users')." SET `password`='".crypt($_POST['password'], $salt)."', salt='".$salt."' WHERE id=".$db->quote((int)$who));
+	    }
 	}
     } else if ($method == 'edit') {
 	$res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE id=".$db->quote((int)$who));
 	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 	if (isset($row['user']))
-	    print $TEMPLATE->edit_user_page_form($row['id'], $who, $row['user'], $row['level']);
+	    print $TEMPLATE->edit_user_page_form($row['id'], $who, htmlspecialchars($row['user']), $row['level']);
     }
 
     $innerhtml = '';
 
     $res =& $db->query("SELECT * FROM ".db_tablename('users')." ORDER BY level asc, user desc");
     while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
-	$innerhtml .= $TEMPLATE->edit_user_page_table_row($row['id'], $row['user'], $row['password'], $row['level']);
+	$innerhtml .= $TEMPLATE->edit_user_page_table_row($row['id'], htmlspecialchars($row['user']), htmlspecialchars($row['password']), $row['level']);
     }
     print $TEMPLATE->edit_user_page_table($innerhtml);
 }
