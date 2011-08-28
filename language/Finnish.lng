@@ -121,6 +121,7 @@ $lang = array (
 'users_list_delete' => 'Poista?',
 'users_list_submit_btn' => 'Poista',
 'users_list_verify' => 'Olen varma:',
+'logged_in_as' => 'Kirjautunut (%s)',
 'login_title' => 'Kirjaudu sisään',
 'login_username' => 'Nimi:',
 'login_password' => 'Salasana:',

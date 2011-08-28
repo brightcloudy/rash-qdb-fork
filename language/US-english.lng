@@ -121,6 +121,7 @@ $lang = array (
 'users_list_delete' => 'Delete',
 'users_list_submit_btn' => 'Submit',
 'users_list_verify' => 'I\'m sure:',
+'logged_in_as' => 'Logged in as %s',
 'login_title' => 'Login',
 'login_username' => 'Username:',
 'login_password' => 'Password:',
