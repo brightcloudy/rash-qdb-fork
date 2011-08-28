@@ -22,7 +22,7 @@ ob_start();
 </head>
 <body>
  <div id="rash_head_container">
- <div id="rash_head"><div id="rash_rash">Rash</div><div id="rash_qms">QMS</div></div>
+ <div id="rash_head"><div id="rash_rash"><?=$topleft?></div><div id="rash_qms"><?=$topright?></div></div>
  </div>
  <div id="site_all">
   <div id="site_image">

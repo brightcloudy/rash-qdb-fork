@@ -7,7 +7,6 @@
     position:absolute;
     top:10px;
     left:75px;
-    width:250px;
     height:100px;
 }
 #rash_rash {
@@ -27,6 +26,7 @@
     padding:0;
     margin-bottom:-40px;
     text-align:right;
+    white-space: nowrap;
 }
 
 div.quote_quote{
