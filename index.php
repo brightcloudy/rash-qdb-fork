@@ -4,6 +4,12 @@ error_reporting(E_ALL);
 ini_set('display_errors','On');
 */
 
+define('USER_SUPERUSER', 1);
+define('USER_ADMIN', 2);
+define('USER_MOD', 3);
+define('USER_NORMAL', 4);
+
+
 if (!file_exists('settings.php')) {
     header("Location: install.php");
     exit;
@@ -94,11 +100,14 @@ $mainmenu = array(array('url' => './', 'id' => 'site_nav_home', 'txt' => 'menu_h
 		  array('url' => '?add', 'id' => 'site_nav_add', 'txt' => 'menu_contribute')
 );
 if (isset($_SESSION['logged_in'])) {
-    $adminmenu = array(array('url' => '?queue', 'id' => 'site_admin_nav_queue', 'txt' => 'menu_queue'),
-		      array('url' => '?flag_queue', 'id' => 'site_admin_nav_flagged', 'txt' => 'menu_flagged'));
-    if ($_SESSION['level'] < 3)
+    $adminmenu = array();
+    if ($_SESSION['level'] < USER_NORMAL) {
+	$adminmenu[] = array('url' => '?queue', 'id' => 'site_admin_nav_queue', 'txt' => 'menu_queue');
+	$adminmenu[] = array('url' => '?flag_queue', 'id' => 'site_admin_nav_flagged', 'txt' => 'menu_flagged');
+    }
+    if ($_SESSION['level'] <= USER_ADMIN)
 	$adminmenu[] = array('url' => '?add_news', 'id' => 'site_admin_nav_add-news', 'txt' => 'menu_addnews');
-    if ($_SESSION['level'] == 1) {
+    if ($_SESSION['level'] <= USER_SUPERUSER) {
 	$adminmenu[] = array('url' => '?users', 'id' => 'site_admin_nav_users', 'txt' => 'menu_users');
 	$adminmenu[] = array('url' => '?add_user', 'id' => 'site_admin_nav_add-user', 'txt' => 'menu_adduser');
     }
@@ -317,7 +326,7 @@ function page_numbers($origin, $quote_limit, $page_default, $page_limit)
 function edit_quote_button($quoteid)
 {
     global $TEMPLATE;
-    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2)) {
+    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] <= USER_ADMIN)) {
 	return $TEMPLATE->edit_quote_button($quoteid);
     }
     return '';
@@ -402,11 +411,12 @@ function add_news($method)
 	print $TEMPLATE->add_news_page();
 }
 
-function user_level_select($selected=3, $id='admin_add-user_level')
+function user_level_select($selected=USER_MOD, $id='admin_add-user_level')
 {
-    $lvls = array('1' => 'superuser',
-		  '2' => 'administrator',
-		  '3' => 'moderator');
+    $lvls = array(USER_SUPERUSER => 'superuser',
+		  USER_ADMIN => 'administrator',
+		  USER_MOD => 'moderator',
+		  USER_NORMAL => 'normal user');
 
     $str = '<select name="level" size="1" id="'.$id.'">';
 
@@ -690,7 +700,7 @@ function edit_quote($method, $quoteid)
 {
     global $CONFIG, $TEMPLATE, $db;
 
-    if (!(isset($_SESSION['logged_in']) && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))) return;
+    if (!isset($_SESSION['logged_in']) || ($_SESSION['level'] > USER_ADMIN)) return;
 
     $innerhtml = '';
 
@@ -774,15 +784,13 @@ switch($page[0])
 	    add_quote($page[1]);
 	    break;
 	case 'add_news':
-	    if (isset($_SESSION['logged_in'])) {
+	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] <= USER_ADMIN)) {
 		add_news($page[1]);
 	    }
 	    break;
 	case 'add_user':
-	    if (isset($_SESSION['logged_in'])) {
-		if ($_SESSION['level'] == 1) {
-		    add_user($page[1]);
-		}
+	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] <= USER_SUPERUSER)) {
+		add_user($page[1]);
 	    }
 	    break;
 	case 'admin':
@@ -804,7 +812,7 @@ switch($page[0])
 	    flag($page[1], $page[2]);
 	    break;
 	case 'flag_queue':
-	    if (isset($_SESSION['logged_in']))
+	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] < USER_NORMAL))
 		flag_queue($page[1]);
 	    break;
 	case 'latest':
@@ -827,7 +835,7 @@ switch($page[0])
 		mk_cookie('passwd');
 		header('Location: http://' . $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']));
 	case 'queue':
-	    if (isset($_SESSION['logged_in']))
+	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] < USER_NORMAL))
 		quote_queue($page[1]);
 	    else {
 		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=1 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
@@ -864,11 +872,11 @@ switch($page[0])
 		quote_generation($query, $lang['top_title'], -1);
 		break;
 	case 'edit':
-	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] >= 1) && ($_SESSION['level'] <= 2))
+	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] <= USER_ADMIN))
 		edit_quote($page[1], $page[2]);
 	    break;
 	case 'users':
-	    if (isset($_SESSION['logged_in']))
+	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] <= USER_SUPERUSER))
 		edit_users($page[1], $page[2]);
 	    break;
 	case 'vote':
