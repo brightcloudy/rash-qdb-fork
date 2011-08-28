@@ -359,6 +359,8 @@ else {
 	    return 'http://'.$_SERVER['SERVER_NAME'] . preg_replace('/\/install.php$/', '', $_SERVER['REQUEST_URI']);
 	}
 
+	$hidelink = 1;
+
 ?>
 <h2>Install</h2>
 <form action="./install.php" method="post">
@@ -389,9 +391,6 @@ else {
  <tr>
   <td>DB Password
   <td><input type="password" name="password" value="password">
- </tr>
- <tr>
-	<td>&nbsp;</td><td>&nbsp;</td>
  </tr>
  <tr>
   <td>DB table prefix
@@ -465,15 +464,15 @@ else {
   <td><input type="text" name="quote_list_limit" value="50" size="4"> (how many quotes are shown in non-browse pages, eg. ?top)
  </tr>
  <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
   <td>Moderated
   <td><input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
  </tr>
  <tr>
   <td>Quote flagging
   <td><input type="checkbox" name="auto_flagged_quotes" checked> Can users flag quotes for admin attention?
- </tr>
- <tr>
-  <td>&nbsp;</td><td>&nbsp;</td>
  </tr>
  <tr>
   <td>CAPTCHA
@@ -512,5 +511,6 @@ else {
 	print "<p>settings.php already exists.";
     }
 }
-print '<p><a href="./">QDB main page</a></p>';
+if (!$hidelink)
+    print '<p><a href="./">QDB main page</a></p>';
 $TEMPLATE->printfooter();

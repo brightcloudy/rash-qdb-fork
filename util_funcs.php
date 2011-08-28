@@ -27,9 +27,10 @@ function write_settings($fname, $data)
 {
     $fp = fopen($fname,"w");
     $str = "<?php\n";
-    foreach ($data as $key=>$val) {
-	$str .= '$CONFIG[\''.$key.'\'] = '.$val.";\n";
-    }
+    if ($data)
+	foreach ($data as $key=>$val) {
+	    $str .= '$CONFIG[\''.$key.'\'] = '.$val.";\n";
+	}
     if (fwrite($fp, $str, strlen($str)) === FALSE) {
 	return FALSE;
     }
