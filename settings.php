@@ -11,6 +11,8 @@ $CONFIG['username'] = 'root';
 $CONFIG['password'] = '';
 $CONFIG['db_table_prefix'] = 'rash';
 
+$CONFIG['secret_salt'] = 'changeme'; // Used to encrypt some things.
+
 // Site info
 $CONFIG['site_short_title'] = 'nhqdb';
 $CONFIG['site_long_title'] = '#NetHack Quote Database';

@@ -62,7 +62,7 @@ if (isset($_COOKIE['lastvisit']) && !isset($_SESSION['lastvisit'])) {
 }
 mk_cookie('lastvisit', mktime());
 
-set_voteip();
+set_voteip($CONFIG['secret_salt']);
 
 $dsn = array(
 	     'phptype'  => $CONFIG['phptype'],
@@ -75,9 +75,9 @@ $dsn = array(
 	     );
 $db =& DB::connect($dsn);
 if (DB::isError($db)) {
-    if (!($page[0] == 'rss')) $TEMPLATE->printheader();
+    $TEMPLATE->printheader();
     print $db->getMessage();
-    if (!($page[0] == 'rss')) $TEMPLATE->printfooter();
+    $TEMPLATE->printfooter();
     exit;
 }
 

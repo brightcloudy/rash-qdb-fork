@@ -282,6 +282,7 @@ If (isset($_POST['submit'])) {
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
 		  'rss_entries' => (!isset($_POST['rss_entries']) || ($_POST['rss_entries'] < 1)) ? 15 : $_POST['rss_entries'],
+		  'secret_salt' => "'".$_POST['secret_salt']."'",
 		  'language' => "'".$_POST['language']."'",
 		  'captcha' => "'".$_POST['captcha']."'",
 		  'use_captcha' => "array(".(isset($_POST['use_captcha']) ? ("'".implode("'=>1, '", $_POST['use_captcha'])."'=>1"): '').")",
@@ -410,6 +411,13 @@ else {
  <tr>
   <td>Admin EMail
   <td><input type="text" name="admin_email" value="qdb@<?php echo $_SERVER['SERVER_NAME']; ?>">
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>Secret Salt
+  <td><input type="text" name="secret_salt" value="<?php echo str_rand(); ?>"> (Used to encrypt some things)
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>

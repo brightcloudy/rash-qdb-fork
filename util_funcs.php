@@ -22,28 +22,33 @@ function urlargs($ar1, $ar2 = null, $ar3 = null)
     return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2, $ar3));
 }
 
-function set_voteip()
+function set_voteip($salt)
 {
     if (isset($_SESSION['voteip'])) {
 	if (!isset($_COOKIE['voteip'])) {
 	    $addr = $_SESSION['voteip'];
-	    mk_cookie('voteip', $addr);
+	    mk_cookie('voteip', $addr . '-' . md5($addr . $salt));
 	    $_SESSION['voteip'] = $addr;
 	}
     } else {
 	if (isset($_COOKIE['voteip'])) {
-	    $addr = $_COOKIE['voteip'];
+	    $arr = split('-', $_COOKIE['voteip'], 2);
+	    $addr = $arr[0];
+	    $hash = $arr[1];
 	    if (preg_match("/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/", $addr)) {
+		if (md5($addr . $salt) != $hash)
+		    $addr = getenv("REMOTE_ADDR");
+		mk_cookie('voteip', $addr . '-' . md5($addr . $salt));
 		$_SESSION['voteip'] = $addr;
 	    } else {
 		/* illegal ip in cookie */
 		$addr = getenv("REMOTE_ADDR");
-		mk_cookie('voteip', $addr);
+		mk_cookie('voteip', $addr . '-' . md5($addr . $salt));
 		$_SESSION['voteip'] = $addr;
 	    }
 	} else {
 	    $addr = getenv("REMOTE_ADDR");
-	    mk_cookie('voteip', $addr);
+	    mk_cookie('voteip', $addr . '-' . md5($addr . $salt));
 	    $_SESSION['voteip'] = $addr;
 	}
     }
