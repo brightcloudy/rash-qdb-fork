@@ -825,9 +825,7 @@ switch($page[0])
 		mk_cookie('user');
 		mk_cookie('userid');
 		mk_cookie('passwd');
-		header("Location: http://" . $_SERVER['HTTP_HOST']
-			             . dirname($_SERVER['PHP_SELF'])
-				         . "/" . $relative_url);
+		header('Location: http://' . $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']));
 	case 'queue':
 	    if (isset($_SESSION['logged_in']))
 		quote_queue($page[1]);
