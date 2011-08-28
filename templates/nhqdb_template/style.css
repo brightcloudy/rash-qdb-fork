@@ -121,14 +121,14 @@ select#search_limit-dropdown{
 
 /* home_*: styles for the default homepage */
 
-div.home_news_date{
+.news_date{
 	font-weight: bold;
 }
-div#home_greeting{
+#home_greeting{
 	float: left;
 	width: 50%;
 }
-div#home_news{
+#news {
 	float: right;
 	width: 50%;
 }

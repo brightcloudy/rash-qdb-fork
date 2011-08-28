@@ -35,16 +35,14 @@ div.quote_quote{
 div.quote_whole{
 	padding-top: 10pt;
 }
-div#home_greeting{
+#home_greeting{
 	float:left;
-	width:67%;
-	width: 45%;
-	margin-right:15px;
-	position: relative;
-	z-index: 1;
+	width:49%;
+	padding-right:15px;
 }
-div#home_news_whole{
-	float: left;
+#home_all > #news{
+	float: right;
+	width: 49%;
 }
 div#site_admin_nav{
 	position: relative;
@@ -65,7 +63,7 @@ div#site_image{
 a, a:visited, a:hover, a:visited:hover{
 	color: #FF0000;
 }
-div.home_news_date{
+.news_date{
 	font-weight: bold;
 }
 div#site_all{

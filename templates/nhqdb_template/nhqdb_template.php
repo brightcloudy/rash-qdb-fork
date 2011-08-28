@@ -95,17 +95,15 @@ function printfooter($dbstats=null)
 
 function news_item($news, $date)
 {
-    return '<div class="home_news_whole"><div class="home_news_date">'.$date.'</div>'.
-	   '<div class="home_news_news">'.$news.'</div></div>';
+    return '<div class="news_entry"><div class="news_date">'.$date.'</div>'.
+	   '<div class="news_news">'.$news.'</div></div>';
 }
 
 function main_page($news)
 {
     global $lang;
-    return $this->get_messages() . '<div id="home_all">
-   <div id="home_news">'.$news.'</div>
-   <div id="home_greeting">'.$lang['home_greeting'].'</div>
-   </div>';
+    return $this->get_messages() . '<div id="home_all"><div id="news">'.$news.
+	'</div><div id="home_greeting">'.$lang['home_greeting'].'</div></div>';
 }
 
 
