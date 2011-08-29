@@ -1,6 +1,7 @@
 <?php
 $lang = array (
 'admin_login_greeting'		=> "Welcome to Rash admin panel! Please log in now.",
+'user_login_greeting'		=> 'Please log in.  If you haven\'t registered yet, do so <a href="?register">here</a>.',
 'home_greeting'				=> "<p>Hello! Enjoy our collection of quotes and if you feel the pleasure, you can add some of your own.</p>"
 	."<p>Depending on if you like or dislike a quote, there are links that are + and - signs that you can click to promote or demote a quote."
 	."If you think a quote has slipped by our moderators and isn't appropriate for this website, you can always click the [X] link near it.</p>"
@@ -20,7 +21,8 @@ $lang = array (
 'downvote' => "Downvote quote",
 'flagquote' => "Flag quote for admin attention",
 'quote_already_flagged' => 'Quote has already been flagged',
-'already_voted' => 'You have already voted this quote',
+'cannot_vote_1' => 'You have already voted this quote',
+'cannot_vote_2' => 'You must login before voting',
 'no_quote' => 'Sorry, no such quote',
 'flag_quote_title' => "Flag a quote",
 'flag_quote_explanation' => 'Flag this quote for moderator attention:',
@@ -42,6 +44,7 @@ $lang = array (
 'menu_adduser' => "Add User",
 'menu_changepass' => "Change Password",
 'menu_logout' => "Log Out",
+'menu_login' => 'Login',
 'pending_quotes' => "Pending quotes",
 'approved_quotes' => "Approved quotes",
 'menu_admin' => "Admin",
@@ -96,9 +99,15 @@ $lang = array (
 'add_user_password_label' => 'Default Password:',
 'add_user_level_label' => 'Level:',
 'add_user_btn' => 'Add',
+'register_user_title' => 'Register new username',
+'register_user_username_label' => 'Username',
+'register_user_password_label' => 'Password',
+'register_user_verifypassword_label' => 'Verify Password',
+'register_user_btn' => 'Register',
 'password_empty' => 'Empty password is not valid',
 'password_old_mismatch' => 'Old password does not match.',
 'password_verify_mismatch' => 'Password verification does not match',
+'password_verification_mismatch' => 'Password and verification do not match',
 'password_updated' => 'Password updated',
 'change_password_title' => 'Change Password',
 'change_password_oldpass' => 'Old Password:',

@@ -1,6 +1,7 @@
 <?php
 $lang = array (
 'admin_login_greeting'		=> "Kirjaudu sisään ylläpitäjän tunnuksella",
+'user_login_greeting'		=> 'Voit rekisteröidä käyttäjätunnuksesi <a href="?register">täällä</a>.',
 'home_greeting'				=> "<p>Tervehdys! Täällä voit selata tai lisätä lainauksia irc-kanavalta.</p>"
 	."<p>Jos pidät jostain lainauksesta, voit äänestää sen puolesta, tai sitä vastaan + ja - linkeillä."
 	." Jos sinusta tuntuu että jokin lainaus ei ole sovelias, voi merkitä sen moderaattorin tarkistettavaksi [X]-linkillä.</p>"
@@ -20,7 +21,8 @@ $lang = array (
 'downvote' => "Äänestä tätä lainausta vastaan",
 'flagquote' => "Merkitse lainaus moderaattorin tarkistettavaksi",
 'quote_already_flagged' => 'Lainaus on jo merkitty tarkistettavaksi',
-'already_voted' => 'Olet jo äänestänyt tätä lainausta',
+'cannot_vote_1' => 'Olet jo äänestänyt tätä lainausta',
+'cannot_vote_2' => 'Et voi äänestää ennenkuin kirjaudut',
 'no_quote' => 'Sori, ei löytynyt sellaista lainausta.',
 'flag_quote_title' => "Merkitse lainaus",
 'flag_quote_explanation' => 'Merkitse tämä lainaus moderaattorin tarkistusta varten:',
@@ -42,6 +44,7 @@ $lang = array (
 'menu_adduser' => "Lisää käyttäjä",
 'menu_changepass' => "Vaihda salasana",
 'menu_logout' => "Kirjaudu ulos",
+'menu_login' => 'Kirjaudu',
 'pending_quotes' => "Lainauksia jonossa",
 'approved_quotes' => "Hyväksyttyjä lainauksia",
 'menu_admin' => "Ylläpitäjä",
@@ -87,6 +90,11 @@ $lang = array (
 'add_news_help' => "Voit käyttää HTML-tägejä. Rivinvaihdot muutetaan br-tägeiksi.",
 'add_news_btn' => "Lisää",
 'add_user_title' => 'Käyttäjän lisäys',
+'register_user_title' => 'Rekisteröi käyttäjänimi',
+'register_user_username_label' => 'Käyttäjänimi',
+'register_user_password_label' => 'Salasana',
+'register_user_verifypassword_label' => 'Salasanan varmennus',
+'register_user_btn' => 'Tallenna',
 'username_illegal_chars' => 'Käyttäjänimessä laittomia merkkejä',
 'username_too_short' => 'Käyttäjänimi liian lyhyt',
 'username_too_long' => 'Käyttäjänimi liian pitkä',
@@ -100,6 +108,7 @@ $lang = array (
 'password_old_mismatch' => 'Vanha salasana on väärin',
 'password_updated' => 'Salasana on vaihdettu',
 'password_verify_mismatch' => 'Uusi salasana ei täsmää',
+'password_verification_mismatch' => 'Salasana ja varmistus eivät täsmää',
 'change_password_title' => 'Salasanan vaihto',
 'change_password_oldpass' => 'Vanha salasana:',
 'change_password_newpass' => 'Uusi salasana:',

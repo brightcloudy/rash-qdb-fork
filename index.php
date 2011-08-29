@@ -96,9 +96,20 @@ $mainmenu = array(array('url' => './', 'id' => 'site_nav_home', 'txt' => 'menu_h
 		  array('url' => '?random2', 'id' => 'site_nav_random2', 'txt' => 'menu_random2'),
 		  array('url' => '?bottom', 'id' => 'site_nav_bottom', 'txt' => 'menu_bottom'),
 		  array('url' => '?top', 'id' => 'site_nav_top', 'txt' => 'menu_top'),
-		  array('url' => '?search', 'id' => 'site_nav_search', 'txt' => 'menu_search'),
-		  array('url' => '?add', 'id' => 'site_nav_add', 'txt' => 'menu_contribute')
-);
+		  array('url' => '?search', 'id' => 'site_nav_search', 'txt' => 'menu_search'));
+
+if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && isset($_SESSION['logged_in']))
+    $mainmenu[] = array('url' => '?add', 'id' => 'site_nav_add', 'txt' => 'menu_contribute');
+
+if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1)) {
+    if (!isset($_SESSION['logged_in'])) {
+	$mainmenu[] = array('url' => '?login', 'id' => 'site_nav_login', 'txt' => 'menu_login');
+    } else {
+	$mainmenu[] = array('url' => '?logout', 'id' => 'site_nav_logout', 'txt' => 'menu_logout');
+    }
+}
+
+
 if (isset($_SESSION['logged_in'])) {
     $adminmenu = array();
     if ($_SESSION['level'] < USER_NORMAL) {
@@ -334,7 +345,7 @@ function edit_quote_button($quoteid)
 
 function user_can_vote_quote($quoteid)
 {
-    global $db;
+    global $CONFIG, $db;
 
     $res =& $db->query('select vote from '.db_tablename('tracking').' where user_ip='.$db->quote($_SESSION['voteip']).' AND quote_id='.$db->quote((int)$quoteid));
     if (DB::isError($res)) {
@@ -342,8 +353,11 @@ function user_can_vote_quote($quoteid)
     }
     $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
-    if (isset($row['vote']) && $row['vote']) return FALSE;
-    return TRUE;
+    if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && !isset($_SESSION['logged_in']))
+	return 2;
+
+    if (isset($row['vote']) && $row['vote']) return 1;
+    return 0;
 }
 
 
@@ -456,6 +470,39 @@ function check_username($username)
     return FALSE;
 }
 
+function register_user_do_inner($row)
+{
+    global $db, $TEMPLATE;
+    $username = $row['username'];
+    $password = $row['password'];
+    $salt = str_rand();
+    $level = USER_NORMAL;
+    $res =& $db->query("INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES(".$db->quote($username).", '".crypt($password, "\$1\$".substr($salt, 0, 8)."\$")."', ".$db->quote((int)$level).", '\$1\$".$salt."\$');");
+    if (DB::isError($res)) {
+	$TEMPLATE->add_message($res->getMessage());
+    } else $TEMPLATE->add_message(sprintf($lang['user_added'], htmlspecialchars($username)));
+
+    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE user=".$db->quote($username));
+    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+    set_user_logged($row);
+    return $row;
+}
+
+function register_user($method)
+{
+    global $CONFIG, $TEMPLATE, $db, $lang;
+    if ($method == 'update') {
+	$username = trim($_POST['username']);
+	if (check_username($username)) {
+	    if ($_POST['verifypassword'] == $_POST['password']) {
+		$row = array('username' => $username, 'password' => $_POST['password']);
+		$row = handle_captcha('register_user', 'register_user_do_inner', $row);
+	    } else $TEMPLATE->add_message($lang['password_verification_mismatch']);
+	}
+    }
+    print $TEMPLATE->register_user_page();
+}
+
 function add_user($method)
 {
     global $CONFIG, $TEMPLATE, $db, $lang;
@@ -507,7 +554,7 @@ function edit_users($method, $who)
 	    while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
 		if(isset($_POST['d'.$row['id']])){
 		    $db->query("DELETE FROM ".db_tablename('users')." WHERE id='{$_POST['d'.$row['id']]}'");
-		    $TEMPLATE->add_message(sprintf($lang['user_removed'], $row['user']));
+		    $TEMPLATE->add_message(sprintf($lang['user_removed'], htmlspecialchars($row['user'])));
 		}
 	    }
 	}
@@ -536,45 +583,60 @@ function edit_users($method, $who)
     print $TEMPLATE->edit_user_page_table($innerhtml);
 }
 
+function userlogin($method)
+{
+    global $CONFIG, $TEMPLATE, $db, $lang;
+    if ($method == 'login') {
+	$res =& $db->query("SELECT salt FROM ".db_tablename('users')." WHERE LOWER(user)=".$db->quote(strtolower($_POST['rash_username'])));
+	$salt = $res->fetchRow(DB_FETCHMODE_ASSOC);
+
+	// if there is no presence of a salt, it is probably md5 since old rash used plain md5
+	if(!$salt['salt']){
+	    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE LOWER(user)=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".md5($_POST['rash_password'])."'");
+	    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	}
+	// if there is presense of a salt, it is probably new rash passwords, so it is salted md5
+	else{
+	    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE LOWER(user)=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".crypt($_POST['rash_password'], $salt['salt'])."'");
+	    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	}
+
+	// if there is no row returned for the user, the password is expected to be false because of the AND conditional in the query
+	if(!$row['user']){
+	    $TEMPLATE->add_message($lang['login_error']);
+	} else {
+	    set_user_logged($row);
+	}
+    }
+    print $TEMPLATE->user_login_page();
+}
+
 function adminlogin($method)
 {
     global $CONFIG, $TEMPLATE, $db, $lang;
-	if ($method == 'login') {
-	    $res =& $db->query("SELECT salt FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username'])));
-		$salt = $res->fetchRow(DB_FETCHMODE_ASSOC);
+    if ($method == 'login') {
+	$res =& $db->query("SELECT salt FROM ".db_tablename('users')." WHERE LOWER(user)=".$db->quote(strtolower($_POST['rash_username'])));
+	$salt = $res->fetchRow(DB_FETCHMODE_ASSOC);
 
-		// if there is no presence of a salt, it is probably md5 since old rash used plain md5
-		if(!$salt['salt']){
-		    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".md5($_POST['rash_password'])."'");
-		    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
-		}
-		// if there is presense of a salt, it is probably new rash passwords, so it is salted md5
-		else{
-		    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE user=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".crypt($_POST['rash_password'], $salt['salt'])."'");
-		    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
-		}
-
-		// if there is no row returned for the user, the password is expected to be false because of the AND conditional in the query
-		if(!$row['user']){
-		    $TEMPLATE->add_message($lang['login_error']);
-		} else {
-			$_SESSION['user'] = $row['user'];		// site-wide accessible username
-			$_SESSION['level'] = $row['level'];		// site-wide accessible level
-			$_SESSION['userid'] = $row['id'];
-			$_SESSION['logged_in'] = 1;				// site-wide accessible login variable
-
-			if (isset($_POST['remember_login'])) {
-			    mk_cookie('user', $row['user']);
-			    mk_cookie('userid', $row['id']);
-			    mk_cookie('passwd', md5($row['password'].$row['salt']));
-			}
-
-			// Go to the main page after being logged in
-			header("Location: http://". $_SERVER['HTTP_HOST']
-			       . dirname($_SERVER['PHP_SELF']));
-		}
+	// if there is no presence of a salt, it is probably md5 since old rash used plain md5
+	if(!$salt['salt']){
+	    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE LOWER(user)=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".md5($_POST['rash_password'])."'");
+	    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
 	}
-	print $TEMPLATE->admin_login_page();
+	// if there is presense of a salt, it is probably new rash passwords, so it is salted md5
+	else{
+	    $res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE LOWER(user)=".$db->quote(strtolower($_POST['rash_username']))." AND `password` ='".crypt($_POST['rash_password'], $salt['salt'])."'");
+	    $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	}
+
+	// if there is no row returned for the user, the password is expected to be false because of the AND conditional in the query
+	if(!$row['user']){
+	    $TEMPLATE->add_message($lang['login_error']);
+	} else {
+	    set_user_logged($row);
+	}
+    }
+    print $TEMPLATE->admin_login_page();
 }
 
 
@@ -800,6 +862,8 @@ if (preg_match('/=/', $page[0])) {
 switch($page[0])
 {
 	case 'add':
+	    if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && !isset($_SESSION['logged_in']))
+		break;
 	    add_quote($page[1]);
 	    break;
 	case 'add_news':
@@ -812,8 +876,28 @@ switch($page[0])
 		add_user($page[1]);
 	    }
 	    break;
+	case 'register':
+	    if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1)) {
+		register_user($page[1]);
+	    }
+	    break;
+	case 'login':
+	    if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1)) {
+		if (isset($_SESSION['logged_in'])) {
+		    header('Location: http://' . $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']));
+		} else {
+		    userlogin($page[1]);
+		}
+	    } else {
+		header('Location: http://' . $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']));
+	    }
+	    break;
 	case 'admin':
-		adminlogin($page[1]);
+		if (isset($_SESSION['logged_in'])) {
+		    /* already logged in */
+		} else {
+		    adminlogin($page[1]);
+		}
 		break;
 	case 'bottom':
 		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT ".$CONFIG['quote_list_limit'];
@@ -828,6 +912,8 @@ switch($page[0])
 		change_pw($page[1], $page[2]);
 	    break;
 	case 'flag':
+	    if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && !isset($_SESSION['logged_in']))
+		break;
 	    flag($page[1], $page[2]);
 	    break;
 	case 'flag_queue':
@@ -845,14 +931,8 @@ switch($page[0])
 	    quote_generation($query, $lang['latest_title'], -1);
 	    break;
 	case 'logout':
-		session_unset($_SESSION['user']);
-		session_unset($_SESSION['logged_in']);
-		session_unset($_SESSION['level']);
-		session_unset($_SESSION['userid']);
-		mk_cookie('user');
-		mk_cookie('userid');
-		mk_cookie('passwd');
-		header('Location: http://' . $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']));
+	    set_user_logout();
+	    break;
 	case 'queue':
 	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] < USER_NORMAL))
 		quote_queue($page[1]);
@@ -899,8 +979,10 @@ switch($page[0])
 		edit_users($page[1], $page[2]);
 	    break;
 	case 'vote':
-		vote($page[1], $page[2]);
+	    if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && !isset($_SESSION['logged_in']))
 		break;
+	    vote($page[1], $page[2]);
+	    break;
 	default:
 	    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
 		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and id =".$db->quote((int)$_SERVER['QUERY_STRING']);

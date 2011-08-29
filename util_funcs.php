@@ -22,6 +22,35 @@ function urlargs($ar1, $ar2 = null, $ar3 = null)
     return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2, $ar3));
 }
 
+/* $row = array with keys 'user', 'id', 'level', 'password', 'salt' */
+function set_user_logged($row)
+{
+    $_SESSION['user'] = $row['user'];		// site-wide accessible username
+    $_SESSION['level'] = $row['level'];		// site-wide accessible level
+    $_SESSION['userid'] = $row['id'];
+    $_SESSION['logged_in'] = 1;				// site-wide accessible login variable
+
+    if (isset($_POST['remember_login'])) {
+	mk_cookie('user', $row['user']);
+	mk_cookie('userid', $row['id']);
+	mk_cookie('passwd', md5($row['password'].$row['salt']));
+    }
+
+    header("Location: http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']));
+}
+
+function set_user_logout()
+{
+    session_unset($_SESSION['user']);
+    session_unset($_SESSION['logged_in']);
+    session_unset($_SESSION['level']);
+    session_unset($_SESSION['userid']);
+    mk_cookie('user');
+    mk_cookie('userid');
+    mk_cookie('passwd');
+    header('Location: http://' . $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']));
+}
+
 function set_voteip($salt)
 {
     if (isset($_SESSION['voteip'])) {
@@ -32,7 +61,7 @@ function set_voteip($salt)
 	}
     } else {
 	if (isset($_COOKIE['voteip'])) {
-	    $arr = split('-', $_COOKIE['voteip'], 2);
+	    $arr = explode('-', $_COOKIE['voteip'], 2);
 	    $addr = $arr[0];
 	    $hash = $arr[1];
 	    if (preg_match("/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/", $addr)) {

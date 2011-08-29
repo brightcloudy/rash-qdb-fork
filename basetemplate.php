@@ -276,6 +276,24 @@ abstract class BaseTemplate {
 
     }
 
+    function register_user_page()
+    {
+	global $lang,$CAPTCHA;
+	$str = '  <div id="register-user_all">
+   <h1 id="register-user_title">'.$lang['register_user_title'].'</h1>
+   <form method="post" action="?'.urlargs('register','update').'">
+   <table>
+   <tr><td>'.$lang['register_user_username_label'].'</td><td><input type="text" name="username" id="register-user_username" /></td></tr>
+   <tr><td>'.$lang['register_user_password_label'].'</td><td><input type="password" name="password" /></td></tr>
+   <tr><td>'.$lang['register_user_verifypassword_label'].'</td><td><input type="password" name="verifypassword" /></td></tr>
+   <tr><td></td><td><input type="submit" value="'.$lang['register_user_btn'].'" id="register-user_submit" /></td></tr>
+   </table>'.$CAPTCHA->get_CAPTCHA('register_user').'
+   </form>
+  </div>
+';
+	return $str;
+    }
+
     function add_user_page()
     {
 	global $lang;
@@ -379,6 +397,22 @@ abstract class BaseTemplate {
 	return $str;
     }
 
+    function user_login_page()
+    {
+	global $lang;
+
+    return '<h1 id="login_title">'.$lang['login_title'].'</h1>'.
+	'<div id="admin_all"><p>'.$lang['user_login_greeting'].'</p>
+    <form action="?'.urlargs('login','login').'" method="post">
+    <table>
+    <tr><td>'.$lang['login_username'].'</td><td><input type="text" name="rash_username" size="8" id="user_login_username-box" /></td></tr>
+    <tr><td>'.$lang['login_password'].'</td><td><input type="password" name="rash_password" size="8" id="user_login_password-box" /></td></tr>
+    <tr><td>'.$lang['login_remember'].'</td><td><input type="checkbox" name="remember_login"></td></tr>
+    <tr><td></td><td><input type="submit" value="'.$lang['login_submit_btn'].'" id="user_login_submit-button" /></td></tr>
+    </table>
+    </form></div>';
+    }
+
     function admin_login_page()
     {
 	global $lang;
@@ -437,22 +471,23 @@ abstract class BaseTemplate {
     function quote_upvote_button($quoteid, $canvote)
     {
 	global $lang;
-	if ($canvote)
+	if (!$canvote)
 	    return '<a href="?'.urlargs('vote',$quoteid,'plus').'" class="quote_plus" title="'.$lang['upvote'].'">+</a>';
-	return '<span class="quote_plus" title="'.$lang['already_voted'].'">+</span>';
+	return '<span class="quote_plus" title="'.$lang['cannot_vote_'.$canvote].'">+</span>';
     }
 
     function quote_downvote_button($quoteid, $canvote)
     {
 	global $lang;
-	if ($canvote)
+	if (!$canvote)
 	    return '<a href="?'.urlargs('vote',$quoteid,'minus').'" class="quote_minus" title="'.$lang['downvote'].'">-</a>';
-	return '<span class="quote_minus" title="'.$lang['already_voted'].'">-</span>';
+	return '<span class="quote_minus" title="'.$lang['cannot_vote_'.$canvote].'">-</span>';
     }
 
     function quote_flag_button($quoteid, $canflag)
     {
 	global $lang, $CONFIG;
+	if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && !isset($_SESSION['logged_in'])) return '';
 	if ($CONFIG['auto_flagged_quotes'] == 1) return '';
 	if ($canflag)
 	    return '<a href="?'.urlargs('flag',$quoteid).'" class="quote_flag" title="'.$lang['flagquote'].'">X</a>';

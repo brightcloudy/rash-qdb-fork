@@ -239,7 +239,8 @@ $captchas = array(array('name'=>'nocaptcha', 'desc'=>'No CAPTCHA'),
 		  array('name'=>'nhcaptcha', 'desc'=>'NetHack CAPTCHA'));
 
 $captcha_uses = array('flag'=>'Flagging a quote',
-		      'add_quote' => 'Adding a quote');
+		      'add_quote' => 'Adding a quote',
+		      'register_user' => 'Registering a normal user');
 
 $templates = array('./templates/bash_template/bash_template.php' => 'bash.org lookalike',
 		   './templates/rash_template/rash_template.php' => 'Rash QMS',
@@ -291,6 +292,7 @@ If (isset($_POST['submit'])) {
 		  'page_limit' => $_POST['page_limit'],
 		  'quote_list_limit' => $_POST['quote_list_limit'],
 		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
+		  'login_required' => (($_POST['login_required'] == 'on') ? 1 : 0),
 		  'auto_flagged_quotes' => (($_POST['auto_flagged_quotes'] == 'on') ? 0 : 1),
 		  'timezone' => "'".$_POST['timezone']."'",
 		  'news_time_format' => "'".$_POST['news_time_format']."'",
@@ -489,6 +491,10 @@ else {
  <tr>
   <td>Use CAPTCHA For
   <td><? foreach ($captcha_uses as $k=>$v) { echo '<input type="checkbox" name="use_captcha[]" value="'.$k.'" checked>'.$v.'<br>'; } ?>
+ </tr>
+ <tr>
+  <td>User Login required
+  <td><input type="checkbox" name="login_required"> Do users need to register and login before voting/adding/flagging?
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
