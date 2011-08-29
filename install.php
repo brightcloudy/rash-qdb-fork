@@ -279,6 +279,7 @@ If (isset($_POST['submit'])) {
 		  'db_table_prefix' => "'".$_POST['db_table_prefix']."'",
 		  'site_short_title' => "'".$_POST['site_short_title']."'",
 		  'site_long_title' => "'".$_POST['site_long_title']."'",
+		  'prefix_short_title' => (($_POST['prefix_short_title'] == 'on') ? 1 : 0),
 		  'rss_url' => "'".preg_replace('/\/$/','',$_POST['rss_url'])."'",
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
@@ -434,6 +435,10 @@ else {
  <tr>
   <td>Site Short Title
   <td><input type="text" name="site_short_title" value="QMS">
+ </tr>
+ <tr>
+  <td>Prefix Title
+  <td><input type="checkbox" name="prefix_short_title" checked> (Prefix "<em>Site Short Title</em>: " to page titles?)
  </tr>
  <tr>
   <td>Site Long Title

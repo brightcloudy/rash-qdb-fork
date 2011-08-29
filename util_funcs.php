@@ -141,8 +141,10 @@ function str_rand($length = 8, $seeds = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklm
 function title($title)
 {
     global $CONFIG, $lang;
-    if (preg_match('/^[0-9]+$/', $title)) return sprintf($lang['pagetitle_quotenum'], $title);
-    if (isset($lang['pagetitle_'.$title])) return $lang['pagetitle_'.$title];
-    return $CONFIG['site_long_title'];
+    $str = ($CONFIG['prefix_short_title'] ? $CONFIG['site_short_title'].': ' : '');
+    if (preg_match('/^[0-9]+$/', $title)) $str .= sprintf($lang['pagetitle_quotenum'], $title);
+    else if (isset($lang['pagetitle_'.$title])) $str .= $lang['pagetitle_'.$title];
+    else $str .= $CONFIG['site_long_title'];
+    return $str;
 }
 

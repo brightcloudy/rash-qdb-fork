@@ -16,6 +16,7 @@ $CONFIG['secret_salt'] = 'changeme'; // Used to encrypt some things.
 // Site info
 $CONFIG['site_short_title'] = 'nhqdb';
 $CONFIG['site_long_title'] = '#NetHack Quote Database';
+$CONFIG['prefix_short_title'] = 1;
 $CONFIG['rss_url'] = 'http://127.0.0.1';
 $CONFIG['rss_title'] = 'Rash QDB';
 $CONFIG['rss_desc'] = 'Quote Database for the IRC channel';
