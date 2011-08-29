@@ -1,5 +1,23 @@
 <?php
 $lang = array (
+'pagetitle_add' => 'Add a Quote',
+'pagetitle_bottom' => 'Bottom',
+'pagetitle_browse' => 'Browse Quotes',
+'pagetitle_latest' => 'Latest Quotes',
+'pagetitle_random' => 'Random Quotes',
+'pagetitle_random2' => 'Random>0 Quotes',
+'pagetitle_random0' => 'Random=0 Quotes',
+'pagetitle_random3' => 'Random=0 Quotes',
+'pagetitle_random4' => 'Random<0 Quotes',
+'pagetitle_randomplus' => 'Random>0 Quotes',
+'pagetitle_randomminus' => 'Random<0 Quotes',
+'pagetitle_search' => 'Search for Quotes',
+'pagetitle_top' => 'Top Quotes',
+'pagetitle_register' => 'Register a new username',
+'pagetitle_login' => 'Login',
+'pagetitle_change_pw' => 'Change Password',
+'pagetitle_flag' => 'Flag a Quote',
+'pagetitle_quotenum' => 'Quote #%s',
 'admin_login_greeting'		=> "Welcome to Rash admin panel! Please log in now.",
 'user_login_greeting'		=> 'Please log in.  If you haven\'t registered yet, do so <a href="?register">here</a>.',
 'home_greeting'				=> "<p>Hello! Enjoy our collection of quotes and if you feel the pleasure, you can add some of your own.</p>"

@@ -1,5 +1,23 @@
 <?php
 $lang = array (
+'pagetitle_add' => 'Lisää lainaus',
+'pagetitle_bottom' => 'Huonoimmat',
+'pagetitle_browse' => 'Sella lainauksia',
+'pagetitle_latest' => 'Uusimmat lainaukset',
+'pagetitle_random' => 'Satunnaiset lainaukset',
+'pagetitle_random2' => 'Satunnaiset >0 lainaukset',
+'pagetitle_random0' => 'Satunnaiset =0 lainaukset',
+'pagetitle_random3' => 'Satunnaiset =0 lainaukset',
+'pagetitle_random4' => 'Satunnaiset <0 lainaukset',
+'pagetitle_randomplus' => 'Satunnaiset >0 lainaukset',
+'pagetitle_randomminus' => 'Satunnaiset <0 lainaukset',
+'pagetitle_search' => 'Etsi lainauksia',
+'pagetitle_top' => 'Parhaimmat lainaukset',
+'pagetitle_register' => 'Rekisteröi käyttäjänimi',
+'pagetitle_login' => 'Kirjaudu sisään',
+'pagetitle_change_pw' => 'Vaihda salasanaa',
+'pagetitle_flag' => 'Merkitse lainaus',
+'pagetitle_quotenum' => 'Lainaus #%s',
 'admin_login_greeting'		=> "Kirjaudu sisään ylläpitäjän tunnuksella",
 'user_login_greeting'		=> 'Voit rekisteröidä käyttäjätunnuksesi <a href="?register">täällä</a>.',
 'home_greeting'				=> "<p>Tervehdys! Täällä voit selata tai lisätä lainauksia irc-kanavalta.</p>"

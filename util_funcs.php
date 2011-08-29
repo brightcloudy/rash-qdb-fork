@@ -140,43 +140,9 @@ function str_rand($length = 8, $seeds = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklm
 
 function title($title)
 {
-    include 'settings.php';
-	switch($title)
-	{
-		case 'add':
-			return 'Add a Quote';
-			break;
-		case 'bottom':
-			return 'Bottom';
-			break;
-		case 'browse':
-			return 'Browse Quotes';
-			break;
-		case 'latest':
-			return 'Latest Quotes';
-			break;
-		case 'random':
-			return 'Random Quotes';
-			break;
-		case 'random2':
-			return 'Random>0 Quotes';
-			break;
-		case 'search':
-			return 'Search for Quotes';
-			break;
-		case 'top':
-			return 'Top Quotes';
-			break;
-		case true:
-		    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
-			return 'Quote #'.$title;
-		    } else {
-			return $CONFIG['site_long_title'];
-		    }
-		    break;
-	default:
-	    return $CONFIG['site_long_title'];
-	    break;
-	}
+    global $CONFIG, $lang;
+    if (preg_match('/^[0-9]+$/', $title)) return sprintf($lang['pagetitle_quotenum'], $title);
+    if (isset($lang['pagetitle_'.$title])) return $lang['pagetitle_'.$title];
+    return $CONFIG['site_long_title'];
 }
 
