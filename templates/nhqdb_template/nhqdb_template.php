@@ -247,7 +247,7 @@ function add_news_page()
 	$str = '  <div id="register-user_all">
    <h1 id="register-user_title">'.$lang['register_user_title'].'</h1>' . $this->get_messages() . '
    <form method="post" action="?'.urlargs('register','update').'">
-   <table border=1>
+   <table>
    <tr><td>'.$lang['register_user_username_label'].'</td><td><input type="text" name="username" id="register-user_username" /></td></tr>
    <tr><td>'.$lang['register_user_password_label'].'</td><td><input type="password" name="password" /></td></tr>
    <tr><td>'.$lang['register_user_verifypassword_label'].'</td><td><input type="password" name="verifypassword" /></td></tr>
