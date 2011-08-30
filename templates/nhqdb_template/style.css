@@ -15,9 +15,6 @@ a:hover, a:visited:hover {
 a#site_nav_admin{
 	color: #0099d7;
 }
-a#site_nav_logout{
-	color: #000000;
-}
 a#site_admin_flag, a#site_admin_queue{
 	color: #336699;
 }
