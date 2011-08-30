@@ -417,13 +417,21 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 function add_news($method)
 {
     global $CONFIG, $TEMPLATE, $db;
-	if($method == 'submit')
-	{
-	    $news = nl2br($_POST['news']);
+    $innerhtml = null;
+    $rawnews = '';
+    if($method == 'submit') {
+	$rawnews = $_POST['news'];
+	$news = nl2br($rawnews);
+	if (isset($_POST['preview'])) {
+	    $innerhtml = $TEMPLATE->news_item($news, date($CONFIG['news_time_format'], mktime()));
+	} else {
 	    $db->query("INSERT INTO ".db_tablename('news')." (news,date) VALUES(".$db->quote($news).", '".mktime()."');");
+	    $TEMPLATE->add_message($lang['news_added']);
+	    $rawnews = '';
 	}
+    }
 
-	print $TEMPLATE->add_news_page();
+    print $TEMPLATE->add_news_page($innerhtml, htmlspecialchars($rawnews));
 }
 
 function user_level_select($selected=USER_MOD, $id='admin_add-user_level')

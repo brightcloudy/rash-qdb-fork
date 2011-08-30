@@ -226,19 +226,21 @@ function flag_queue_page($inner_html)
     return $str;
 }
 
-function add_news_page()
+function add_news_page($previewnews, $newstxt)
 {
     global $lang;
-    return '  <div id="admin_add-news_all">
-   <h1 id="admin_add-news_title">'.$lang['add_news_title'].'</h1>' . $this->get_messages() . '
-   <p>'.$lang['add_news_help'].'
+    $str = '  <div id="admin_add-news_all">
+   <h1 id="admin_add-news_title">'.$lang['add_news_title'].'</h1>' . $this->get_messages();
+    if (isset($previewnews)) $str .= '<div class="admin_preview_news">'.$previewnews.'</div>';
+    $str .= '<p>'.$lang['add_news_help'].'
    <form method="post" action="?'.urlargs('add_news','submit').'">
-	<textarea cols="80" rows="5" name="news" id="add_news_news" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)"></textarea><br />
-	<input type="submit" value="'.$lang['add_news_btn'].'" id="add_news" />
+	<textarea cols="80" rows="5" name="news" id="add_news_news" onkeyup="resizeTextarea(this)" onmouseup="resizeTextarea(this)" onblur="resizeTextarea(this)">'.$newstxt.'</textarea><br />
+        <input type="submit" value="'.$lang['preview_news_btn'].'" id="add_preview" name="preview" />
+        <input type="submit" value="'.$lang['add_news_btn'].'" id="add_news" name="submit" />
    </form>
   </div>
 ';
-
+    return $str;
 }
 
     function register_user_page()
