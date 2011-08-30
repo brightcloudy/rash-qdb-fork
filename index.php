@@ -98,8 +98,12 @@ $mainmenu = array(array('url' => './', 'id' => 'site_nav_home', 'txt' => 'menu_h
 		  array('url' => '?top', 'id' => 'site_nav_top', 'txt' => 'menu_top'),
 		  array('url' => '?search', 'id' => 'site_nav_search', 'txt' => 'menu_search'));
 
+if ((isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && isset($_SESSION['logged_in']))
+    || !isset($CONFIG['login_required']) || ($CONFIG['login_required'] == 0))
+    $mainmenu[] = array('url' => '?add', 'id' => 'site_nav_add', 'txt' => 'menu_contribute');
 if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && isset($_SESSION['logged_in']))
     $mainmenu[] = array('url' => '?add', 'id' => 'site_nav_add', 'txt' => 'menu_contribute');
+else
 
 if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1)) {
     if (!isset($_SESSION['logged_in'])) {
