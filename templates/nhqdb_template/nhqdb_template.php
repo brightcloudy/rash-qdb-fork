@@ -93,12 +93,6 @@ function printfooter($dbstats=null)
 
 }
 
-function news_item($news, $date)
-{
-    return '<div class="news_entry"><div class="news_date">'.$date.'</div>'.
-	   '<div class="news_news">'.$news.'</div></div>';
-}
-
 function main_page($news)
 {
     global $lang;
