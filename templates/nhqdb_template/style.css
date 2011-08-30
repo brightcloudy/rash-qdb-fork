@@ -25,6 +25,7 @@ input:focus {
     -moz-box-shadow: 0px 0px 5px #ffff80;
     -webkit-box-shadow: 0px 0px 5px #ffff80;
     box-shadow: 0px 0px 5px #ffff80;
+    background-color: #fffff0;
 }
 
 /* quote-output styles */
@@ -104,17 +105,6 @@ span.quote_minus:hover {
   font-weight:bold;
 }
 
-/* searchpage */
-input#search_query-box{
-	background-color: #f0f0f0;
-}
-select#search_sortby-dropdown{
-	background-color: #f0f0f0;
-}
-select#search_limit-dropdown{
-	background-color: #f0f0f0;
-}
-
 
 /* home_*: styles for the default homepage */
 
@@ -123,11 +113,11 @@ select#search_limit-dropdown{
 }
 #home_greeting{
 	float: left;
-	width: 50%;
+	width: 49%;
 }
 #news {
 	float: right;
-	width: 50%;
+	width: 49%;
 }
 
 
@@ -170,16 +160,6 @@ html>body div#site_admin_nav{ /* hack for firefox, disabled in opera and ie */
   background-color:lightgreen;
 }
 
-
-input#admin_login_username-box{
-	background-color: #f0f0f0;
-}
-input#admin_login_password-box{
-	background-color: #f0f0f0;
-}
-input#admin_login_submit-button{
-	background-color: #0099d7;
-}
 
 
 /* site_nav_*: navigation on the top, for everyone */
