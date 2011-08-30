@@ -101,9 +101,6 @@ $mainmenu = array(array('url' => './', 'id' => 'site_nav_home', 'txt' => 'menu_h
 if ((isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && isset($_SESSION['logged_in']))
     || !isset($CONFIG['login_required']) || ($CONFIG['login_required'] == 0))
     $mainmenu[] = array('url' => '?add', 'id' => 'site_nav_add', 'txt' => 'menu_contribute');
-if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && isset($_SESSION['logged_in']))
-    $mainmenu[] = array('url' => '?add', 'id' => 'site_nav_add', 'txt' => 'menu_contribute');
-else
 
 if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1)) {
     if (!isset($_SESSION['logged_in'])) {
