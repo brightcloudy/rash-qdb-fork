@@ -106,6 +106,10 @@ span.quote_minus:hover {
 }
 
 
+.hilight_news_entry {
+  background-color:#fff0f0;
+}
+
 /* home_*: styles for the default homepage */
 
 .news_date{

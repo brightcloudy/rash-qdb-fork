@@ -68,6 +68,10 @@ select#search_limit-dropdown{
 }
 
 
+.hilight_news_entry {
+  background-color:#fff0f0;
+}
+
 /* home_*: styles for the default homepage */
 
 .news_date{

@@ -92,8 +92,10 @@ if (isset($_SESSION['logged_in'])) {
 	$adminmenu[] = array('url' => '?queue', 'id' => 'site_admin_nav_queue', 'txt' => 'menu_queue');
 	$adminmenu[] = array('url' => '?flag_queue', 'id' => 'site_admin_nav_flagged', 'txt' => 'menu_flagged');
     }
-    if ($_SESSION['level'] <= USER_ADMIN)
+    if ($_SESSION['level'] <= USER_ADMIN) {
 	$adminmenu[] = array('url' => '?add_news', 'id' => 'site_admin_nav_add-news', 'txt' => 'menu_addnews');
+	$adminmenu[] = array('url' => '?edit_news', 'id' => 'site_admin_nav_edit-news', 'txt' => 'menu_editnews');
+    }
     if ($_SESSION['level'] <= USER_SUPERUSER) {
 	$adminmenu[] = array('url' => '?users', 'id' => 'site_admin_nav_users', 'txt' => 'menu_users');
 	$adminmenu[] = array('url' => '?add_user', 'id' => 'site_admin_nav_add-user', 'txt' => 'menu_adduser');
@@ -388,6 +390,48 @@ function quote_generation($query, $origin, $page = 1, $quote_limit = 50, $page_l
 }
 
 
+function edit_news($method, $id)
+{
+    global $CONFIG, $TEMPLATE, $db;
+    $news = '';
+
+    if ($method == 'edit') {
+	$res =& $db->query("SELECT * FROM ".db_tablename('news')." where id=".$db->quote((int)$id));
+	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	$newstxt = preg_replace('/\<br \/\>/', '', $row['news']);
+	$news = $TEMPLATE->edit_news_form($row['id'], $newstxt);
+    } else if ($method == 'update') {
+	if (isset($_POST['preview'])) {
+	    $newstxt = nl2br(trim($_POST['news']));
+	    $news = $TEMPLATE->news_item($newstxt, date($CONFIG['news_time_format'], mktime()));
+	    $newstxt = preg_replace('/\<br \/\>/', '', $newstxt);
+	    $news .= $TEMPLATE->edit_news_form($id, $newstxt);
+	} else if (isset($_POST['delete'])) {
+	    if (isset($_POST['verify_delete'])) {
+		$res =& $db->query("DELETE FROM ".db_tablename('news')." where id=".$db->quote((int)$id));
+		$TEMPLATE->add_message(lang('news_item_deleted'));
+	    } else {
+		$TEMPLATE->add_message(lang('news_item_delete_no_verify'));
+		$id = null;
+	    }
+	} else {
+	    $newstxt = nl2br(trim($_POST['news']));
+	    $db->query("UPDATE ".db_tablename('news')." SET news=".$db->quote($newstxt)." WHERE id=".$db->quote((int)$id));
+	    $TEMPLATE->add_message(lang('news_item_saved'));
+	    $id = null;
+	}
+    }
+
+    $res =& $db->query("SELECT * FROM ".db_tablename('news')." ORDER BY date DESC");
+    while ($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	$mode = 1;
+	if ($row['id'] == $id) $mode = 2;
+	$news .= $TEMPLATE->news_item($row['news'], date($CONFIG['news_time_format'], $row['date']), $row['id'], $mode);
+    }
+
+    print $TEMPLATE->edit_news_page($news);
+}
+
 
 function add_news($method)
 {
@@ -395,7 +439,7 @@ function add_news($method)
     $innerhtml = null;
     $rawnews = '';
     if($method == 'submit') {
-	$rawnews = $_POST['news'];
+	$rawnews = trim($_POST['news']);
 	$news = nl2br($rawnews);
 	if (isset($_POST['preview'])) {
 	    $innerhtml = $TEMPLATE->news_item($news, date($CONFIG['news_time_format'], mktime()));
@@ -849,6 +893,11 @@ switch($page[0])
 	    if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && !isset($_SESSION['logged_in']))
 		break;
 	    add_quote($page[1]);
+	    break;
+	case 'edit_news':
+	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] <= USER_ADMIN)) {
+		edit_news($page[1], $page[2]);
+	    }
 	    break;
 	case 'add_news':
 	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] <= USER_ADMIN)) {

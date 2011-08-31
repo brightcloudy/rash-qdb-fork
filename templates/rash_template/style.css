@@ -29,6 +29,10 @@
     white-space: nowrap;
 }
 
+.hilight_news_entry {
+  background-color:#fff0f0;
+}
+
 div.quote_quote{
 	padding-bottom: 5pt;	
 }

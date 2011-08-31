@@ -86,10 +86,38 @@ abstract class BaseTemplate {
 	return '</body></html>';
     }
 
-    function news_item($news, $date)
+    function news_item($news, $date, $id=null, $mode=0)
     {
-	return '<div class="news_entry"><div class="news_date">'.$date.'</div>'.
+	if ($mode == 0) {
+	    return '<div class="news_entry"><div class="news_date">'.$date.'</div>'.
 	    '<div class="news_news">'.$news.'</div></div>';
+	} else {
+	    $str = '<div class="news_entry"><div class="news_date"><a href="?'.urlargs('edit_news','edit',$id).'">'.$date.'</a></div>'.
+		'<div class="news_news">'.$news.'</div></div>';
+
+	    if ($mode == 2) $str = '<div class="hilight_news_entry">'.$str.'</div>';
+	    return $str;
+	}
+    }
+
+    function edit_news_form($id, $news)
+    {
+	return '<div class="edit_news_form"><form action="?'.urlargs('edit_news','update',$id).'" method="post">
+  <textarea cols="80" rows="5" name="news" id="edit_news_news">'.$news.'</textarea><br />
+  <input type="submit" value="'.lang('preview_news_btn').'" id="edit_preview" name="preview" />
+  <input type="submit" value="'.lang('save_news_btn').'" id="edit_news" name="submit" />
+  <input type="submit" value="'.lang('delete_news_btn').'" id="delete_news" name="delete" />
+  '.lang('delete_news_verify').'<input type="checkbox" name="verify_delete">
+  </form></div><p>';
+    }
+
+    function edit_news_page($news)
+    {
+	$str = '<div id="editnews_all">';
+	$str .= '<h1 id="editnews_title">'.lang('editnews_title').'</h1>';
+	$str .= $news;
+	$str .= '</div>';
+	return $str;
     }
 
     function main_page($news)

@@ -91,6 +91,17 @@ function printfooter($dbstats=null)
 
 }
 
+function edit_news_page($news)
+{
+    $str = '<div id="editnews_all">';
+    $str .= '<h1 id="editnews_title">'.lang('editnews_title').'</h1>';
+    $str .= $this->get_messages();
+    $str .= $news;
+    $str .= '</div>';
+    return $str;
+}
+
+
 function main_page($news)
 {
     return $this->get_messages() . '<div id="home_all"><div id="news">'.$news.
