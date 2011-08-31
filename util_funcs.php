@@ -22,6 +22,31 @@ function urlargs($ar1, $ar2 = null, $ar3 = null)
     return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2, $ar3));
 }
 
+function autologin()
+{
+    if (isset($_COOKIE['user']) && isset($_COOKIE['passwd']) && isset($_COOKIE['userid'])) {
+	global $db;
+	$pass = $_COOKIE['passwd'];
+	$user = $_COOKIE['user'];
+	$userid = $_COOKIE['userid'];
+
+	$res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE id=".$db->quote((int)$userid)." AND user=".$db->quote($user));
+	if (DB::isError($res)) return;
+	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	if (!isset($row['password'])) return;
+	$passchk = md5($row['password'].$row['salt']);
+	if ($pass == $passchk) {
+	    $_SESSION['user'] = $row['user'];
+	    $_SESSION['level'] = $row['level'];
+	    $_SESSION['userid'] = $row['id'];
+	    $_SESSION['logged_in'] = 1;
+	    mk_cookie('user', $row['user']);
+	    mk_cookie('userid', $row['id']);
+	    mk_cookie('passwd', $passchk);
+	}
+    }
+}
+
 /* $row = array with keys 'user', 'id', 'level', 'password', 'salt' */
 function set_user_logged($row)
 {
@@ -137,13 +162,26 @@ function str_rand($length = 8, $seeds = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklm
     return $str;
 }
 
+function is_lang($str)
+{
+    global $lang;
+    if (isset($lang[$str])) return TRUE;
+    return FALSE;
+}
+
+function lang($str)
+{
+    global $lang;
+    if (isset($lang[$str])) return $lang[$str];
+    return $str;
+}
 
 function title($title)
 {
     global $CONFIG, $lang;
     $str = ($CONFIG['prefix_short_title'] ? $CONFIG['site_short_title'].': ' : '');
-    if (preg_match('/^[0-9]+$/', $title)) $str .= sprintf($lang['pagetitle_quotenum'], $title);
-    else if (isset($lang['pagetitle_'.$title])) $str .= $lang['pagetitle_'.$title];
+    if (preg_match('/^[0-9]+$/', $title)) $str .= sprintf(lang('pagetitle_quotenum'), $title);
+    else if (is_lang('pagetitle_'.$title)) $str .= lang('pagetitle_'.$title);
     else $str .= $CONFIG['site_long_title'];
     return $str;
 }

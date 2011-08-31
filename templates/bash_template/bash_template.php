@@ -4,7 +4,6 @@ class BashTemplate extends BaseTemplate {
 
 function printheader($title, $topleft='QMS', $topright='Quote Management System')
 {
-    global $lang;
 ob_start();
 // begin editing after this line ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -28,9 +27,9 @@ ob_start();
 <?
 
 if(!isset($_SESSION['logged_in'])){
-    print '<a href="?admin" id="site_nav_admin">'.$lang['menu_admin'].'</a>';
+    print '<a href="?admin" id="site_nav_admin">'.lang('menu_admin').'</a>';
 } else {
-    print sprintf($lang['logged_in_as'], htmlspecialchars($_SESSION['user']));
+    print sprintf(lang('logged_in_as'), htmlspecialchars($_SESSION['user']));
 }
 
 	print '</div>';
@@ -45,7 +44,6 @@ if(!isset($_SESSION['logged_in'])){
 //
 function printfooter($dbstats=null)
 {
-    global $lang;
 ?>
   <div id="site_admin_nav">
    <div id="site_admin_nav_upper">
@@ -61,12 +59,12 @@ function printfooter($dbstats=null)
     <div id="site_admin_nav_lower_infobar">
      <span id="site_admin_nav_lower_infobar_pending">
 <?
-	  echo $lang['pending_quotes'].": ".$dbstats['pending_quotes'].";\n";
+	  echo lang('pending_quotes').": ".$dbstats['pending_quotes'].";\n";
 ?>
      </span>
      <span id="site_admin_nav_lower_infobar_approved">
 <?
-	  echo $lang['approved_quotes'].": ".$dbstats['approved_quotes']."\n";
+	  echo lang('approved_quotes').": ".$dbstats['approved_quotes']."\n";
 ?>
      </span>
     </div>
