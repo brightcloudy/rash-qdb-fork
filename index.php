@@ -411,8 +411,9 @@ function edit_news($method, $id)
 		$res =& $db->query("DELETE FROM ".db_tablename('news')." where id=".$db->quote((int)$id));
 		$TEMPLATE->add_message(lang('news_item_deleted'));
 	    } else {
+		$newstxt = trim($_POST['news']);
+		$news .= $TEMPLATE->edit_news_form($id, $newstxt);
 		$TEMPLATE->add_message(lang('news_item_delete_no_verify'));
-		$id = null;
 	    }
 	} else {
 	    $newstxt = nl2br(trim($_POST['news']));
