@@ -8,6 +8,16 @@ function mangle_quote_text($txt)
     return $txt;
 }
 
+function get_number_limit($param, $min, $max)
+{
+    if (isset($param) && preg_match('/^[0-9]+$/', $param)) {
+	$limit = (int)$param;
+	if ($limit < $min) $limit = $min;
+	else if ($limit > $max) $limit = $max;
+    } else $limit = $max;
+    return $limit;
+}
+
 function db_tablename($name)
 {
     include 'settings.php';

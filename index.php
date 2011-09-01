@@ -894,6 +894,8 @@ if (preg_match('/=/', $page[0])) {
     $pageparam = trim($tmppage[1]);
 }
 
+$limit = get_number_limit($pageparam, 1, $CONFIG['quote_list_limit']);
+
 switch($page[0])
 {
 	case 'add':
@@ -940,9 +942,9 @@ switch($page[0])
 		}
 		break;
 	case 'bottom':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT ".$CONFIG['quote_list_limit'];
-		quote_generation($query, lang('bottom_title'), -1);
-		break;
+	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating < 0 ORDER BY rating ASC LIMIT ".$limit;
+	    quote_generation($query, lang('bottom_title'), -1);
+	    break;
 	case 'browse':
 		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id ASC ";
 		quote_generation($query, lang('browse_title'), $page[1], $CONFIG['quote_limit'], $CONFIG['page_limit']);
@@ -961,7 +963,7 @@ switch($page[0])
 		flag_queue($page[1]);
 	    break;
 	case 'latest':
-	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT ".$CONFIG['quote_list_limit'];
+	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY id DESC LIMIT ".$limit;
 	    if (isset($_SESSION['lastvisit'])) {
 		$nlatest = $db->getOne("SELECT count(1) FROM ".db_tablename('quotes')." WHERE queue=0 AND date>=".$_SESSION['lastvisit']);
 		if (($nlatest >= 3) && ($nlatest <= $CONFIG['quote_list_limit'])) {
@@ -977,29 +979,29 @@ switch($page[0])
 	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] < USER_NORMAL))
 		quote_queue($page[1]);
 	    else if (isset($CONFIG['public_queue']) && ($CONFIG['public_queue'] == 1)) {
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=1 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
+		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=1 ORDER BY rand() LIMIT ".$limit;
 		quote_generation($query, lang('quote_queue_title'), -1);
 	    }
 	    break;
 	case 'random':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
-		quote_generation($query, lang('random_title'), -1);
-		break;
+	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 ORDER BY rand() LIMIT ".$limit;
+	    quote_generation($query, lang('random_title'), -1);
+	    break;
 	case 'random2':
 	case 'randomplus':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating>0 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
-		quote_generation($query, lang('random2_title'), -1);
-		break;
+	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating>0 ORDER BY rand() LIMIT ".$limit;
+	    quote_generation($query, lang('random2_title'), -1);
+	    break;
 	case 'random3':
 	case 'random0':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating=0 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
-		quote_generation($query, lang('random3_title'), -1);
-		break;
+	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating=0 ORDER BY rand() LIMIT ".$limit;
+	    quote_generation($query, lang('random3_title'), -1);
+	    break;
 	case 'random4':
 	case 'randomminus':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating<0 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
-		quote_generation($query, lang('random4_title'), -1);
-		break;
+	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating<0 ORDER BY rand() LIMIT ".$limit;
+	    quote_generation($query, lang('random4_title'), -1);
+	    break;
 	case 'rss':
 	    rash_rss();
 	    break;
@@ -1007,9 +1009,9 @@ switch($page[0])
 	    search($page[1], $pageparam);
 	    break;
 	case 'top':
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT ".$CONFIG['quote_list_limit'];
-		quote_generation($query, lang('top_title'), -1);
-		break;
+	    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and rating > 0 ORDER BY rating DESC LIMIT ".$limit;
+	    quote_generation($query, lang('top_title'), -1);
+	    break;
 	case 'edit':
 	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] <= USER_ADMIN))
 		edit_quote($page[1], $page[2]);
