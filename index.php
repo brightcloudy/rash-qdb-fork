@@ -1024,9 +1024,25 @@ switch($page[0])
 	    vote($page[1], $page[2]);
 	    break;
 	default:
-	    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
-		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and id =".$db->quote((int)$_SERVER['QUERY_STRING']);
-		quote_generation($query, "#${_SERVER['QUERY_STRING']}", -1);
+	    if (preg_match('/^[0-9]+(&[0-9]+)*$/', $_SERVER['QUERY_STRING'])) {
+		$idlist = explode('&', $_SERVER['QUERY_STRING']);
+		if (count($idlist) < 11) {
+		    $ids = array();
+		    $order = array();
+		    $idx = 0;
+		    foreach ($idlist as $id) {
+			$ids[] = 'id='.$db->quote((int)$id);
+			$order[] = 'WHEN '.$db->quote((int)$id).' THEN '.$idx.' ';
+			$idx++;
+		    }
+		    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and (".implode(' or ', $ids).") ORDER BY CASE id ".implode($order)." END";
+		    if ($idx > 1) $title = 'Selected Quotes';
+		    else $title = "#${_SERVER['QUERY_STRING']}";
+		} else {
+		    $query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=0 and id =".$db->quote((int)$idlist[0]);
+		    $title = "#${idlist[0]}";
+		}
+		quote_generation($query, $title, -1);
 	    } else {
 		home_generation();
 	    }
