@@ -37,6 +37,7 @@ $CONFIG['timezone'] = 'America/New_York';
 $CONFIG['news_time_format'] = 'Y-m-d';
 $CONFIG['quote_time_format'] = 'F j, Y';
 $CONFIG['public_queue'] = 1; // Can users view & vote for quotes in the moderation queue?
+$CONFIG['min_quote_length'] = 15; // Minimum acceptable quote length, in characters
 
 // No need to change these
 $CONFIG['GET_SEPARATOR'] = ini_get('arg_separator.output');

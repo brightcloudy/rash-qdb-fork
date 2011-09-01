@@ -23,6 +23,7 @@ require('settings.php');
 
 if (!isset($CONFIG['quote_list_limit']) || !is_int($CONFIG['quote_list_limit'])) $CONFIG['quote_list_limit'] = 50;
 if (!isset($CONFIG['rss_entries']) || ($CONFIG['rss_entries'] < 1)) $CONFIG['rss_entries'] = 15;
+if (!isset($CONFIG['min_quote_length'])) $CONFIG['min_quote_length'] = 15;
 
 require('util_funcs.php');
 
@@ -860,7 +861,7 @@ function add_quote($method)
 
     if ($method == 'submit') {
 	$quotxt = htmlspecialchars(trim($_POST["rash_quote"]));
-	if (strlen($quotxt) < 3) {
+	if (strlen($quotxt) < $CONFIG['min_quote_length']) {
 	    $TEMPLATE->add_message(lang('add_quote_short'));
 	} else {
 	    if (isset($_POST['preview'])) {

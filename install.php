@@ -292,6 +292,7 @@ If (isset($_POST['submit'])) {
 		  'quote_limit' => $_POST['quote_limit'],
 		  'page_limit' => $_POST['page_limit'],
 		  'quote_list_limit' => $_POST['quote_list_limit'],
+		  'min_quote_length' => $_POST['min_quote_length'],
 		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
 		  'login_required' => (($_POST['login_required'] == 'on') ? 1 : 0),
 		  'auto_flagged_quotes' => (($_POST['auto_flagged_quotes'] == 'on') ? 0 : 1),
@@ -478,6 +479,10 @@ else {
  <tr>
   <td>Quote List limit
   <td><input type="text" name="quote_list_limit" value="50" size="4"> (how many quotes are shown in non-browse pages, eg. ?top)
+ </tr>
+ <tr>
+  <td>Min Quote Length
+  <td><input type="text" name="min_quote_length" value="15" size="4"> (Minimum acceptable quote length, in characters)
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
