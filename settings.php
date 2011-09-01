@@ -36,6 +36,7 @@ $CONFIG['use_captcha'] = array('flag'=>1, 'add_quote'=>0, 'register_user'=>1);
 $CONFIG['timezone'] = 'America/New_York';
 $CONFIG['news_time_format'] = 'Y-m-d';
 $CONFIG['quote_time_format'] = 'F j, Y';
+$CONFIG['public_queue'] = 1; // Can users view & vote for quotes in the moderation queue?
 
 // No need to change these
 $CONFIG['GET_SEPARATOR'] = ini_get('arg_separator.output');

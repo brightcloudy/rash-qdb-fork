@@ -295,6 +295,7 @@ If (isset($_POST['submit'])) {
 		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
 		  'login_required' => (($_POST['login_required'] == 'on') ? 1 : 0),
 		  'auto_flagged_quotes' => (($_POST['auto_flagged_quotes'] == 'on') ? 0 : 1),
+		  'public_queue' => (($_POST['public_queue'] == 'on') ? 0 : 1),
 		  'timezone' => "'".$_POST['timezone']."'",
 		  'news_time_format' => "'".$_POST['news_time_format']."'",
 		  'quote_time_format' => "'".$_POST['quote_time_format']."'",
@@ -484,6 +485,10 @@ else {
  <tr>
   <td>Moderated
   <td><input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
+ </tr>
+ <tr>
+  <td>Public Queue
+  <td><input type="checkbox" name="public_queue" checked> Can users view and vote quotes in the moderation queue?
  </tr>
  <tr>
   <td>Quote flagging

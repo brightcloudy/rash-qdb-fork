@@ -70,8 +70,14 @@ $mainmenu = array(array('url' => './', 'id' => 'site_nav_home', 'txt' => 'menu_h
 		  array('url' => '?random', 'id' => 'site_nav_random', 'txt' => 'menu_random'),
 		  array('url' => '?random2', 'id' => 'site_nav_random2', 'txt' => 'menu_random2'),
 		  array('url' => '?bottom', 'id' => 'site_nav_bottom', 'txt' => 'menu_bottom'),
-		  array('url' => '?top', 'id' => 'site_nav_top', 'txt' => 'menu_top'),
-		  array('url' => '?search', 'id' => 'site_nav_search', 'txt' => 'menu_search'));
+		  array('url' => '?top', 'id' => 'site_nav_top', 'txt' => 'menu_top'));
+
+if (isset($CONFIG['public_queue']) && ($CONFIG['public_queue'] == 1) &&
+    isset($CONFIG['moderated_quotes']) && ($CONFIG['moderated_quotes'] == 1)) {
+    $mainmenu[] = array('url' => '?queue', 'id' => 'site_nav_queue', 'txt' => 'menu_queue');
+}
+
+$mainmenu[] = array('url' => '?search', 'id' => 'site_nav_search', 'txt' => 'menu_search');
 
 if ((isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && isset($_SESSION['logged_in']))
     || !isset($CONFIG['login_required']) || ($CONFIG['login_required'] == 0))
@@ -970,7 +976,7 @@ switch($page[0])
 	case 'queue':
 	    if (isset($_SESSION['logged_in']) && ($_SESSION['level'] < USER_NORMAL))
 		quote_queue($page[1]);
-	    else {
+	    else if (isset($CONFIG['public_queue']) && ($CONFIG['public_queue'] == 1)) {
 		$query = "SELECT * FROM ".db_tablename('quotes')." WHERE queue=1 ORDER BY rand() LIMIT ".$CONFIG['quote_list_limit'];
 		quote_generation($query, lang('quote_queue_title'), -1);
 	    }
