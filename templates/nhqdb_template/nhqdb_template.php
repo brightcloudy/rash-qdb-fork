@@ -105,7 +105,8 @@ function edit_news_page($news)
 function main_page($news)
 {
     return $this->get_messages() . '<div id="home_all"><div id="news">'.$news.
-	'</div><div id="home_greeting">'.lang('home_greeting').'</div></div>';
+	'<div class="show_all_news"><a href="?'.urlargs('news').'">'.lang('news_show_all').'</a></div></div>
+         <div id="home_greeting">'.lang('home_greeting').'</div></div>';
 }
 
 

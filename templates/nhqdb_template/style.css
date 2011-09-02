@@ -112,6 +112,10 @@ span.quote_minus:hover {
 
 /* home_*: styles for the default homepage */
 
+.show_all_news {
+    text-align:right;
+}
+
 .news_date{
 	font-weight: bold;
 }

@@ -100,6 +100,15 @@ abstract class BaseTemplate {
 	}
     }
 
+    function news_page($news)
+    {
+	$str = '<div id="news_all">';
+	$str .= '<h1 id="news_title">'.lang('news_title').'</h1>';
+	$str .= $news;
+	$str .= '</div>';
+	return $str;
+    }
+
     function edit_news_form($id, $news)
     {
 	return '<div class="edit_news_form"><form action="?'.urlargs('edit_news','update',$id).'" method="post">
@@ -122,7 +131,8 @@ abstract class BaseTemplate {
 
     function main_page($news)
     {
-	return '<div id="home_all"><div id="news">'.$news.'</div>
+	return '<div id="home_all"><div id="news">'.$news.
+        '<div class="show_all_news"><a href="?'.urlargs('news').'">'.lang('news_show_all').'</a></div></div>
         <div id="home_greeting">'.lang('home_greeting').'</div></div>';
     }
 

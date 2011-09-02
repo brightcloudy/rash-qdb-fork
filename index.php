@@ -220,17 +220,18 @@ function vote($quote_num, $method)
 }
 
 
+function news_page()
+{
+    global $db, $TEMPLATE, $CONFIG;
+    $res =& $db->query("SELECT * FROM ".db_tablename('news')." ORDER BY date desc");
+    $news = '';
 
-// home_generation()
-//
-// Generates the page that shows up when there are none or invalid URL arguments,
-// the default page, can be used to show the general idea of the site, and/or
-// used for news updates, either can be turned off in rash_settings.php
-// in the rash/templates/rash_template folder.
-//
-// The greeting div has a variable named $home_greeting in it, this variable
-// should be assigned to a greeting, although anything you want can do.
-//
+    while ($row=$res->fetchRow(DB_FETCHMODE_ASSOC)) {
+	$news .= $TEMPLATE->news_item($row['news'], date($CONFIG['news_time_format'], $row['date']));
+    }
+    print $TEMPLATE->news_page($news);
+}
+
 function home_generation()
 {
     global $db, $TEMPLATE, $CONFIG;
@@ -1025,6 +1026,9 @@ switch($page[0])
 	    if (isset($CONFIG['login_required']) && ($CONFIG['login_required'] == 1) && !isset($_SESSION['logged_in']))
 		break;
 	    vote($page[1], $page[2]);
+	    break;
+	case 'news':
+	    news_page();
 	    break;
 	default:
 	    if (preg_match('/^[0-9]+(&[0-9]+)*$/', $_SERVER['QUERY_STRING'])) {
