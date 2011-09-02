@@ -244,6 +244,7 @@ $captcha_uses = array('flag'=>'Flagging a quote',
 
 $templates = array('./templates/bash_template/bash_template.php' => 'bash.org lookalike',
 		   './templates/rash_template/rash_template.php' => 'Rash QMS',
+		   './templates/owned/owned.php' => 'i-rox.com owned lookalike',
 		   './templates/nhqdb_template/nhqdb_template.php' => 'nhqdb');
 $def_template = './templates/bash_template/bash_template.php';
 

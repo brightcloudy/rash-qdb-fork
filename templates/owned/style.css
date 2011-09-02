@@ -1,0 +1,235 @@
+body {
+  background-color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: #e44c00;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+a:hover {
+  border-bottom: 1px dashed #e44c00;
+}
+
+h1 {
+  text-align: right;
+  text-transform:lowercase;
+  color: #e44c00;
+  letter-spacing: 0.75em;
+  font-weight: normal;
+  letter-spacing: 0.75em;
+}
+
+select:focus,
+textarea:focus,
+input:focus {
+    -moz-box-shadow: 0px 0px 5px #e44c00;
+    -webkit-box-shadow: 0px 0px 5px #e44c00;
+    box-shadow: 0px 0px 5px #e44c00;
+}
+
+#site_all {
+  margin: 1em 10% 1em 10%;
+  background-color: white;
+  height: 90%;
+}
+
+#site_nav_admin {
+  display:none;
+}
+
+#site_nav_upper_qms {
+  font-size: 4em;
+  text-align:right;
+  text-transform:lowercase;
+  color: #e44c00;
+  letter-spacing: 0.75em;
+  z-index:0;
+}
+
+#site_nav_upper_qms-long {
+  float:right;
+  display:inline;
+  font-size: x-small;
+  color: #e0e0e0;
+  z-index:1;
+  font-weight: bold;
+  letter-spacing: 0.5em;
+  white-space: nowrap;
+  text-align: right;
+  margin-top: -1em;
+
+}
+
+#content {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.quote_pagenums {
+  text-align:right;
+  text-transform:lowercase;
+}
+
+#home_all > #news {
+  width: 48%;
+  display: table-cell;
+}
+
+.show_all_news {
+  text-align: right;
+  padding-right: 1em;
+}
+
+
+#home_greeting {
+  width: 48%;
+  display: table-cell;
+  padding-left: 1em;
+}
+
+#site_nav_lower {
+  text-align: right;
+}
+
+#site_nav_lower_linkbar {
+  text-transform:lowercase;
+}
+
+#site_admin_nav_lower_infobar {
+  text-align: right;
+}
+
+#logged_in_as {
+  float: right;
+  font-size: smaller;
+  color: #a0a0a0;
+}
+
+#site_admin_nav {
+  border-top: 1em solid #e0e0e0;
+}
+#site_nav {
+  border-bottom: 1em solid #e0e0e0;
+}
+
+
+.news_date {
+  text-align: right;
+  font-weight: bold;
+}
+.news_entry {
+  border: 1px solid black;
+  background-color: #f0f0f0;
+  margin: 1em;
+  padding: 0.25em;
+}
+
+
+.quote_quote {
+  font-family: courier new, lucida console, fixed;
+  font-size: smaller;
+  padding-bottom: 5pt;
+}
+.quote_whole {
+  padding-top: 10pt;
+  padding-left:0.25em;
+  padding-right:0.25em;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+.quote_whole:nth-child(odd) {
+  background-color:#f0f0f0;
+}
+
+
+span.quote_flag,
+span.quote_plus,
+span.quote_minus {
+  display: none;
+}
+
+.quote_number,
+.quote_rating,
+.quote_date {
+  display: inline-block;
+  text-align: left;
+  min-width: 5em;
+  width: 5em;
+  white-space: nowrap;
+  font-family: courier new, lucida console, fixed;
+  font-size: smaller;
+}
+
+a.quote_plus:hover {
+  text-decoration: none;
+  border: 1px solid green;
+}
+a.quote_plus {
+  float: right;
+  color: green;
+  font-weight: bold;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+  border: 1px solid transparent;
+}
+a.quote_minus:hover {
+  text-decoration: none;
+  border: 1px solid red;
+}
+a.quote_minus {
+  float: right;
+  color: red;
+  font-weight: bold;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+  border: 1px solid transparent;
+}
+a.quote_flag:hover {
+  text-decoration: none;
+  border: 1px solid #a0a0a0;
+}
+a.quote_flag {
+  float: right;
+  color: #a0a0a0;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+  border: 1px solid transparent;
+}
+a.quote_edit {
+  float: right;
+  display: inline-block;
+  min-width: 1.25em;
+  text-align:center;
+}
+
+.hilight_news_entry {
+  background-color:red;
+}
+
+.admin_queue tr:nth-child(odd) {
+	background-color: #ffffff;
+}
+.admin_queue tr {
+	background-color: #f0f0f0;
+}
+.admin_queue .quote_delete label,
+.admin_queue .quote_unflag label,
+.admin_queue .quote_no label,
+.admin_queue .quote_yes label {
+  display:block;
+}
+.admin_queue .quote_delete label:hover,
+.admin_queue .quote_no label:hover {
+  background-color:pink;
+}
+.admin_queue .quote_unflag label:hover,
+.admin_queue .quote_yes label:hover {
+  background-color:lightgreen;
+}
