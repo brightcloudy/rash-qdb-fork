@@ -47,9 +47,7 @@ function printfooter($dbstats=null)
 {
 ?>
   <div id="site_admin_nav">
-<?php
-		print $this->get_menu(1);
-?>
+<?=$this->get_menu(1);?>
   </div>
  </div>
 </body>

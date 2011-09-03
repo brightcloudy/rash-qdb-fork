@@ -374,7 +374,7 @@ else {
 <table>
  <tr>
   <td>Template</td>
-  <td><select name="template"><? foreach ($templates as $k=>$v) { echo '<option value="'.$k.'">'.$v; } ?></select>
+  <td><select name="template"><?php foreach ($templates as $k=>$v) { echo '<option value="'.$k.'">'.$v; } ?></select>
  </tr>
  <tr>
 	<td>&nbsp;</td><td>&nbsp;</td>
@@ -416,21 +416,21 @@ else {
  </tr>
  <tr>
   <td>Admin EMail
-  <td><input type="text" name="admin_email" value="qdb@<?php echo $_SERVER['SERVER_NAME']; ?>">
+  <td><input type="text" name="admin_email" value="qdb@<?=$_SERVER['SERVER_NAME'];?>">
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
  </tr>
  <tr>
   <td>Secret Salt
-  <td><input type="text" name="secret_salt" value="<?php echo str_rand(); ?>"> (Used to encrypt some things)
+  <td><input type="text" name="secret_salt" value="<?=str_rand();?>"> (Used to encrypt some things)
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
  </tr>
  <tr>
   <td>Site Language
-  <td><select name="language"><? foreach($languages as $l) { echo '<option value="'.$l.'">'.$l; } ?></select>
+  <td><select name="language"><?php foreach($languages as $l) { echo '<option value="'.$l.'">'.$l; } ?></select>
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
@@ -452,7 +452,7 @@ else {
  </tr>
  <tr>
   <td>RSS URL
-  <td><input type="text" name="rss_url" value="<?php echo mk_rss_url(); ?>" size="40">
+  <td><input type="text" name="rss_url" value="<?=mk_rss_url();?>" size="40">
  </tr>
  <tr>
   <td>RSS Title
@@ -502,11 +502,11 @@ else {
  </tr>
  <tr>
   <td>CAPTCHA
-  <td><select name="captcha"><? foreach($captchas as $c) { echo '<option value="'.$c['name'].'">'.$c['desc']; } ?></select>
+  <td><select name="captcha"><?php foreach($captchas as $c) { echo '<option value="'.$c['name'].'">'.$c['desc']; } ?></select>
  </tr>
  <tr>
   <td>Use CAPTCHA For
-  <td><? foreach ($captcha_uses as $k=>$v) { echo '<input type="checkbox" name="use_captcha[]" value="'.$k.'" checked>'.$v.'<br>'; } ?>
+  <td><?php foreach ($captcha_uses as $k=>$v) { echo '<input type="checkbox" name="use_captcha[]" value="'.$k.'" checked>'.$v.'<br>'; } ?>
  </tr>
  <tr>
   <td>User Login required
@@ -521,11 +521,11 @@ else {
  </tr>
  <tr>
   <td>News time format
-				 <td><input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>, See <a href="http://php.net/manual/en/function.date.php">list of date format characters</a>)
+				 <td><input type="text" name="news_time_format" value="Y-m-d"> (example: <em><?=date("Y-m-d");?></em>, See <a href="http://php.net/manual/en/function.date.php">list of date format characters</a>)
  </tr>
  <tr>
   <td>Quote time format
-  <td><input type="text" name="quote_time_format" value="F j, Y"> (example: <? print date("F j, Y"); ?>)
+  <td><input type="text" name="quote_time_format" value="F j, Y"> (example: <em><?=date("F j, Y");?></em>)
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>

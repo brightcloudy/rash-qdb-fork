@@ -40,7 +40,7 @@ ob_start();
     </div>
       <div id="site_nav_upper_qms"><?=$topleft?>
     </div>&nbsp;
-<?
+<?php
 
   if(!isset($_SESSION['logged_in'])){
       print '<a href="?admin" id="site_nav_admin">'.lang('menu_admin').'</a>';
@@ -63,23 +63,16 @@ function printfooter($dbstats=null)
   <p>
   <div id="site_admin_nav">
    <div id="site_admin_nav_upper">
-    <div id="site_admin_nav_upper_linkbar">
-<?
-       print $this->get_menu(1);
-?>
+    <div id="site_admin_nav_upper_linkbar"><?=$this->get_menu(1);?>
     </div>
    </div>
    <div id="site_admin_nav_lower">
     <div id="site_admin_nav_lower_infobar">
      <span id="site_admin_nav_lower_infobar_pending">
-<?
-	  echo lang('pending_quotes').": ".$dbstats['pending_quotes'].";\n";
-?>
+<?=lang('pending_quotes').": ".$dbstats['pending_quotes'].";\n";?>
      </span>
      <span id="site_admin_nav_lower_infobar_approved">
-<?
-	  echo lang('approved_quotes').": ".$dbstats['approved_quotes']."\n";
-?>
+<?=lang('approved_quotes').": ".$dbstats['approved_quotes']."\n";?>
      </span>
     </div>
    </div>
@@ -87,7 +80,7 @@ function printfooter($dbstats=null)
  </div>
 </body>
 </html>
-<?
+<?php
 
 }
 
