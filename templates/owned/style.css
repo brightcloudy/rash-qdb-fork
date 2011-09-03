@@ -35,13 +35,13 @@ select,
 input,
 textarea {
     background-color: white;
-    border: 1px solid black;
+    border: 1px solid #a0a0a0;
     color: black;
     font-size: 10px;
 }
 
 form {
-  border: 1px solid black;
+  border: 1px solid #a0a0a0;
   background-color: #f0f0f0;
   margin: 1em;
   padding: 2em;
@@ -140,7 +140,7 @@ form {
   font-weight: bold;
 }
 .news_entry {
-  border: 1px solid black;
+  border: 1px solid #a0a0a0;
   background-color: #f0f0f0;
   margin: 1em;
   padding: 0.25em;
