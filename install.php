@@ -3,11 +3,17 @@
 error_reporting(E_ALL);
 ini_set('display_errors','On');
 */
+require_once 'DB.php';
 include 'util_funcs.php';
 
-function db_query($sql) {
+$db = null;
+$hidelink = 0;
+
+function mk_datasource()
+{
+    global $db;
+    if ($db != null) return $db;
     include 'settings.php';
-    require_once 'DB.php';
     $dsn = array(
 		 'phptype'  => $CONFIG['phptype'],
 		 'username' => $CONFIG['username'],
@@ -19,9 +25,13 @@ function db_query($sql) {
 		 );
     $db =& DB::connect($dsn);
     if (DB::isError($db)) {
-	print $db->getMessage().'<br />';
-	return 1;
+	die($db->getMessage().'<br />');
     }
+    return $db;
+}
+
+function db_query($sql) {
+    global $db;
     $res =& $db->query($sql);
     if (DB::isError($res)) {
 	print $res->getMessage().'<br />';
@@ -34,22 +44,7 @@ function db_query($sql) {
 
 function update_rash_quotes()
 {
-    include 'settings.php';
-    require_once 'DB.php';
-    $dsn = array(
-		 'phptype'  => $CONFIG['phptype'],
-		 'username' => $CONFIG['username'],
-		 'password' => $CONFIG['password'],
-		 'hostspec' => $CONFIG['hostspec'],
-		 'port'     => $CONFIG['port'],
-		 'socket'   => $CONFIG['socket'],
-		 'database' => $CONFIG['database'],
-		 );
-    $db =& DB::connect($dsn);
-    if (DB::isError($db)) {
-	print $db->getMessage().'<br />';
-	return 1;
-    }
+    global $db;
 
     $res =& $db->query("SELECT * from ".db_tablename('quotes').' LIMIT 1');
     if (!(DB::isError($res))) {
@@ -94,22 +89,7 @@ function update_rash_quotes()
 
 function update_old_users()
 {
-    include 'settings.php';
-    require_once 'DB.php';
-    $dsn = array(
-		 'phptype'  => $CONFIG['phptype'],
-		 'username' => $CONFIG['username'],
-		 'password' => $CONFIG['password'],
-		 'hostspec' => $CONFIG['hostspec'],
-		 'port'     => $CONFIG['port'],
-		 'socket'   => $CONFIG['socket'],
-		 'database' => $CONFIG['database'],
-		 );
-    $db =& DB::connect($dsn);
-    if (DB::isError($db)) {
-	print $db->getMessage().'<br />';
-	return 1;
-    }
+    global $db;
 
     $users = array();
 
@@ -156,22 +136,7 @@ function update_old_users()
 
 function update_old_tracking()
 {
-    include 'settings.php';
-    require_once 'DB.php';
-    $dsn = array(
-		 'phptype'  => $CONFIG['phptype'],
-		 'username' => $CONFIG['username'],
-		 'password' => $CONFIG['password'],
-		 'hostspec' => $CONFIG['hostspec'],
-		 'port'     => $CONFIG['port'],
-		 'socket'   => $CONFIG['socket'],
-		 'database' => $CONFIG['database'],
-		 );
-    $db =& DB::connect($dsn);
-    if (DB::isError($db)) {
-	print $db->getMessage().'<br />';
-	return 1;
-    }
+    global $db;
 
     $tracking = array();
 
@@ -294,10 +259,10 @@ If (isset($_POST['submit'])) {
 		  'page_limit' => $_POST['page_limit'],
 		  'quote_list_limit' => $_POST['quote_list_limit'],
 		  'min_quote_length' => $_POST['min_quote_length'],
-		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
-		  'login_required' => (($_POST['login_required'] == 'on') ? 1 : 0),
+		  'moderated_quotes' => ((isset($_POST['moderated_quotes']) && ($_POST['moderated_quotes'] == 'on')) ? 1 : 0),
+		  'login_required' => ((isset($_POST['login_required']) && ($_POST['login_required'] == 'on')) ? 1 : 0),
 		  'auto_flagged_quotes' => (($_POST['auto_flagged_quotes'] == 'on') ? 0 : 1),
-		  'public_queue' => (($_POST['public_queue'] == 'on') ? 0 : 1),
+		  'public_queue' => ((isset($_POST['public_queue']) && ($_POST['public_queue'] == 'on')) ? 0 : 1),
 		  'timezone' => "'".$_POST['timezone']."'",
 		  'news_time_format' => "'".$_POST['news_time_format']."'",
 		  'quote_time_format' => "'".$_POST['quote_time_format']."'",
@@ -327,6 +292,8 @@ If (isset($_POST['submit'])) {
 	$str = "INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES('$username', '".crypt($password, "\$1\$".substr($salt, 0, 8)."\$")."', '$level', '\$1\$".$salt."\$');";
 	return db_query($str);
     }
+
+    $db = mk_datasource();
 
     $error = mk_db_table(db_tablename('quotes'), "id int(11) NOT NULL auto_increment primary key,
 							quote text NOT NULL,
