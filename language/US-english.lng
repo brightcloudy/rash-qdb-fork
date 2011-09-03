@@ -1,5 +1,9 @@
 <?php
 $lang = array (
+'user_level_superuser' => 'superuser',
+'user_level_administrator' => 'administrator',
+'user_level_moderator' => 'moderator',
+'user_level_user' => 'normal user',
 'pagetitle_add' => 'Add a Quote',
 'pagetitle_bottom' => 'Bottom',
 'pagetitle_browse' => 'Browse Quotes',

@@ -4,16 +4,20 @@ error_reporting(E_ALL);
 ini_set('display_errors','On');
 */
 
+if (!file_exists('settings.php')) {
+    header("Location: install.php");
+    exit;
+}
+
 define('USER_SUPERUSER', 1);
 define('USER_ADMIN', 2);
 define('USER_MOD', 3);
 define('USER_NORMAL', 4);
 
-
-if (!file_exists('settings.php')) {
-    header("Location: install.php");
-    exit;
-}
+$user_levels = array(USER_SUPERUSER => 'superuser',
+		     USER_ADMIN => 'administrator',
+		     USER_MOD => 'moderator',
+		     USER_NORMAL => 'user');
 
 session_start();
 
@@ -464,17 +468,14 @@ function add_news($method)
 
 function user_level_select($selected=USER_MOD, $id='admin_add-user_level')
 {
-    $lvls = array(USER_SUPERUSER => 'superuser',
-		  USER_ADMIN => 'administrator',
-		  USER_MOD => 'moderator',
-		  USER_NORMAL => 'normal user');
+    global $user_levels;
 
     $str = '<select name="level" size="1" id="'.$id.'">';
 
-    foreach ($lvls as $key => $val) {
+    foreach ($user_levels as $key => $val) {
 	$str .= '<option value="'.$key.'"';
 	if ($key == $selected) $str .= ' selected';
-	$str .= '>'.$key.' - '.$val.'</option>';
+	$str .= '>'.$key.' - '.lang('user_level_'.$val).'</option>';
     }
 
     $str .= '</select>';

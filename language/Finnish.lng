@@ -1,5 +1,9 @@
 <?php
 $lang = array (
+'user_level_superuser' => 'superuser',
+'user_level_administrator' => 'järjestelmänvalvoja',
+'user_level_moderator' => 'moderaattori',
+'user_level_user' => 'normaali käyttäjä',
 'pagetitle_add' => 'Lisää lainaus',
 'pagetitle_bottom' => 'Huonoimmat',
 'pagetitle_browse' => 'Sella lainauksia',
