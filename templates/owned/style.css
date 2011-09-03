@@ -31,6 +31,15 @@ input:focus {
     box-shadow: 0px 0px 5px #e44c00;
 }
 
+select,
+input,
+textarea {
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+    font-size: 10px;
+}
+
 #site_all {
   margin: 1em 10% 1em 10%;
   background-color: white;
@@ -104,6 +113,8 @@ input:focus {
 }
 
 #logged_in_as {
+  position: absolute;
+  top: 1.5em;
   float: right;
   font-size: smaller;
   color: #a0a0a0;
