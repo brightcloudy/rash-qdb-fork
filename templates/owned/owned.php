@@ -4,6 +4,7 @@ class OwnedTemplate extends BaseTemplate {
 
 function printheader($title, $topleft='Owned', $topright='Quote Database')
 {
+    $this->set_menu_join_str(' / ');
 ob_start();
 // begin editing after this line ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

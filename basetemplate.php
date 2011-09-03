@@ -5,6 +5,8 @@ abstract class BaseTemplate {
     private $messages = array();
     private $mainmenu = array();
     private $adminmenu = array();
+    private $menu_join_str = ' | ';
+    private $menu_wrap_str = '<div id="site_nav_lower"><div id="site_nav_lower_linkbar">%s</div></div>';
 
     function __constructor()
     {
@@ -38,6 +40,9 @@ abstract class BaseTemplate {
 	}
     }
 
+    function set_menu_join_str($str) { $this->menu_join_str = $str; }
+    function set_menu_wrap_str($str) { $this->menu_wrap_str = $str; }
+
     function get_menu($admin = 0)
     {
 	if ($admin) { $menudata = $this->adminmenu; } else { $menudata = $this->mainmenu; }
@@ -47,9 +52,9 @@ abstract class BaseTemplate {
 	    foreach ($menudata as $m) {
 		$arr[] = '<a href="'.$m['url'].'" id="'.$m['id'].'">'.lang($m['txt']).'</a>';
 	    }
-	    $str = join(' | ', $arr);
+	    $str = join($this->menu_join_str, $arr);
 	}
-	return '<div id="site_nav_lower"><div id="site_nav_lower_linkbar">'.$str.'</div></div>';
+	return sprintf($this->menu_wrap_str, $str);
     }
 
     function rss_feed_item($title, $desc, $link)
