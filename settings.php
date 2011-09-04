@@ -1,5 +1,5 @@
 <?php
-$CONFIG['template'] = './templates/nhqdb_template/nhqdb_template.php';
+$CONFIG['template'] = './templates/nhqdb/nhqdb.php';
 
 // Database
 $CONFIG['phptype'] = 'mysql';

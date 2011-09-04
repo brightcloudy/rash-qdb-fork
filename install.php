@@ -207,11 +207,11 @@ $captcha_uses = array('flag'=>'Flagging a quote',
 		      'add_quote' => 'Adding a quote',
 		      'register_user' => 'Registering a normal user');
 
-$templates = array('./templates/bash_template/bash_template.php' => 'bash.org lookalike',
-		   './templates/rash_template/rash_template.php' => 'Rash QMS',
+$templates = array('./templates/bash/bash.php' => 'bash.org lookalike',
+		   './templates/rash/rash.php' => 'Rash QMS',
 		   './templates/owned/owned.php' => 'i-rox.com owned lookalike',
-		   './templates/nhqdb_template/nhqdb_template.php' => 'nhqdb');
-$def_template = './templates/bash_template/bash_template.php';
+		   './templates/nhqdb/nhqdb.php' => 'nhqdb');
+$def_template = './templates/bash/bash.php';
 
 require 'basetemplate.php';
 

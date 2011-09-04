@@ -11,10 +11,10 @@ ob_start();
 <head>
  <title><?=$title?></title>
  <meta name="robots" content="noarchive,nofollow" />
- <link rel="icon" type="image/png" href="./templates/nhqdb_template/favicon.png">
+ <link rel="icon" type="image/png" href="./templates/nhqdb/favicon.png">
  <link rel="alternate" type="application/rss+xml" href="?rss" title="RSS">
  <style type="text/css" media="all">
-  @import "./templates/nhqdb_template/style.css";
+  @import "./templates/nhqdb/style.css";
  </style>
 <script type="text/javascript">
 
@@ -30,7 +30,7 @@ ob_start();
 
 
 </script>
-<script src="./templates/nhqdb_template/util.js" type="text/javascript"></script>
+<script src="./templates/nhqdb/util.js" type="text/javascript"></script>
 </head>
 <body>
  <div id="site_all">

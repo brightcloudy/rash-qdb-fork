@@ -886,7 +886,7 @@ $page = explode($CONFIG['GET_SEPARATOR'], $_SERVER['QUERY_STRING']);
 
 
 if(!($page[0] == 'rss'))
-    $TEMPLATE->printheader(title($page[0]), $CONFIG['site_short_title'], $CONFIG['site_long_title']); // templates/x_template/x_template.php
+    $TEMPLATE->printheader(title($page[0]), $CONFIG['site_short_title'], $CONFIG['site_long_title']);
 
 $page[1] = (isset($page[1]) ? $page[1] : null);
 $page[2] = (isset($page[2]) ? $page[2] : null);
@@ -1057,6 +1057,6 @@ switch($page[0])
 
 }
 if(!($page[0] == 'rss'))
-    $TEMPLATE->printfooter(get_db_stats());	// templates/x_template/x_template.php
+    $TEMPLATE->printfooter(get_db_stats());
 
 $db->disconnect();

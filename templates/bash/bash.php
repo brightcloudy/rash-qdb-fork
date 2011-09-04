@@ -13,7 +13,7 @@ ob_start();
  <meta name="robots" content="noarchive,nofollow" />
  <link rel="alternate" type="application/rss+xml" href="?rss" title="RSS">
  <style type="text/css" media="all">
-  @import "./templates/bash_template/style.css";
+  @import "./templates/bash/style.css";
  </style>
 </head>
 <body>

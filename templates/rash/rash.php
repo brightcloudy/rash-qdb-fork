@@ -16,7 +16,7 @@ ob_start();
  <link rel="alternate" type="text/xml" title="RSS" href="?rss" />
  <meta name="robots" content="noarchive,nofollow" />
  <style type="text/css" media="all">
-  @import "./templates/rash_template/style.css";
+  @import "./templates/rash/style.css";
  </style>
 </head>
 <body>
