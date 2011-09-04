@@ -371,7 +371,7 @@ function quote_queue_page($innerhtml)
 
 function quote_iter($quoteid, $rating, $quotetxt, $canflag, $canvote, $date=null)
 {
-    $str = '<div class="quote_whole">
+    $str = '<div class="quote_whole" id="'.$quoteid.'">
     <div class="quote_separator">&nbsp;</div>
     <div class="quote_option-bar">
      <a href="?'.urlargs($quoteid).'" class="quote_number">#'.$quoteid.'</a>'

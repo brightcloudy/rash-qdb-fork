@@ -516,7 +516,7 @@ abstract class BaseTemplate {
 
     function quote_iter($quoteid, $rating, $quotetxt, $canflag, $canvote, $date=null)
     {
-	$str = '<div class="quote_whole">
+	$str = '<div class="quote_whole" id="'.$quoteid.'">
     <div class="quote_option-bar">
      <a href="?'.urlargs($quoteid).'" class="quote_number">#'.$quoteid.'</a>'
 	    .' '.$this->quote_upvote_button($quoteid, $canvote)
