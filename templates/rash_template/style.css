@@ -1,21 +1,52 @@
 /* ORGANIZE THE CSS SOMETIME YOU SHIT */
 
+#rash_head_container {
+    padding-bottom:140px;
+}
+#rash_head {
+    position:absolute;
+    top:10px;
+    left:75px;
+    height:100px;
+}
+#rash_rash {
+    font-size:100px;
+    font-family:Courier, monospace;
+    margin:0;
+    padding:0;
+    margin-bottom: -33px;
+    margin-top:-30px;
+}
+#rash_qms {
+    font-family:Courier, monospace;
+    background-color:red;
+    color:white;
+    font-size:60px;
+    margin:0;
+    padding:0;
+    margin-bottom:-40px;
+    text-align:right;
+    white-space: nowrap;
+}
+
+.hilight_news_entry {
+  background-color:#fff0f0;
+}
+
 div.quote_quote{
 	padding-bottom: 5pt;	
 }
 div.quote_whole{
 	padding-top: 10pt;
 }
-div#home_greeting{
+#home_greeting{
 	float:left;
-	width:67%;
-	width: 45%;
-	margin-right:15px;
-	position: relative;
-	z-index: 1;
+	width:49%;
+	padding-right:15px;
 }
-div#home_news_whole{
-	float: left;
+#home_all > #news{
+	float: right;
+	width: 49%;
 }
 div#site_admin_nav{
 	position: relative;
@@ -36,7 +67,7 @@ div#site_image{
 a, a:visited, a:hover, a:visited:hover{
 	color: #FF0000;
 }
-div.home_news_date{
+.news_date{
 	font-weight: bold;
 }
 div#site_all{

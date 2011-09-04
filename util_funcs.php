@@ -8,6 +8,16 @@ function mangle_quote_text($txt)
     return $txt;
 }
 
+function get_number_limit($param, $min, $max)
+{
+    if (isset($param) && preg_match('/^[0-9]+$/', $param)) {
+	$limit = (int)$param;
+	if ($limit < $min) $limit = $min;
+	else if ($limit > $max) $limit = $max;
+    } else $limit = $max;
+    return $limit;
+}
+
 function db_tablename($name)
 {
     include 'settings.php';
@@ -22,14 +32,100 @@ function urlargs($ar1, $ar2 = null, $ar3 = null)
     return implode($CONFIG['GET_SEPARATOR_HTML'], array($ar1, $ar2, $ar3));
 }
 
+function autologin()
+{
+    if (isset($_COOKIE['user']) && isset($_COOKIE['passwd']) && isset($_COOKIE['userid'])) {
+	global $db;
+	$pass = $_COOKIE['passwd'];
+	$user = $_COOKIE['user'];
+	$userid = $_COOKIE['userid'];
+
+	$res =& $db->query("SELECT * FROM ".db_tablename('users')." WHERE id=".$db->quote((int)$userid)." AND user=".$db->quote($user));
+	if (DB::isError($res)) return;
+	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	if (!isset($row['password'])) return;
+	$passchk = md5($row['password'].$row['salt']);
+	if ($pass == $passchk) {
+	    $_SESSION['user'] = $row['user'];
+	    $_SESSION['level'] = $row['level'];
+	    $_SESSION['userid'] = $row['id'];
+	    $_SESSION['logged_in'] = 1;
+	    mk_cookie('user', $row['user']);
+	    mk_cookie('userid', $row['id']);
+	    mk_cookie('passwd', $passchk);
+	}
+    }
+}
+
+/* $row = array with keys 'user', 'id', 'level', 'password', 'salt' */
+function set_user_logged($row)
+{
+    $_SESSION['user'] = $row['user'];		// site-wide accessible username
+    $_SESSION['level'] = $row['level'];		// site-wide accessible level
+    $_SESSION['userid'] = $row['id'];
+    $_SESSION['logged_in'] = 1;				// site-wide accessible login variable
+
+    if (isset($_POST['remember_login'])) {
+	mk_cookie('user', $row['user']);
+	mk_cookie('userid', $row['id']);
+	mk_cookie('passwd', md5($row['password'].$row['salt']));
+    }
+
+    header("Location: http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']));
+}
+
+function set_user_logout()
+{
+    session_unset($_SESSION['user']);
+    session_unset($_SESSION['logged_in']);
+    session_unset($_SESSION['level']);
+    session_unset($_SESSION['userid']);
+    mk_cookie('user');
+    mk_cookie('userid');
+    mk_cookie('passwd');
+    header('Location: http://' . $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']));
+}
+
+function set_voteip($salt)
+{
+    if (isset($_SESSION['voteip'])) {
+	if (!isset($_COOKIE['voteip'])) {
+	    $addr = $_SESSION['voteip'];
+	    mk_cookie('voteip', $addr . '-' . md5($addr . $salt));
+	    $_SESSION['voteip'] = $addr;
+	}
+    } else {
+	if (isset($_COOKIE['voteip'])) {
+	    $arr = explode('-', $_COOKIE['voteip'], 2);
+	    $addr = $arr[0];
+	    $hash = $arr[1];
+	    if (preg_match("/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/", $addr)) {
+		if (md5($addr . $salt) != $hash)
+		    $addr = getenv("REMOTE_ADDR");
+		mk_cookie('voteip', $addr . '-' . md5($addr . $salt));
+		$_SESSION['voteip'] = $addr;
+	    } else {
+		/* illegal ip in cookie */
+		$addr = getenv("REMOTE_ADDR");
+		mk_cookie('voteip', $addr . '-' . md5($addr . $salt));
+		$_SESSION['voteip'] = $addr;
+	    }
+	} else {
+	    $addr = getenv("REMOTE_ADDR");
+	    mk_cookie('voteip', $addr . '-' . md5($addr . $salt));
+	    $_SESSION['voteip'] = $addr;
+	}
+    }
+}
 
 function write_settings($fname, $data)
 {
     $fp = fopen($fname,"w");
     $str = "<?php\n";
-    foreach ($data as $key=>$val) {
-	$str .= '$CONFIG[\''.$key.'\'] = '.$val.";\n";
-    }
+    if ($data)
+	foreach ($data as $key=>$val) {
+	    $str .= '$CONFIG[\''.$key.'\'] = '.$val.";\n";
+	}
     if (fwrite($fp, $str, strlen($str)) === FALSE) {
 	return FALSE;
     }
@@ -58,7 +154,7 @@ function mk_cookie($name, $data = null)
  * @param        int     $length  Length of the string you want generated
  * @param        string  $seeds   The seeds you want the string to be generated from
  */
-function str_rand($length = 8, $seeds = 'abcdefghijklmnopqrstuvwxyz0123456789')
+function str_rand($length = 8, $seeds = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')
 {
     $str = '';
     $seeds_count = strlen($seeds);
@@ -76,46 +172,27 @@ function str_rand($length = 8, $seeds = 'abcdefghijklmnopqrstuvwxyz0123456789')
     return $str;
 }
 
+function is_lang($str)
+{
+    global $lang;
+    if (isset($lang[$str])) return TRUE;
+    return FALSE;
+}
+
+function lang($str)
+{
+    global $lang;
+    if (isset($lang[$str])) return $lang[$str];
+    return $str;
+}
 
 function title($title)
 {
-    include 'settings.php';
-	switch($title)
-	{
-		case 'add':
-			return 'Add a Quote';
-			break;
-		case 'bottom':
-			return 'Bottom';
-			break;
-		case 'browse':
-			return 'Browse Quotes';
-			break;
-		case 'latest':
-			return 'Latest Quotes';
-			break;
-		case 'random':
-			return 'Random Quotes';
-			break;
-		case 'random2':
-			return 'Random>0 Quotes';
-			break;
-		case 'search':
-			return 'Search for Quotes';
-			break;
-		case 'top':
-			return 'Top Quotes';
-			break;
-		case true:
-		    if (preg_match('/^[0-9]+$/', $_SERVER['QUERY_STRING'])) {
-			return 'Quote #'.$title;
-		    } else {
-			return $CONFIG['site_long_title'];
-		    }
-		    break;
-	default:
-	    return $CONFIG['site_long_title'];
-	    break;
-	}
+    global $CONFIG, $lang;
+    $str = ($CONFIG['prefix_short_title'] ? $CONFIG['site_short_title'].': ' : '');
+    if (preg_match('/^[0-9]+$/', $title)) $str .= sprintf(lang('pagetitle_quotenum'), $title);
+    else if (is_lang('pagetitle_'.$title)) $str .= lang('pagetitle_'.$title);
+    else $str .= $CONFIG['site_long_title'];
+    return $str;
 }
 

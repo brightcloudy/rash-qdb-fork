@@ -3,11 +3,17 @@
 error_reporting(E_ALL);
 ini_set('display_errors','On');
 */
+require_once 'DB.php';
 include 'util_funcs.php';
 
-function db_query($sql) {
+$db = null;
+$hidelink = 0;
+
+function mk_datasource()
+{
+    global $db;
+    if ($db != null) return $db;
     include 'settings.php';
-    require_once 'DB.php';
     $dsn = array(
 		 'phptype'  => $CONFIG['phptype'],
 		 'username' => $CONFIG['username'],
@@ -19,9 +25,13 @@ function db_query($sql) {
 		 );
     $db =& DB::connect($dsn);
     if (DB::isError($db)) {
-	print $db->getMessage().'<br />';
-	return 1;
+	die($db->getMessage().'<br />');
     }
+    return $db;
+}
+
+function db_query($sql) {
+    global $db;
     $res =& $db->query($sql);
     if (DB::isError($res)) {
 	print $res->getMessage().'<br />';
@@ -34,22 +44,7 @@ function db_query($sql) {
 
 function update_rash_quotes()
 {
-    include 'settings.php';
-    require_once 'DB.php';
-    $dsn = array(
-		 'phptype'  => $CONFIG['phptype'],
-		 'username' => $CONFIG['username'],
-		 'password' => $CONFIG['password'],
-		 'hostspec' => $CONFIG['hostspec'],
-		 'port'     => $CONFIG['port'],
-		 'socket'   => $CONFIG['socket'],
-		 'database' => $CONFIG['database'],
-		 );
-    $db =& DB::connect($dsn);
-    if (DB::isError($db)) {
-	print $db->getMessage().'<br />';
-	return 1;
-    }
+    global $db;
 
     $res =& $db->query("SELECT * from ".db_tablename('quotes').' LIMIT 1');
     if (!(DB::isError($res))) {
@@ -94,22 +89,7 @@ function update_rash_quotes()
 
 function update_old_users()
 {
-    include 'settings.php';
-    require_once 'DB.php';
-    $dsn = array(
-		 'phptype'  => $CONFIG['phptype'],
-		 'username' => $CONFIG['username'],
-		 'password' => $CONFIG['password'],
-		 'hostspec' => $CONFIG['hostspec'],
-		 'port'     => $CONFIG['port'],
-		 'socket'   => $CONFIG['socket'],
-		 'database' => $CONFIG['database'],
-		 );
-    $db =& DB::connect($dsn);
-    if (DB::isError($db)) {
-	print $db->getMessage().'<br />';
-	return 1;
-    }
+    global $db;
 
     $users = array();
 
@@ -156,22 +136,7 @@ function update_old_users()
 
 function update_old_tracking()
 {
-    include 'settings.php';
-    require_once 'DB.php';
-    $dsn = array(
-		 'phptype'  => $CONFIG['phptype'],
-		 'username' => $CONFIG['username'],
-		 'password' => $CONFIG['password'],
-		 'hostspec' => $CONFIG['hostspec'],
-		 'port'     => $CONFIG['port'],
-		 'socket'   => $CONFIG['socket'],
-		 'database' => $CONFIG['database'],
-		 );
-    $db =& DB::connect($dsn);
-    if (DB::isError($db)) {
-	print $db->getMessage().'<br />';
-	return 1;
-    }
+    global $db;
 
     $tracking = array();
 
@@ -235,12 +200,16 @@ $languages = array('US-english','Finnish');
 
 $captchas = array(array('name'=>'nocaptcha', 'desc'=>'No CAPTCHA'),
 		  array('name'=>'42captcha', 'desc'=>'The Ultimate Question CAPTCHA'),
+		  array('name'=>'mathcaptcha', 'desc'=>'Math CAPTCHA'),
 		  array('name'=>'nhcaptcha', 'desc'=>'NetHack CAPTCHA'));
 
 $captcha_uses = array('flag'=>'Flagging a quote',
-		      'add_quote' => 'Adding a quote');
+		      'add_quote' => 'Adding a quote',
+		      'register_user' => 'Registering a normal user');
 
 $templates = array('./templates/bash_template/bash_template.php' => 'bash.org lookalike',
+		   './templates/rash_template/rash_template.php' => 'Rash QMS',
+		   './templates/owned/owned.php' => 'i-rox.com owned lookalike',
 		   './templates/nhqdb_template/nhqdb_template.php' => 'nhqdb');
 $def_template = './templates/bash_template/bash_template.php';
 
@@ -276,10 +245,12 @@ If (isset($_POST['submit'])) {
 		  'db_table_prefix' => "'".$_POST['db_table_prefix']."'",
 		  'site_short_title' => "'".$_POST['site_short_title']."'",
 		  'site_long_title' => "'".$_POST['site_long_title']."'",
+		  'prefix_short_title' => (($_POST['prefix_short_title'] == 'on') ? 1 : 0),
 		  'rss_url' => "'".preg_replace('/\/$/','',$_POST['rss_url'])."'",
 		  'rss_title' => "'".$_POST['rss_title']."'",
 		  'rss_desc' => "'".$_POST['rss_desc']."'",
 		  'rss_entries' => (!isset($_POST['rss_entries']) || ($_POST['rss_entries'] < 1)) ? 15 : $_POST['rss_entries'],
+		  'secret_salt' => "'".$_POST['secret_salt']."'",
 		  'language' => "'".$_POST['language']."'",
 		  'captcha' => "'".$_POST['captcha']."'",
 		  'use_captcha' => "array(".(isset($_POST['use_captcha']) ? ("'".implode("'=>1, '", $_POST['use_captcha'])."'=>1"): '').")",
@@ -287,8 +258,11 @@ If (isset($_POST['submit'])) {
 		  'quote_limit' => $_POST['quote_limit'],
 		  'page_limit' => $_POST['page_limit'],
 		  'quote_list_limit' => $_POST['quote_list_limit'],
-		  'moderated_quotes' => (($_POST['moderated_quotes'] == 'on') ? 1 : 0),
+		  'min_quote_length' => $_POST['min_quote_length'],
+		  'moderated_quotes' => ((isset($_POST['moderated_quotes']) && ($_POST['moderated_quotes'] == 'on')) ? 1 : 0),
+		  'login_required' => ((isset($_POST['login_required']) && ($_POST['login_required'] == 'on')) ? 1 : 0),
 		  'auto_flagged_quotes' => (($_POST['auto_flagged_quotes'] == 'on') ? 0 : 1),
+		  'public_queue' => ((isset($_POST['public_queue']) && ($_POST['public_queue'] == 'on')) ? 0 : 1),
 		  'timezone' => "'".$_POST['timezone']."'",
 		  'news_time_format' => "'".$_POST['news_time_format']."'",
 		  'quote_time_format' => "'".$_POST['quote_time_format']."'",
@@ -318,6 +292,8 @@ If (isset($_POST['submit'])) {
 	$str = "INSERT INTO ".db_tablename('users')." (user, password, level, salt) VALUES('$username', '".crypt($password, "\$1\$".substr($salt, 0, 8)."\$")."', '$level', '\$1\$".$salt."\$');";
 	return db_query($str);
     }
+
+    $db = mk_datasource();
 
     $error = mk_db_table(db_tablename('quotes'), "id int(11) NOT NULL auto_increment primary key,
 							quote text NOT NULL,
@@ -357,13 +333,15 @@ else {
 	    return 'http://'.$_SERVER['SERVER_NAME'] . preg_replace('/\/install.php$/', '', $_SERVER['REQUEST_URI']);
 	}
 
+	$hidelink = 1;
+
 ?>
 <h2>Install</h2>
 <form action="./install.php" method="post">
 <table>
  <tr>
   <td>Template</td>
-  <td><select name="template"><? foreach ($templates as $k=>$v) { echo '<option value="'.$k.'">'.$v; } ?></select>
+  <td><select name="template"><?php foreach ($templates as $k=>$v) { echo '<option value="'.$k.'">'.$v; } ?></select>
  </tr>
  <tr>
 	<td>&nbsp;</td><td>&nbsp;</td>
@@ -389,9 +367,6 @@ else {
   <td><input type="password" name="password" value="password">
  </tr>
  <tr>
-	<td>&nbsp;</td><td>&nbsp;</td>
- </tr>
- <tr>
   <td>DB table prefix
   <td><input type="text" name="db_table_prefix" value="rash">
  </tr>
@@ -408,14 +383,21 @@ else {
  </tr>
  <tr>
   <td>Admin EMail
-  <td><input type="text" name="admin_email" value="qdb@<?php echo $_SERVER['SERVER_NAME']; ?>">
+  <td><input type="text" name="admin_email" value="qdb@<?=$_SERVER['SERVER_NAME'];?>">
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
+  <td>Secret Salt
+  <td><input type="text" name="secret_salt" value="<?=str_rand();?>"> (Used to encrypt some things)
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
  </tr>
  <tr>
   <td>Site Language
-  <td><select name="language"><? foreach($languages as $l) { echo '<option value="'.$l.'">'.$l; } ?></select>
+  <td><select name="language"><?php foreach($languages as $l) { echo '<option value="'.$l.'">'.$l; } ?></select>
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
@@ -423,6 +405,10 @@ else {
  <tr>
   <td>Site Short Title
   <td><input type="text" name="site_short_title" value="QMS">
+ </tr>
+ <tr>
+  <td>Prefix Title
+  <td><input type="checkbox" name="prefix_short_title" checked> (Prefix "<em>Site Short Title</em>: " to page titles?)
  </tr>
  <tr>
   <td>Site Long Title
@@ -433,7 +419,7 @@ else {
  </tr>
  <tr>
   <td>RSS URL
-  <td><input type="text" name="rss_url" value="<?php echo mk_rss_url(); ?>" size="40">
+  <td><input type="text" name="rss_url" value="<?=mk_rss_url();?>" size="40">
  </tr>
  <tr>
   <td>RSS Title
@@ -463,23 +449,35 @@ else {
   <td><input type="text" name="quote_list_limit" value="50" size="4"> (how many quotes are shown in non-browse pages, eg. ?top)
  </tr>
  <tr>
+  <td>Min Quote Length
+  <td><input type="text" name="min_quote_length" value="15" size="4"> (Minimum acceptable quote length, in characters)
+ </tr>
+ <tr>
+  <td>&nbsp;</td><td>&nbsp;</td>
+ </tr>
+ <tr>
   <td>Moderated
   <td><input type="checkbox" name="moderated_quotes" checked> Do quotes need to be accepted by a moderator?
+ </tr>
+ <tr>
+  <td>Public Queue
+  <td><input type="checkbox" name="public_queue" checked> Can users view and vote quotes in the moderation queue?
  </tr>
  <tr>
   <td>Quote flagging
   <td><input type="checkbox" name="auto_flagged_quotes" checked> Can users flag quotes for admin attention?
  </tr>
  <tr>
-  <td>&nbsp;</td><td>&nbsp;</td>
- </tr>
- <tr>
   <td>CAPTCHA
-  <td><select name="captcha"><? foreach($captchas as $c) { echo '<option value="'.$c['name'].'">'.$c['desc']; } ?></select>
+  <td><select name="captcha"><?php foreach($captchas as $c) { echo '<option value="'.$c['name'].'">'.$c['desc']; } ?></select>
  </tr>
  <tr>
   <td>Use CAPTCHA For
-  <td><? foreach ($captcha_uses as $k=>$v) { echo '<input type="checkbox" name="use_captcha[]" value="'.$k.'" checked>'.$v.'<br>'; } ?>
+  <td><?php foreach ($captcha_uses as $k=>$v) { echo '<input type="checkbox" name="use_captcha[]" value="'.$k.'" checked>'.$v.'<br>'; } ?>
+ </tr>
+ <tr>
+  <td>User Login required
+  <td><input type="checkbox" name="login_required"> Do users need to register and login before voting/adding/flagging?
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
@@ -490,11 +488,11 @@ else {
  </tr>
  <tr>
   <td>News time format
-				 <td><input type="text" name="news_time_format" value="Y-m-d"> (example: <? print date("Y-m-d"); ?>, See <a href="http://php.net/manual/en/function.date.php">list of date format characters</a>)
+				 <td><input type="text" name="news_time_format" value="Y-m-d"> (example: <em><?=date("Y-m-d");?></em>, See <a href="http://php.net/manual/en/function.date.php">list of date format characters</a>)
  </tr>
  <tr>
   <td>Quote time format
-  <td><input type="text" name="quote_time_format" value="F j, Y"> (example: <? print date("F j, Y"); ?>)
+  <td><input type="text" name="quote_time_format" value="F j, Y"> (example: <em><?=date("F j, Y");?></em>)
  </tr>
  <tr>
   <td>&nbsp;</td><td>&nbsp;</td>
@@ -510,5 +508,6 @@ else {
 	print "<p>settings.php already exists.";
     }
 }
-print '<p><a href="./">QDB main page</a></p>';
+if (!$hidelink)
+    print '<p><a href="./">QDB main page</a></p>';
 $TEMPLATE->printfooter();
