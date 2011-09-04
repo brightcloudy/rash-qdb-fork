@@ -896,7 +896,7 @@ if (preg_match('/=/', $page[0])) {
     $tmppage = split("=", $page[0], 2);
     $page[0] = trim($tmppage[0]);
     $pageparam = trim($tmppage[1]);
-}
+} else $pageparam = null;
 
 $limit = get_number_limit($pageparam, 1, $CONFIG['quote_list_limit']);
 
