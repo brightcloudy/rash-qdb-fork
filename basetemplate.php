@@ -518,7 +518,7 @@ abstract class BaseTemplate {
     {
 	$str = '<div class="quote_whole">
     <div class="quote_option-bar">
-     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>'
+     <a href="?'.urlargs($quoteid).'" class="quote_number">#'.$quoteid.'</a>'
 	    .' '.$this->quote_upvote_button($quoteid, $canvote)
 	    .' '.'<span class="quote_rating">('.$rating.')</span>'
 	    .' '.$this->quote_downvote_button($quoteid, $canvote)

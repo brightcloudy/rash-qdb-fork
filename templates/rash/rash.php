@@ -30,7 +30,7 @@ ob_start();
 <?php
        print $this->get_menu();
 if(!isset($_SESSION['logged_in'])){
-    print '<a href="?admin" id="site_nav_admin">'.lang('menu_admin').'</a>';
+    print '<a href="?'.urlargs('admin').'" id="site_nav_admin">'.lang('menu_admin').'</a>';
 } else {
     print sprintf(lang('logged_in_as'), htmlspecialchars($_SESSION['user']));
 }

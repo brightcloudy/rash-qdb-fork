@@ -27,7 +27,7 @@ ob_start();
 <?php
 
   if(!isset($_SESSION['logged_in'])){
-      print '<a href="?admin" id="site_nav_admin">'.lang('menu_admin').'</a>';
+      print '<a href="?'.urlargs('admin').'" id="site_nav_admin">'.lang('menu_admin').'</a>';
   } else {
       print '<span id="logged_in_as">'.sprintf(lang('logged_in_as'), htmlspecialchars($_SESSION['user'])).'</span>';
   }

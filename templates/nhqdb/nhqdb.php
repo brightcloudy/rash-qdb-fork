@@ -43,7 +43,7 @@ ob_start();
 <?php
 
   if(!isset($_SESSION['logged_in'])){
-      print '<a href="?admin" id="site_nav_admin">'.lang('menu_admin').'</a>';
+      print '<a href="?'.urlargs('admin').'" id="site_nav_admin">'.lang('menu_admin').'</a>';
   } else {
       print sprintf(lang('logged_in_as'), htmlspecialchars($_SESSION['user']));
   }
@@ -374,7 +374,7 @@ function quote_iter($quoteid, $rating, $quotetxt, $canflag, $canvote, $date=null
     $str = '<div class="quote_whole">
     <div class="quote_separator">&nbsp;</div>
     <div class="quote_option-bar">
-     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>'
+     <a href="?'.urlargs($quoteid).'" class="quote_number">#'.$quoteid.'</a>'
 	.' '.$this->quote_upvote_button($quoteid, $canvote)
 	.' '.'<span class="quote_rating">('.$rating.')</span>'
 	.' '.$this->quote_downvote_button($quoteid, $canvote)
