@@ -16,7 +16,7 @@ ob_start();
  <link rel="alternate" type="text/xml" title="RSS" href="?rss" />
  <meta name="robots" content="noarchive,nofollow" />
  <style type="text/css" media="all">
-  @import "./templates/rash_template/style.css";
+  @import "./templates/rash/style.css";
  </style>
 </head>
 <body>
@@ -30,7 +30,7 @@ ob_start();
 <?php
        print $this->get_menu();
 if(!isset($_SESSION['logged_in'])){
-    print '<a href="?admin" id="site_nav_admin">'.lang('menu_admin').'</a>';
+    print '<a href="?'.urlargs('admin').'" id="site_nav_admin">'.lang('menu_admin').'</a>';
 } else {
     print sprintf(lang('logged_in_as'), htmlspecialchars($_SESSION['user']));
 }

@@ -11,26 +11,12 @@ ob_start();
 <head>
  <title><?=$title?></title>
  <meta name="robots" content="noarchive,nofollow" />
- <link rel="icon" type="image/png" href="./templates/nhqdb_template/favicon.png">
+ <link rel="icon" type="image/png" href="./templates/nhqdb/favicon.png">
  <link rel="alternate" type="application/rss+xml" href="?rss" title="RSS">
  <style type="text/css" media="all">
-  @import "./templates/nhqdb_template/style.css";
+  @import "./templates/nhqdb/style.css";
  </style>
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-24280817-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-
-</script>
-<script src="./templates/nhqdb_template/util.js" type="text/javascript"></script>
+<script src="./templates/nhqdb/util.js" type="text/javascript"></script>
 </head>
 <body>
  <div id="site_all">
@@ -43,7 +29,7 @@ ob_start();
 <?php
 
   if(!isset($_SESSION['logged_in'])){
-      print '<a href="?admin" id="site_nav_admin">'.lang('menu_admin').'</a>';
+      print '<a href="?'.urlargs('admin').'" id="site_nav_admin">'.lang('menu_admin').'</a>';
   } else {
       print sprintf(lang('logged_in_as'), htmlspecialchars($_SESSION['user']));
   }
@@ -371,10 +357,10 @@ function quote_queue_page($innerhtml)
 
 function quote_iter($quoteid, $rating, $quotetxt, $canflag, $canvote, $date=null)
 {
-    $str = '<div class="quote_whole">
+    $str = '<div class="quote_whole" id="'.$quoteid.'">
     <div class="quote_separator">&nbsp;</div>
     <div class="quote_option-bar">
-     <a href="?'.$quoteid.'" class="quote_number">#'.$quoteid.'</a>'
+     <a href="?'.urlargs($quoteid).'" class="quote_number">#'.$quoteid.'</a>'
 	.' '.$this->quote_upvote_button($quoteid, $canvote)
 	.' '.'<span class="quote_rating">('.$rating.')</span>'
 	.' '.$this->quote_downvote_button($quoteid, $canvote)
